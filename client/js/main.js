@@ -21,7 +21,7 @@ let generateData = function(data, httpMethod = 'POST') {
     return obj;
 };
 
-let drawPoint = function(tap) {
+let drawShot = function(tap) {
     let shot = document.createElement('div');
     let imageWrapper = document.getElementById('image-wrapper');
     shot.className = 'shot';
@@ -30,18 +30,18 @@ let drawPoint = function(tap) {
     imageWrapper.insertBefore(shot, targetImage);
 };
 
-let removePoints = function() {
-    let points = document.querySelectorAll('.point');
-    Array.prototype.forEach.call(points, function(point) {
-        point.remove();
+let removeShots = function() {
+    let shots = document.querySelectorAll('.shot');
+    Array.prototype.forEach.call(shots, function(shot) {
+        shot.remove();
     });
 };
 
-let displayPoints = function(response) {
+let displayShots = function(response) {
     return response.json().then((objects) => {
         for (let studentResult of objects)
-            for (let point of studentResult)
-                drawPoint(point);
+            for (let shot of studentResult)
+                drawShot(shot);
     });
 };
 
@@ -51,7 +51,7 @@ targetImage.addEventListener('click', function(event) {
         y: event.offsetY
     };
     tapsCoordinates.push(tap);
-    drawPoint(tap);
+    drawShot(tap);
     tapCounter++;
     if (tapCounter === 4)
         sendDataButton.className = '';
@@ -60,17 +60,17 @@ targetImage.addEventListener('click', function(event) {
 clearTargetButton.addEventListener('click', function() {
     tapCounter = 0;
     tapsCoordinates = [];
-    removePoints();
+    removeShots();
     sendDataButton.className = 'hidden';
 });
 
 sendDataButton.addEventListener('click', function() {
-    removePoints();
+    removeShots();
     const init = generateData(tapsCoordinates);
-    fetch('/points', init);
+    fetch('/shots', init);
     const getData = generateData(null, 'GET');
-    fetch('/points', getData)
-        .then((response) => displayPoints(response))
+    fetch('/shots', getData)
+        .then((response) => displayShots(response))
         .catch((error) => console.log(error));
     sendDataButton.innerHTML = 'Обновить';
 });

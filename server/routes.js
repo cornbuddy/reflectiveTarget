@@ -18,7 +18,7 @@ exports.renderMainPage = (_, res) => {
     res.end(index);
 };
 
-exports.clearPoints = (_, res) => {
+exports.clearShots = (_, res) => {
     reflectionResults = [];
     const header = {
         'Content-Type': 'text/html',
