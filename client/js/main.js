@@ -3,7 +3,6 @@
 const MAX_TAPS = 4;
 
 const targetImage = document.querySelector('img');
-const clearTargetButton = document.getElementById('clear');
 const sendDataButton = document.getElementById('send');
 
 let tapCounter = 0;
@@ -64,13 +63,6 @@ targetImage.addEventListener('click', function(event) {
     if (tapCounter === MAX_TAPS) {
         sendDataButton.className = '';
     }
-});
-
-clearTargetButton.addEventListener('click', function() {
-    tapCounter = 0;
-    tapsCoordinates = [];
-    removeShots();
-    sendDataButton.className = 'hidden';
 });
 
 sendDataButton.addEventListener('click', function() {

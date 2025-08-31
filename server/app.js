@@ -8,7 +8,6 @@ const sendResult = require('./routes').sendResult;
 const show404Page = require('./routes').show404Page;
 const show500Page = require('./routes').show500Page;
 const serveFile = require('./routes').serveFile;
-const clearShots = require('./routes').clearShots;
 
 
 let isStatic = (url) => {
@@ -28,8 +27,6 @@ http.createServer((request, response) => {
         renderMainPage(request, response);
     else if (method === 'GET' && url === '/shots')
         sendResult(response);
-    else if (method === 'GET' && url === '/clear-shots')
-        clearShots(request, response);
     // post methods
     else if (method === 'POST' && url === '/shots')
         getDataFromClient(request, response);
