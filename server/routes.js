@@ -9,7 +9,7 @@ const stat = require('fs').stat;
 const index = fs.readFileSync('../client/index.html');
 let reflectionResults = [];
 
-exports.renderMainPage = (req, res) => {
+exports.renderMainPage = (_, res) => {
     const header = {
         'Content-Type': 'text/html',
         'Content-Length': Buffer.byteLength(index)
@@ -18,7 +18,7 @@ exports.renderMainPage = (req, res) => {
     res.end(index);
 };
 
-exports.clearPoints = (req, res) => {
+exports.clearPoints = (_, res) => {
     reflectionResults = [];
     const header = {
         'Content-Type': 'text/html',
@@ -73,21 +73,21 @@ exports.show500Page = (error, res) => {
     res.end('500');
 };
 
-exports.serveFile = (request, response) => {
-    const parsedUrl = parse(request.url);
+exports.serveFile = (req, resp) => {
+    const parsedUrl = parse(req.url);
     const root = __dirname;
-    let path = join(root, '..', 'client', parsedUrl.pathname);
+    const path = join(root, '..', 'client', parsedUrl.pathname);
     stat(path, (err, stat) => {
         if (err) {
             if (err.code === 'ENOENT')
-                exports.show404Page(err, request, response);
+                exports.show404Page(err, req, resp);
             else
-                exports.show500Page(request, response);
+                exports.show500Page(req, resp);
         } else {
-            response.setHeader('Content-Length', stat.size);
+            resp.setHeader('Content-Length', stat.size);
             let stream = createReadStream(path);
-            stream.pipe(response);
-            stream.on('error', (error) => exports.show500Page(response, error));
+            stream.pipe(resp);
+            stream.on('error', (error) => exports.show500Page(resp, error));
         }
     });
 };
