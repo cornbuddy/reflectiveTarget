@@ -4,4 +4,4 @@ pip:
 
 .PHONY: test
 test: pip
-	@python3 -m unittest discover -s ./
+	@python3 -m pytest
