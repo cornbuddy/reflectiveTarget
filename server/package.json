@@ -1,0 +1,20 @@
+{
+    "name": "reflective-target",
+    "version": "0.0.0",
+    "description": "simple web applicaion than implements reflective target",
+    "main": "app.js",
+    "scripts": {
+        "test": "mocha",
+        "start": "node app.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/cornBuddy/reflectiveTarget.git"
+    },
+    "author": "cornBuddy",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/cornBuddy/reflectiveTarget/issues"
+    },
+    "homepage": "https://github.com/cornBuddy/reflectiveTarget#readme"
+}
