@@ -1,18 +1,35 @@
 from os import environ
+from time import sleep
+from random import randint
 
 import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
+ALLOWED_SHOTS = 4
 URL = f"http://localhost:{environ['PORT']}"
 
 
 @pytest.fixture
 def driver():
-    return webdriver.Chrome()
+    _driver = webdriver.Chrome()
+    _driver.get(URL)
+    yield _driver
+
+    _driver.quit()
 
 
-def test_can_click_exactly_4_times_before_submitting(driver):
-    driver.get(URL)
-    img = driver.find_element(by=By.TAG_NAME, value="img")
-    assert img is not None
+def test_should_handle_mutliple_shots(driver):
+    target = driver.find_element(By.TAG_NAME, "img")
+    for _ in range(ALLOWED_SHOTS):
+        target.click()
+    shots = driver.find_elements(By.CSS_SELECTOR, "div.shot")
+    assert len(shots) == ALLOWED_SHOTS
+
+
+def test_should_ignore_excessive_shots(driver):
+    target = driver.find_element(By.TAG_NAME, "img")
+    for _ in range(ALLOWED_SHOTS + randint(1, 10)):
+        target.click()
+    shots = driver.find_elements(By.CSS_SELECTOR, "div.shot")
+    assert len(shots) == ALLOWED_SHOTS
