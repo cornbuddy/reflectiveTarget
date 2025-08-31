@@ -22,12 +22,12 @@ let generateData = function(data, httpMethod = 'POST') {
 };
 
 let drawPoint = function(tap) {
-    let point = document.createElement('div');
+    let shot = document.createElement('div');
     let imageWrapper = document.getElementById('image-wrapper');
-    point.className = 'shot';
-    point.style.marginTop = `${tap.y}px`;
-    point.style.marginLeft = `${tap.x}px`;
-    imageWrapper.insertBefore(point, targetImage);
+    shot.className = 'shot';
+    shot.style.marginTop = `${tap.y}px`;
+    shot.style.marginLeft = `${tap.x}px`;
+    imageWrapper.insertBefore(shot, targetImage);
 };
 
 let removePoints = function() {
