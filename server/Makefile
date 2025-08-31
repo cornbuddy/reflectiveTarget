@@ -1,3 +1,3 @@
 .PHONY: run
 run:
-	npm start
+	@npm start
