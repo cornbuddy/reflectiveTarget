@@ -31,7 +31,6 @@ def test_should_handle_mutliple_shots(driver):
     assert len(shots) == ALLOWED_SHOTS
 
 
-@pytest.mark.skip(reason="not implemeted yet")
 def test_should_ignore_excessive_shots(driver):
     target = driver.find_element(By.TAG_NAME, "img")
     for _ in range(ALLOWED_SHOTS + randint(1, 10)):

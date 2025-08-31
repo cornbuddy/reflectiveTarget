@@ -1,11 +1,13 @@
 'use strict';
 
-let tapCounter = 0;
-let tapsCoordinates = [];
+const MAX_TAPS = 4;
 
 const targetImage = document.querySelector('img');
 const clearTargetButton = document.getElementById('clear');
 const sendDataButton = document.getElementById('send');
+
+let tapCounter = 0;
+let tapsCoordinates = [];
 
 let generateData = function(data, httpMethod = 'POST') {
     const headers = {
@@ -39,22 +41,29 @@ let removeShots = function() {
 
 let displayShots = function(response) {
     return response.json().then((objects) => {
-        for (let studentResult of objects)
-            for (let shot of studentResult)
+        for (let studentResult of objects) {
+            for (let shot of studentResult) {
                 drawShot(shot);
+            }
+        }
     });
 };
 
 targetImage.addEventListener('click', function(event) {
+    if (tapCounter >= MAX_TAPS) {
+        return;
+    }
+
     const tap = {
         x: event.offsetX,
-        y: event.offsetY
+        y: event.offsetY,
     };
     tapsCoordinates.push(tap);
     drawShot(tap);
     tapCounter++;
-    if (tapCounter === 4)
+    if (tapCounter === MAX_TAPS) {
         sendDataButton.className = '';
+    }
 });
 
 clearTargetButton.addEventListener('click', function() {
