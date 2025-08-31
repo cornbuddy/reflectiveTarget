@@ -43,11 +43,6 @@ input {
     font-size: 20px;
 }
 
-#blitz-wrapper {
-    margin-top: 20px;
-    width: 530px;
-}
-
 #target-wrapper {
     width: 530px;
     height: 800px;
@@ -59,15 +54,6 @@ input {
 
 #send {
     background-color: #43ac6a;
-}
-
-#send-blitz {
-    width: 100%;
-    background-color: #43ac6a;
-}
-
-.hidden {
-    display: none !important;
 }
 
 .centered {

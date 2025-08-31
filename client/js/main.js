@@ -74,32 +74,3 @@ sendDataButton.addEventListener('click', function() {
         .catch((error) => console.log(error));
     sendDataButton.innerHTML = 'Обновить';
 });
-
-
-let showTarget = function() {
-    const blitzWrapper = document.getElementById('blitz-wrapper');
-    blitzWrapper.className = 'hidden';
-    const targetWrapper = document.getElementById('target-wrapper');
-    targetWrapper.className = 'centered';
-};
-
-let getBlitzResult = function() {
-    return {
-        'lastName': document.getElementById('last-name').value,
-        'group': document.getElementById('group').value,
-        'first': document.getElementById('first').value,
-        'second': document.getElementById('second').value,
-        'third': document.getElementById('third').value,
-        'fourth': document.getElementById('fourth').value,
-        'fiveth': document.getElementById('fiveth').value
-    };
-};
-
-const sendBlitzButton = document.getElementById('send-blitz');
-
-sendBlitzButton.addEventListener('click', function() {
-    const blitzResult = getBlitzResult();
-    const init = generateData(blitzResult);
-    fetch('/blitz', init);
-    showTarget();
-});
