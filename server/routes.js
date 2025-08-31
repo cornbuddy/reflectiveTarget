@@ -6,7 +6,7 @@ const join = require('path').join;
 const createReadStream = require('fs').createReadStream;
 const stat = require('fs').stat;
 
-const index = fs.readFileSync('./html/index.html');
+const index = fs.readFileSync('../client/index.html');
 let reflectionResults = [];
 let blitzResult = [];
 
@@ -112,7 +112,7 @@ exports.show500Page = (error, res) => {
 exports.serveFile = (request, response) => {
     const parsedUrl = parse(request.url);
     const root = __dirname;
-    let path = join(root, 'html', parsedUrl.pathname);
+    let path = join(root, '..', 'client', parsedUrl.pathname);
     stat(path, (err, stat) => {
         if (err) {
             if (err.code === 'ENOENT')

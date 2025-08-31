@@ -4,7 +4,6 @@
     "description": "simple web applicaion than implements reflective target",
     "main": "app.js",
     "scripts": {
-        "test": "mocha",
         "start": "node app.js"
     },
     "repository": {
