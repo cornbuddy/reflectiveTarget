@@ -15,14 +15,15 @@ exports.renderMainPage = (_, res) => {
 };
 
 exports.getDataFromClient = (req, res) => {
-    let reflectionResult = "";
+    let data = "";
     req.setEncoding("utf-8");
-    req.on("data", (chunk) => reflectionResult += chunk);
+    req.on("data", (chunk) => data += chunk);
     req.on("end", () => {
-        reflectionResults.push(JSON.parse(reflectionResult));
+        reflectionResults.push(JSON.parse(data));
+        const length = Buffer.byteLength(JSON.stringify(reflectionResults));
         const header = {
             "Content-Type": "text/html",
-            "Content-Length": Buffer.byteLength("OK"),
+            "Content-Length": length,
         };
         res.writeHeader(200, header);
         res.end("OK");
