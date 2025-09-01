@@ -11,12 +11,12 @@ let tapsCoordinates = [];
 function generateData(data, httpMethod = "POST") {
     const headers = {
         "Accept": "application/json",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     };
     let obj = {
         method: httpMethod,
         body: JSON.stringify(data),
-        headers: headers
+        headers: headers,
     };
     httpMethod === "GET" && delete obj.body;
     return obj;
@@ -74,4 +74,13 @@ sendDataButton.addEventListener("click", function() {
         .then((response) => displayShots(response))
         .catch((error) => console.log(error));
     sendDataButton.innerHTML = "Обновить";
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const init = generateData(tapsCoordinates);
+    fetch("/shots", init);
+    const getData = generateData(null, "GET");
+    fetch("/shots", getData)
+        .then((response) => displayShots(response))
+        .catch((error) => console.log(error));
 });

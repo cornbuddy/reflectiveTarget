@@ -1,6 +1,6 @@
 "use strict";
 
-const path = require("path");
+const join = require("path").join;
 
 const {
     renderMainPage,
@@ -11,7 +11,7 @@ const {
 const express = require("express");
 const app = express();
 
-const path = path.join(__dirname, "..", "client");
+const path = join(__dirname, "..", "client");
 app.use(express.static(path))
 app.get("/", renderMainPage);
 app.get("/shots", sendResult);

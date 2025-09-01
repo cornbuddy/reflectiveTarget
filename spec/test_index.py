@@ -28,6 +28,9 @@ def test_should_submit_shots_only_once(driver):
     shots = driver.find_elements(By.CSS_SELECTOR, "div.shot")
     assert len(shots) == ALLOWED_SHOTS
 
+    submit = driver.find_element(By.ID, "send")
+    target = driver.find_element(By.TAG_NAME, "img")
+    shots = driver.find_elements(By.CSS_SELECTOR, "div.shot")
     for _ in range(randint(1, 10)):
         target.click()
     submit.click()
