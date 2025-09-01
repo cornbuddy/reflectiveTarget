@@ -8,14 +8,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/cornBuddy/reflectiveTarget.git"
+        "url": "git+https://github.com/cornbuddy/reflectiveTarget.git"
     },
     "author": "cornBuddy",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/cornBuddy/reflectiveTarget/issues"
+        "url": "https://github.com/cornbuddy/reflectiveTarget/issues"
     },
-    "homepage": "https://github.com/cornBuddy/reflectiveTarget#readme",
+    "homepage": "https://github.com/cornbuddy/reflectiveTarget#readme",
     "dependencies": {
         "express": "^5.1.0"
     }
