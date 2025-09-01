@@ -2,9 +2,9 @@
     "name": "reflective-target",
     "version": "0.0.0",
     "description": "simple web applicaion than implements reflective target",
-    "main": "app.js",
+    "main": "index.js",
     "scripts": {
-        "start": "node app.js"
+        "start": "node index.js"
     },
     "repository": {
         "type": "git",
@@ -15,5 +15,8 @@
     "bugs": {
         "url": "https://github.com/cornBuddy/reflectiveTarget/issues"
     },
-    "homepage": "https://github.com/cornBuddy/reflectiveTarget#readme"
+    "homepage": "https://github.com/cornBuddy/reflectiveTarget#readme",
+    "dependencies": {
+        "express": "^5.1.0"
+    }
 }

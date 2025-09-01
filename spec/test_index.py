@@ -28,6 +28,11 @@ def test_should_submit_shots_only_once(driver):
     shots = driver.find_elements(By.CSS_SELECTOR, "div.shot")
     assert len(shots) == ALLOWED_SHOTS
 
+    for _ in range(randint(1, 10)):
+        target.click()
+    submit.click()
+    assert len(shots) == ALLOWED_SHOTS
+
 
 def test_should_handle_mutliple_shots(driver):
     submit = driver.find_element(By.ID, "send")
