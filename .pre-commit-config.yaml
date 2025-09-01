@@ -13,3 +13,10 @@ repos:
     rev: v0.6.0
     hooks:
       - id: action-validator
+  - repo: local
+    hooks:
+      - id: make-lint
+        name: make lint
+        entry: make lint
+        language: system
+        pass_filenames: false

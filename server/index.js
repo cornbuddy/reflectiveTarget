@@ -12,7 +12,7 @@ const express = require("express");
 const app = express();
 
 const path = join(__dirname, "..", "client");
-app.use(express.static(path))
+app.use(express.static(path));
 app.get("/", renderMainPage);
 app.get("/shots", sendResult);
 app.post("/shots", getDataFromClient);

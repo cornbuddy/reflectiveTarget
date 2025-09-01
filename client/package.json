@@ -1,11 +1,8 @@
 {
-    "name": "reflective-target-server",
+    "name": "reflective-target-client",
     "version": "0.0.0",
     "description": "simple web applicaion than implements reflective target",
-    "main": "index.js",
-    "scripts": {
-        "start": "node index.js"
-    },
+    "main": "js/main.js",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/cornbuddy/reflectiveTarget.git"
@@ -16,9 +13,6 @@
         "url": "https://github.com/cornbuddy/reflectiveTarget/issues"
     },
     "homepage": "https://github.com/cornbuddy/reflectiveTarget#readme",
-    "dependencies": {
-        "express": "^5.1.0"
-    },
     "devDependencies": {
         "eslint": "^9.34.0"
     }
