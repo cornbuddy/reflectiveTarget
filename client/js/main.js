@@ -1,44 +1,44 @@
-'use strict';
+"use strict";
 
 const MAX_TAPS = 4;
 
-const targetImage = document.querySelector('img');
-const sendDataButton = document.getElementById('send');
+const targetImage = document.querySelector("img");
+const sendDataButton = document.getElementById("send");
 
 let tapCounter = 0;
 let tapsCoordinates = [];
 
-let generateData = function(data, httpMethod = 'POST') {
+function generateData(data, httpMethod = "POST") {
     const headers = {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        "Accept": "application/json",
+        "Content-Type": "application/json"
     };
     let obj = {
         method: httpMethod,
         body: JSON.stringify(data),
         headers: headers
     };
-    httpMethod === 'GET' && delete obj.body;
+    httpMethod === "GET" && delete obj.body;
     return obj;
 };
 
-let drawShot = function(tap) {
-    let shot = document.createElement('div');
-    let imageWrapper = document.getElementById('image-wrapper');
-    shot.className = 'shot';
+function drawShot(tap) {
+    let shot = document.createElement("div");
+    let imageWrapper = document.getElementById("image-wrapper");
+    shot.className = "shot";
     shot.style.marginTop = `${tap.y}px`;
     shot.style.marginLeft = `${tap.x}px`;
     imageWrapper.insertBefore(shot, targetImage);
 };
 
-let removeShots = function() {
-    let shots = document.querySelectorAll('.shot');
+function removeShots() {
+    let shots = document.querySelectorAll(".shot");
     Array.prototype.forEach.call(shots, function(shot) {
         shot.remove();
     });
 };
 
-let displayShots = function(response) {
+function displayShots(response) {
     return response.json().then((objects) => {
         for (let studentResult of objects) {
             for (let shot of studentResult) {
@@ -48,7 +48,7 @@ let displayShots = function(response) {
     });
 };
 
-targetImage.addEventListener('click', function(event) {
+targetImage.addEventListener("click", function(event) {
     if (tapCounter >= MAX_TAPS) {
         return;
     }
@@ -61,17 +61,17 @@ targetImage.addEventListener('click', function(event) {
     drawShot(tap);
     tapCounter++;
     if (tapCounter === MAX_TAPS) {
-        sendDataButton.className = '';
+        sendDataButton.className = "";
     }
 });
 
-sendDataButton.addEventListener('click', function() {
+sendDataButton.addEventListener("click", function() {
     removeShots();
     const init = generateData(tapsCoordinates);
-    fetch('/shots', init);
-    const getData = generateData(null, 'GET');
-    fetch('/shots', getData)
+    fetch("/shots", init);
+    const getData = generateData(null, "GET");
+    fetch("/shots", getData)
         .then((response) => displayShots(response))
         .catch((error) => console.log(error));
-    sendDataButton.innerHTML = 'Обновить';
+    sendDataButton.innerHTML = "Обновить";
 });
