@@ -5,7 +5,9 @@ const fs = require("fs");
 const index = fs.readFileSync("../client/index.html");
 let reflectionResults = [];
 
-exports.renderMainPage = (_, res) => {
+exports.index = (req, res) => {
+    req.session.views = (req.session.views || 0) + 1;
+    console.log(`views: ${req.session.views}`);
     const header = {
         "Content-Type": "text/html",
         "Content-Length": Buffer.byteLength(index),
@@ -14,23 +16,33 @@ exports.renderMainPage = (_, res) => {
     res.end(index);
 };
 
-exports.getDataFromClient = (req, res) => {
-    let data = "";
-    req.setEncoding("utf-8");
-    req.on("data", (chunk) => data += chunk);
-    req.on("end", () => {
-        reflectionResults.push(JSON.parse(data));
-        const length = Buffer.byteLength(JSON.stringify(reflectionResults));
+exports.saveShots = (req, res) => {
+    const shots = +req.cookies.shots;
+    if (shots > 0) {
+        const msg = "not ok";
         const header = {
             "Content-Type": "text/html",
-            "Content-Length": length,
+            "Content-Length": Buffer.byteLength(msg),
         };
-        res.writeHeader(200, header);
-        res.end("OK");
-    });
+        res.writeHeader(406, header);
+        res.end(msg);
+        return;
+    }
+
+    const obj = req.body;
+    reflectionResults.push(obj);
+
+    const msg = "ok";
+    const header = {
+        "Content-Type": "text/html",
+        "Content-Length": Buffer.byteLength(msg),
+        "Set-Cookie": `shots=${obj.length}`,
+    };
+    res.writeHeader(200, header);
+    res.end(msg);
 };
 
-exports.sendResult = (_, res) => {
+exports.getShots = (_, res) => {
     const textResponse = JSON.stringify(reflectionResults);
     const header = {
         "Content-Type": "application/json",

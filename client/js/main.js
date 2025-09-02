@@ -8,7 +8,7 @@ const sendDataButton = document.getElementById("send");
 let tapCounter = 0;
 let tapsCoordinates = [];
 
-function generateData(data, httpMethod = "POST") {
+function makeRequestObject(data, httpMethod = "POST") {
     const headers = {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -17,6 +17,7 @@ function generateData(data, httpMethod = "POST") {
         method: httpMethod,
         body: JSON.stringify(data),
         headers: headers,
+        credentials: "include",
     };
     httpMethod === "GET" && delete obj.body;
     return obj;
@@ -31,20 +32,20 @@ function drawShot(tap) {
     imageWrapper.insertBefore(shot, targetImage);
 };
 
-function removeShots() {
-    let shots = document.querySelectorAll(".shot");
-    Array.prototype.forEach.call(shots, function(shot) {
-        shot.remove();
-    });
-};
-
-function displayShots(response) {
+function drawShots(response) {
     return response.json().then((objects) => {
         for (let studentResult of objects) {
             for (let shot of studentResult) {
                 drawShot(shot);
             }
         }
+    });
+};
+
+function removeShots() {
+    const shots = document.querySelectorAll(".shot");
+    Array.prototype.forEach.call(shots, function(shot) {
+        shot.remove();
     });
 };
 
@@ -67,20 +68,20 @@ targetImage.addEventListener("click", function(event) {
 
 sendDataButton.addEventListener("click", function() {
     removeShots();
-    const init = generateData(tapsCoordinates);
-    fetch("/shots", init);
-    const getData = generateData(null, "GET");
+    const init = makeRequestObject(tapsCoordinates);
+    fetch("/shots", init)
+        .then(console.log)
+        .catch(console.error);
+    const getData = makeRequestObject(null, "GET");
     fetch("/shots", getData)
-        .then((response) => displayShots(response))
-        .catch((error) => console.log(error));
+        .then(drawShots)
+        .catch(console.error);
     sendDataButton.innerHTML = "Обновить";
 });
 
 document.addEventListener("DOMContentLoaded", function() {
-    const init = generateData(tapsCoordinates);
-    fetch("/shots", init);
-    const getData = generateData(null, "GET");
+    const getData = makeRequestObject(tapsCoordinates, "GET");
     fetch("/shots", getData)
-        .then((response) => displayShots(response))
-        .catch((error) => console.log(error));
+        .then(drawShots)
+        .catch(console.error);
 });

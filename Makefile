@@ -1,9 +1,3 @@
-.PHONY: pre-commit
-pre-commit:
-	pre-commit install
-	pre-commit install --hook-type commit-msg
-	pre-commit run --verbose --all-files --show-diff-on-failure
-
 .PHONY: run
 run:
 	@$(MAKE) -C server run
@@ -23,3 +17,9 @@ spec:
 		export SERVER_PID=$$!; \
 		$(MAKE) -C spec test; \
 		kill $${SERVER_PID}
+
+.PHONY: pre-commit
+pre-commit:
+	pre-commit install
+	pre-commit install --hook-type commit-msg
+	pre-commit run --verbose --all-files --show-diff-on-failure
