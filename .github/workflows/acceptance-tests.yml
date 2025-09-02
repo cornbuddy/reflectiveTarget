@@ -5,6 +5,7 @@ on: pull_request
 concurrency:
   group: acceptance-${{ github.event.repository.name }}
 
+jobs:
   acceptance:
     runs-on: ubuntu-latest
     steps:
