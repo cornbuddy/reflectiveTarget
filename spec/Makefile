@@ -1,11 +1,11 @@
-.PHONY: pip
-pip:
+.PHONY: deps
+deps:
 	@pip3 install -r requirements.txt
 
 .PHONY: test
-test: pip
+test: deps
 	@python3 -m pytest
 
 .PHONY: lint
-lint: pip
+lint: deps
 	@python3 -m pylint --recursive=true .

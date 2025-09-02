@@ -1,11 +1,11 @@
 .PHONY: run
-run:
+run: deps
 	@npm start
-
-.PHONY: deps
-deps:
-	@npm install
 
 .PHONY: lint
 lint: deps
 	@npx eslint
+
+.PHONY: deps
+deps:
+	@npm install
