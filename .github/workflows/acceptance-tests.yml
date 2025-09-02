@@ -8,14 +8,9 @@ concurrency:
 jobs:
   acceptance:
     runs-on: ubuntu-latest
-    container:
-      image: node:24
-    services:
-      selenium:
-        image: selenium/standalone-chrome
-        options: --shm-size=2gb
     steps:
       - uses: actions/checkout@v4
+      - run: node -v
       - run: make spec
 
   approve-pull-request:
