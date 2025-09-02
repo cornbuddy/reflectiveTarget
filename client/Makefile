@@ -3,5 +3,5 @@ deps:
 	@npm install
 
 .PHONY: lint
-lint:
+lint: deps
 	@npx eslint js/**
