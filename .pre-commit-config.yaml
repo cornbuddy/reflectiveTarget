@@ -9,10 +9,6 @@ repos:
     rev: 2.7.3
     hooks:
       - id: editorconfig-checker
-  - repo: https://github.com/mpalmer/action-validator
-    rev: v0.6.0
-    hooks:
-      - id: action-validator
   - repo: local
     hooks:
       - id: make-lint

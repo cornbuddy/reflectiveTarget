@@ -1,0 +1,21 @@
+---
+name: commit checks
+on:
+  push:
+    branches:
+      - "*"
+      - "*/*"
+      - "!main"
+
+concurrency:
+  group: commit-checks-${{ github.event.repository.name }}-${{ github.ref }}
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          update-environment: false
+      - uses: pre-commit/action@v3.0.0
