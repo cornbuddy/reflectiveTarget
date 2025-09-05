@@ -21,7 +21,8 @@ jobs:
           python-version: "3.13"
       - run: apt update -y
       - run: apt install build-essential -y
-      - run: make spec
+      - run: which pip
+      - run: make PIP=pip spec
 
   approve-pull-request:
     if: |

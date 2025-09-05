@@ -1,6 +1,8 @@
+PIP ?= pip3
+
 .PHONY: deps
 deps:
-	@pip3 install -r requirements.txt
+	@$(PIP) install -r requirements.txt
 
 .PHONY: test
 test: deps
