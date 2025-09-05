@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: "3.13"
       - run: apt update -y
-      - run: apt install build-essentials -y
+      - run: apt install build-essential -y
       - run: make spec
 
   approve-pull-request:
