@@ -19,7 +19,8 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
-      - run: node -v
+      - run: apt update -y
+      - run: apt install build-essentials -y
       - run: make spec
 
   approve-pull-request:
