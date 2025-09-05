@@ -12,7 +12,7 @@ jobs:
       image: nikolaik/python3.13-nodejs24-slim
     services:
       selenium:
-        image: selenium/standalone-chrome
+        image: docker.io/selenium/standalone-chrome
         options: --shm-size=2gb
     steps:
       - uses: actions/checkout@v4
