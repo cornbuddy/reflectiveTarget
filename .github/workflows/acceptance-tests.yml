@@ -22,7 +22,7 @@ jobs:
       - run: apt update -y
       - run: apt install build-essential -y
       - run: which pip
-      - run: make PIP=pip spec
+      - run: PIP=$(which pip) make spec
 
   approve-pull-request:
     if: |
