@@ -8,6 +8,12 @@ concurrency:
 jobs:
   acceptance:
     runs-on: ubuntu-latest
+    container:
+      image: nikolaik/python3.13-nodejs24-slim
+    services:
+      selenium:
+        image: selenium/standalone-chrome
+        options: --shm-size=2gb
     steps:
       - uses: actions/checkout@v4
       - run: node -v
