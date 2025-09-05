@@ -9,7 +9,7 @@ jobs:
   acceptance:
     runs-on: ubuntu-latest
     container:
-      image: nikolaik/python3.13-nodejs24-slim
+      image: nikolaik/python-nodejs:python3.13-nodejs24-slim
     services:
       selenium:
         image: docker.io/selenium/standalone-chrome
