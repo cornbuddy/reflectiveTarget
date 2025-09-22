@@ -10,6 +10,7 @@ const { Client } = require("pg");
 
 const { initDatabase } = require("./index");
 
+const DATABASE_NAME = "reflective_target";
 const IMAGE = "postgres:17-alpine";
 const TIMEOUT = 60 * 1000;
 
@@ -22,6 +23,7 @@ describe("initDatabase", () => {
             connectionString: container.getConnectionUri(),
         });
         await client.connect();
+        await initDatabase(client, DATABASE_NAME);
     });
 
     afterAll(async () => {
@@ -29,13 +31,15 @@ describe("initDatabase", () => {
         await container.stop();
     });
 
-    test("db should be connectable", async () => {
-        const result = await client.query("SELECT 1");
-        expect(result.rows[0]).toEqual({ "?column?": 1 });
-    });
-
     test("should create database", async () => {
-        expect(initDatabase(client)).toBe(undefined);
+        const result = await client.query("SELECT datname FROM pg_database;");
+        expect(result.rows).toContainEqual({ "datname": DATABASE_NAME });
     });
 
+    test("should be idempotent", async () => {
+        await initDatabase(client, DATABASE_NAME);
+
+        const result = await client.query("SELECT datname FROM pg_database;");
+        expect(result.rows).toContainEqual({ "datname": DATABASE_NAME });
+    });
 }, TIMEOUT);
