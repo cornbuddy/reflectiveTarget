@@ -24,12 +24,12 @@ describe("initDatabase", () => {
         });
         await client.connect();
         await initDatabase(client, DATABASE_NAME);
-    });
+    }, TIMEOUT);
 
     afterAll(async () => {
         await client.end();
         await container.stop();
-    });
+    }, TIMEOUT);
 
     test("should create database", async () => {
         const result = await client.query("SELECT datname FROM pg_database;");
