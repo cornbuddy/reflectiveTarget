@@ -8,6 +8,10 @@ lint:
 	@$(MAKE) -C server lint
 	@$(MAKE) -C spec lint
 
+.PHONY: test
+test:
+	@$(MAKE) -C server test
+
 PORT := 8080
 export PORT
 
