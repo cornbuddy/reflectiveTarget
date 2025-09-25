@@ -10,7 +10,6 @@ const { Client } = require("pg");
 
 const { initDatabase } = require("./index");
 
-const DATABASE_NAME = "reflective_target";
 const IMAGE = "postgres:17-alpine";
 const TIMEOUT = 60 * 1000;
 
@@ -18,9 +17,7 @@ describe("initDatabase", () => {
     var client, container;
 
     beforeEach(async () => {
-        container = await new PostgreSqlContainer(IMAGE)
-            .withDatabase(DATABASE_NAME)
-            .start();
+        container = await new PostgreSqlContainer(IMAGE).start();
         client = new Client({ connectionString: container.getConnectionUri() });
         await client.connect();
         await initDatabase(client);
