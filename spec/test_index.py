@@ -4,6 +4,7 @@ from random import randint
 import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+import chromedriver_autoinstaller
 
 ALLOWED_SHOTS = 4
 URL = f"http://localhost:{environ['PORT']}"
@@ -11,7 +12,20 @@ URL = f"http://localhost:{environ['PORT']}"
 
 @pytest.fixture
 def driver():
-    _driver = webdriver.Chrome()
+    chromedriver_autoinstaller.install()
+    chrome_options = webdriver.ChromeOptions()
+    options = [
+        "--ignore-certificate-errors",
+        # These flags BELOW are recommended for stability when running Chrome
+        # in headless or containerized environments (such as GitHub Actions).
+        "--disable-gpu",
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+        "--remote-debugging-port=9222",
+    ]
+    for option in options:
+        chrome_options.add_argument(option)
+    _driver = webdriver.Chrome(options=chrome_options)
     _driver.get(URL)
     yield _driver
 
