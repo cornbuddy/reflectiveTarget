@@ -21,8 +21,7 @@ jobs:
       - run: sudo apt purge chromium-browser
       - run: sudo apt update -y
       - run: sudo apt install build-essential xvfb -y
-      - run: which pip
-      - run: PIP=$(which pip) make spec
+      - run: make spec
 
   approve-pull-request:
     if: |
