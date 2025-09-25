@@ -1,6 +1,6 @@
 const {
-    beforeAll,
-    afterAll,
+    beforeEach,
+    afterEach,
     expect,
     describe,
     test,
@@ -17,29 +17,26 @@ const TIMEOUT = 60 * 1000;
 describe("initDatabase", () => {
     var client, container;
 
-    beforeAll(async () => {
-        container = await new PostgreSqlContainer(IMAGE).start();
-        client = new Client({
-            connectionString: container.getConnectionUri(),
-        });
+    beforeEach(async () => {
+        container = await new PostgreSqlContainer(IMAGE)
+            .withDatabase(DATABASE_NAME)
+            .start();
+        client = new Client({ connectionString: container.getConnectionUri() });
         await client.connect();
-        await initDatabase(client, DATABASE_NAME);
+        await initDatabase(client);
     }, TIMEOUT);
 
-    afterAll(async () => {
+    afterEach(async () => {
         await client.end();
         await container.stop();
     }, TIMEOUT);
 
-    test("should create database", async () => {
-        const result = await client.query("SELECT datname FROM pg_database;");
-        expect(result.rows).toContainEqual({ "datname": DATABASE_NAME });
-    });
-
-    test("should be idempotent", async () => {
-        await initDatabase(client, DATABASE_NAME);
-
-        const result = await client.query("SELECT datname FROM pg_database;");
-        expect(result.rows).toContainEqual({ "datname": DATABASE_NAME });
+    test("should create tables", async () => {
+        const tables = ["shots", "questions", "targets", "users"];
+        for (const table of tables) {
+            const query = `select * from ${table}`;
+            const result = await client.query(query);
+            expect(result.rows).toHaveLength(0);
+        }
     });
 }, TIMEOUT);

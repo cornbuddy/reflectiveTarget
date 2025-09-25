@@ -1,15 +1,11 @@
-async function initDatabase(client, databaseName) {
-    const res = await client.query(
-        `SELECT FROM pg_database WHERE datname = '${databaseName}'`,
-    );
+const fs = require("node:fs/promises");
 
-    if (res.rowCount === 0) {
-        console.log(`${databaseName} database not found, creating it.`);
-        await client.query(`CREATE DATABASE "${databaseName}";`);
-        console.log(`created database ${databaseName}.`);
-    } else {
-        console.log(`${databaseName} database already exists.`);
-    }
+async function initDatabase(client) {
+    const script = await fs.readFile(
+        `${__dirname}/tables.sql`,
+        { encoding: "utf8" },
+    );
+    await client.query(script);
 }
 
 module.exports = { initDatabase };
