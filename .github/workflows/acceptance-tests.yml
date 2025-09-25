@@ -8,9 +8,6 @@ concurrency:
 jobs:
   acceptance:
     runs-on: ubuntu-latest
-    container:
-      image: docker.io/selenium/standalone-chrome
-      options: --shm-size=2gb --user root
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v5
@@ -19,8 +16,11 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
-      - run: apt update -y
-      - run: apt install build-essential -y
+      - run: sudo apt list --installed
+      - run: sudo apt purge google-chrome-stable
+      - run: sudo apt purge chromium-browser
+      - run: sudo apt update -y
+      - run: sudo apt install build-essential xvfb -y
       - run: which pip
       - run: PIP=$(which pip) make spec
 
