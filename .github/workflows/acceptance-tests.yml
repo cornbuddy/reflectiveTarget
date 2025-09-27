@@ -21,6 +21,8 @@ jobs:
       - run: sudo apt purge chromium-browser
       - run: sudo apt update -y
       - run: sudo apt install build-essential xvfb -y
+      - uses: browser-actions/setup-chrome@v2
+      - run: chrome --version
       - run: make spec
 
   approve-pull-request:
