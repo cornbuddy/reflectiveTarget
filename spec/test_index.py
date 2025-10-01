@@ -26,8 +26,6 @@ def driver():
     service = Service(executable_path=path)
     _driver = webdriver.Firefox(options=options, service=service)
     _driver.set_window_size(1920, 1080)
-    _driver.maximize_window()
-    _driver.implicitly_wait(10)
     _driver.get(URL)
     yield _driver
 
