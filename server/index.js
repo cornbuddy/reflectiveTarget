@@ -7,7 +7,7 @@ const morgan = require("morgan");
 const express = require("express");
 const app = express();
 
-const router = require("./routes");
+const router = require("./router");
 
 const path = join(__dirname, "..", "client");
 app.use(express.static(path));
