@@ -17,10 +17,9 @@ export PORT
 
 .PHONY: spec
 spec:
-	@$(MAKE) -C server run & \
-		export SERVER_PID=$$!; \
-		$(MAKE) -C spec test; \
-		kill $${SERVER_PID}
+	$(MAKE) -C server run & \
+		$(MAKE) -C spec test && \
+		pkill -f node
 
 .PHONY: pre-commit
 pre-commit:
