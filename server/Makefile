@@ -1,5 +1,5 @@
 .PHONY: run
-run: deps
+run: stop deps
 	@npm start
 
 .PHONY: lint
@@ -13,3 +13,7 @@ test: deps lint
 .PHONY: deps
 deps:
 	@npm install
+
+.PHONY: stop
+stop:
+	- pkill -f node
