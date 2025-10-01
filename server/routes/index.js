@@ -2,21 +2,34 @@
 
 const fs = require("fs");
 
-const index = fs.readFileSync("../client/index.html");
+const express = require("express");
+const router = express.Router();
+
+const indexHtml = fs.readFileSync("../client/index.html");
 let reflectionResults = [];
 
-exports.index = (req, res) => {
+router.get("/", (req, res) => {
     req.session.views = (req.session.views || 0) + 1;
     console.log(`views: ${req.session.views}`);
     const header = {
         "Content-Type": "text/html",
-        "Content-Length": Buffer.byteLength(index),
+        "Content-Length": Buffer.byteLength(indexHtml),
     };
     res.writeHeader(200, header);
-    res.end(index);
-};
+    res.end(indexHtml);
+});
 
-exports.saveShots = (req, res) => {
+router.get("/shots", (_, res) => {
+    const textResponse = JSON.stringify(reflectionResults);
+    const header = {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(textResponse),
+    };
+    res.writeHeader(200, header);
+    res.end(textResponse);
+});
+
+router.post("/shots", (req, res) => {
     const shots = +req.cookies.shots;
     if (shots > 0) {
         const msg = "not ok";
@@ -40,14 +53,6 @@ exports.saveShots = (req, res) => {
     };
     res.writeHeader(200, header);
     res.end(msg);
-};
+});
 
-exports.getShots = (_, res) => {
-    const textResponse = JSON.stringify(reflectionResults);
-    const header = {
-        "Content-Type": "application/json",
-        "Content-Length": Buffer.byteLength(textResponse),
-    };
-    res.writeHeader(200, header);
-    res.end(textResponse);
-};
+module.exports = router;
