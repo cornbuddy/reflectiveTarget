@@ -19,6 +19,7 @@ def driver():
         "--disable-gpu",
         "--no-sandbox",
         "--disable-dev-shm-usage",
+        "--headless",
     ]
     for opt in opts:
         options.add_argument(opt)
