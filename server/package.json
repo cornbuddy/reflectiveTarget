@@ -1,5 +1,9 @@
 {
     "name": "reflective-target-server",
+    "jest": {
+        "testTimeout": 90000,
+        "verbose": true
+    },
     "version": "0.0.0",
     "description": "simple web applicaion than implements reflective target",
     "main": "index.js",
@@ -26,6 +30,7 @@
     "devDependencies": {
         "@testcontainers/postgresql": "^11.6.0",
         "eslint": "^9.34.0",
-        "jest": "^30.1.3"
+        "jest": "^30.1.3",
+        "supertest": "^7.1.4"
     }
 }

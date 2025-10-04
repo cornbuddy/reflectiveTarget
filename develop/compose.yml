@@ -1,10 +1,19 @@
 services:
   db:
     image: postgres:18-alpine
+    environment:
+      POSTGRES_PASSWORD: &pgpassword password
+      POSTGRES_USER: &pguser reflective_target
+      POSTGRES_DB: &pgdatabase reflective_target
   server:
     depends_on: [db]
     build:
       context: ../server
+    environment:
+      PGPASSWORD: *pgpassword
+      PGUSER: *pguser
+      PGDATABASE: *pgdatabase
+      PGHOST: db
   client:
     depends_on: [server]
     image: nginx:latest
