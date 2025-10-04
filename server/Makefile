@@ -1,6 +1,6 @@
 .PHONY: run
-run: stop deps
-	@npm start
+run: stop
+	docker compose -f ../develop/compose.yml up --build
 
 .PHONY: lint
 lint: deps
@@ -16,4 +16,4 @@ deps:
 
 .PHONY: stop
 stop:
-	- pkill -f node
+	- docker compose -f ../develop/compose.yml down
