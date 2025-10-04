@@ -1,23 +1,9 @@
 "use strict";
 
-const fs = require("fs");
-
 const express = require("express");
 const router = express.Router();
 
-const indexHtml = fs.readFileSync("../client/index.html");
 let reflectionResults = [];
-
-router.get("/", (req, res) => {
-    req.session.views = (req.session.views || 0) + 1;
-    console.log(`views: ${req.session.views}`);
-    const header = {
-        "Content-Type": "text/html",
-        "Content-Length": Buffer.byteLength(indexHtml),
-    };
-    res.writeHeader(200, header);
-    res.end(indexHtml);
-});
 
 router.get("/shots", (_, res) => {
     const textResponse = JSON.stringify(reflectionResults);

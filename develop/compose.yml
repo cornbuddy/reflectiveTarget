@@ -1,0 +1,10 @@
+services:
+  client:
+    image: nginx:latest
+    volumes: [../client:/usr/share/nginx/html:ro]
+    depends_on: [server]
+    ports:
+      - 8080:80
+  server:
+    build:
+      context: ../server
