@@ -10,8 +10,8 @@ const { Client } = require("pg");
 
 const { initDatabase } = require("./index");
 
-const IMAGE = "postgres:17-alpine";
-const TIMEOUT = 60 * 1000;
+const IMAGE = "postgres:18-alpine";
+const TIMEOUT = 90 * 1000;
 
 describe("initDatabase", () => {
     var client, container;
