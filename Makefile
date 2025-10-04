@@ -18,7 +18,7 @@ export PORT
 .PHONY: spec
 spec:
 	$(MAKE) -C server run & \
-		sleep 10 && \
+		sleep 30 && \
 		$(MAKE) -C spec test && \
 		$(MAKE) -C server stop
 

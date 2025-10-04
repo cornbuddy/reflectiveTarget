@@ -11,22 +11,21 @@ const { Client } = require("pg");
 const { initDatabase } = require("./index");
 
 const IMAGE = "postgres:18-alpine";
-const TIMEOUT = 90 * 1000;
 
 describe("initDatabase", () => {
-    var client, container;
+    let client, container;
 
     beforeEach(async () => {
         container = await new PostgreSqlContainer(IMAGE).start();
         client = new Client({ connectionString: container.getConnectionUri() });
         await client.connect();
         await initDatabase(client);
-    }, TIMEOUT);
+    });
 
     afterEach(async () => {
         await client.end();
         await container.stop();
-    }, TIMEOUT);
+    });
 
     test("should create tables", async () => {
         const tables = ["shots", "questions", "targets", "users"];
@@ -36,4 +35,4 @@ describe("initDatabase", () => {
             expect(result.rows).toHaveLength(0);
         }
     });
-}, TIMEOUT);
+});
