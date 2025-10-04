@@ -69,11 +69,11 @@ targetImage.addEventListener("click", function(event) {
 sendDataButton.addEventListener("click", function() {
     removeShots();
     const init = makeRequestObject(tapsCoordinates);
-    fetch("/shots", init)
+    fetch("/api/shots", init)
         .then(console.log)
         .catch(console.error);
     const getData = makeRequestObject(null, "GET");
-    fetch("/shots", getData)
+    fetch("/api/shots", getData)
         .then(drawShots)
         .catch(console.error);
     sendDataButton.innerHTML = "Обновить";
@@ -81,7 +81,7 @@ sendDataButton.addEventListener("click", function() {
 
 document.addEventListener("DOMContentLoaded", function() {
     const getData = makeRequestObject(tapsCoordinates, "GET");
-    fetch("/shots", getData)
+    fetch("/api/shots", getData)
         .then(drawShots)
         .catch(console.error);
 });
