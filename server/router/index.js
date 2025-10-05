@@ -1,9 +1,11 @@
-"use strict";
-
 const express = require("express");
 const router = express.Router();
 
 let reflectionResults = [];
+
+router.get("/health", (_, res) => {
+    res.status(503).json({ connected: false });
+});
 
 router.get("/shots", (_, res) => {
     const textResponse = JSON.stringify(reflectionResults);
