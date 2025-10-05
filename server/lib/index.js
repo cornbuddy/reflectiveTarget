@@ -2,14 +2,15 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const express = require("express");
 
-const router = require("../router");
+const { healthRouter, shotsRouter } = require("../routers");
 
-function makeApp() {
+function makeApp(client) {
     const app = express();
     app.use(express.json());
     app.use(morgan("tiny"));
     app.use(cookieParser());
-    app.use(router);
+    app.use("/health", healthRouter(client));
+    app.use("/shots", shotsRouter(client));
     return app;
 }
 
