@@ -1,24 +1,49 @@
-"use strict";
-
 const {
+    afterEach,
+    beforeEach,
     expect,
     describe,
     test,
 } = require("@jest/globals");
 const supertest = require("supertest");
 
+const { setupTestDb } = require("../test");
 const { makeApp } = require("./index");
 
-describe("endpoints", () => {
-    const app = makeApp();
+describe("/health", () => {
+    let client, container;
 
-    test("get /health should succeed", async () => {
+    beforeEach(async () => {
+        ({ client, container } = await setupTestDb());
+    });
+
+    afterEach(async () => {
+        await client.end();
+        await container.stop();
+    });
+
+    test("get should fail if connection is not established", async () => {
+        await client.end();
+        const app = makeApp(client);
+        const resp = await supertest(app).get("/health");
+        expect(resp.status).toEqual(503);
+        expect(resp.headers["content-type"]).toMatch(/json/);
+        expect(resp.body.connected).toBeFalsy();
+    });
+
+    test("get should succeed when connected to db", async () => {
+        const app = makeApp(client);
         const resp = await supertest(app).get("/health");
         expect(resp.status).toEqual(200);
         expect(resp.headers["content-type"]).toMatch(/json/);
+        expect(resp.body.connected).toBeTruthy();
     });
+});
 
-    test("get /shots should succeed", async () => {
+describe("/shots", () => {
+    const app = makeApp();
+
+    test("get should succeed", async () => {
         const resp = await supertest(app).get("/shots");
         expect(resp.status).toEqual(200);
         expect(resp.headers["content-type"]).toMatch(/json/);

@@ -1,5 +1,3 @@
-"use strict";
-
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const express = require("express");

@@ -1,24 +1,19 @@
 const {
-    beforeEach,
     afterEach,
+    beforeEach,
     expect,
     describe,
     test,
 } = require("@jest/globals");
-const { PostgreSqlContainer } = require("@testcontainers/postgresql");
-const { Client } = require("pg");
 
+const { setupTestDb } = require("../test");
 const { initDatabase } = require("./index");
-
-const IMAGE = "postgres:18-alpine";
 
 describe("initDatabase", () => {
     let client, container;
 
     beforeEach(async () => {
-        container = await new PostgreSqlContainer(IMAGE).start();
-        client = new Client({ connectionString: container.getConnectionUri() });
-        await client.connect();
+        ({ client, container } = await setupTestDb());
         await initDatabase(client);
     });
 
