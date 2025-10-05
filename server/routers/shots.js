@@ -44,5 +44,4 @@ function router() {
     return route;
 }
 
-
 module.exports = router;
