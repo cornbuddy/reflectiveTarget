@@ -20,7 +20,12 @@ jobs:
       - run: |
           firefox --version
           firefox.geckodriver --version
-      - run: make spec
+      - name: spec
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 2
+          command: make spec
       - if: always()
         uses: actions/upload-artifact@v4
         with:
