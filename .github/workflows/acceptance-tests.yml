@@ -21,6 +21,10 @@ jobs:
           firefox --version
           firefox.geckodriver --version
       - run: make spec
+      - uses: actions/upload-artifact@v4
+        with:
+          name: report
+          path: spec/report.html
 
   approve-pull-request:
     if: |
