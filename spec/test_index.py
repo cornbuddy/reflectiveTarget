@@ -1,16 +1,15 @@
 from os import environ
 from random import randint
 
+import pytest
 from selenium.webdriver.common.by import By
 
 ALLOWED_SHOTS = 4
 URL = f"http://localhost:{environ['PORT']}"
 
 
+@pytest.mark.parametrize("url", [(URL)])
 def test_should_submit_shots_only_once(driver):
-    driver.get(URL)
-    driver.implicitly_wait(10)
-
     target = driver.find_element(By.TAG_NAME, "img")
     for _ in range(ALLOWED_SHOTS):
         target.click()

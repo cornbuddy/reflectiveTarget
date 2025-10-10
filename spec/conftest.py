@@ -7,7 +7,7 @@ from selenium.webdriver.firefox.service import Service
 
 
 @pytest.fixture
-def driver():
+def driver(url):
     options = Options()
     opts = [
         "--disable-gpu",
@@ -21,20 +21,11 @@ def driver():
     service = Service(executable_path=path)
     _driver = webdriver.Firefox(options=options, service=service)
     _driver.set_window_size(1920, 1080)
+    _driver.get(url)
+    _driver.implicitly_wait(10)
     yield _driver
 
     _driver.quit()
-
-
-def open_url(url):
-
-    @pytest.fixture
-    def fixture(driver):
-        driver.get(url)
-        driver.implicitly_wait(10)
-        return driver
-
-    return fixture
 
 
 @pytest.hookimpl(hookwrapper=True)
