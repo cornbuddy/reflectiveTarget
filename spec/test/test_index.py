@@ -1,11 +1,9 @@
-from os import environ
 from random import randint
 
 import pytest
 from selenium.webdriver.common.by import By
 
-ALLOWED_SHOTS = 4
-URL = f"http://localhost:{environ['PORT']}"
+from .constants import ALLOWED_SHOTS, URL
 
 
 @pytest.mark.parametrize("url", [(URL)])
