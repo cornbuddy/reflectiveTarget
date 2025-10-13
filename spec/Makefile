@@ -1,7 +1,5 @@
 include Makefile.venv
 
-PIP ?= pip3
-
 .PHONY: test
 test: $(VENV)/pytest
 	$(VENV)/pytest --verbose --html=report.html --self-contained-html \
