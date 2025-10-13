@@ -4,7 +4,8 @@ PIP ?= pip3
 
 .PHONY: test
 test: $(VENV)/pytest
-	$(VENV)/pytest --html=report.html --self-contained-html
+	$(VENV)/pytest --verbose --html=report.html --self-contained-html \
+		test/test_authz.py
 	- xdg-open report.html
 
 .PHONY: lint

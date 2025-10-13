@@ -2,6 +2,10 @@
 run:
 	@$(MAKE) -C server run
 
+.PHONY: stop
+stop:
+	@$(MAKE) -C server stop
+
 .PHONY: lint
 lint:
 	@$(MAKE) -C client lint
