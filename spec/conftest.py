@@ -1,3 +1,5 @@
+import json
+from os import environ
 from shutil import which
 
 import pytest
@@ -8,13 +10,14 @@ from selenium.webdriver.firefox.service import Service
 
 @pytest.fixture
 def driver(url):
-    options = Options()
-    opts = [
+    debug = json.loads(environ.get("DEBUG", "false").lower())
+    opts = list(filter(None, [
         "--disable-gpu",
         "--no-sandbox",
         "--disable-dev-shm-usage",
-        "--headless",
-    ]
+        "--headless" if not debug else "",
+    ]))
+    options = Options()
     for opt in opts:
         options.add_argument(opt)
     path = which("firefox.geckodriver")
@@ -38,4 +41,4 @@ def pytest_runtest_makereport(item):
         pytest_html = item.config.pluginmanager.getplugin("html")
         extras = getattr(test_report, "extra", [])
         extras.append(pytest_html.extras.image(screenshot))
-        test_report.extra = extras
+        test_report.extras = extras
