@@ -1,4 +1,4 @@
-"use strict";
+import "htmx";
 
 const MAX_TAPS = 4;
 
