@@ -3,6 +3,9 @@
     "version": "0.0.0",
     "description": "simple web applicaion than implements reflective target",
     "main": "js/main.js",
+    "scripts": {
+        "build": "npx webpack"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/cornbuddy/reflectiveTarget.git"
@@ -14,6 +17,14 @@
     },
     "homepage": "https://github.com/cornbuddy/reflectiveTarget#readme",
     "devDependencies": {
-        "eslint": "^9.34.0"
+        "css-loader": "^7.1.2",
+        "css-minimizer-webpack-plugin": "^7.0.2",
+        "eslint": "^9.34.0",
+        "mini-css-extract-plugin": "^2.9.4",
+        "webpack": "^5.102.1",
+        "webpack-cli": "^6.0.1"
+    },
+    "dependencies": {
+        "htmx": "^0.0.2"
     }
 }
