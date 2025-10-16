@@ -21,15 +21,9 @@ function makeApp(client) {
 
     app.use("/api/health", healthRouter(client));
     app.use("/api/shots", shotsRouter(client));
-    app.get("/", (_, res) => {
-        res.render("index");
-    });
-    app.get("/login", (_, res) => {
-        res.render("login");
-    });
-    app.get("/signup", (_, res) => {
-        res.render("signup");
-    });
+    app.get("/", (_, res) => res.render("index"));
+    app.get("/login", (_, res) => res.render("login"));
+    app.get("/signup", (_, res) => res.render("signup"));
 
     return app;
 }
