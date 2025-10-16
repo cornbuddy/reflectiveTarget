@@ -11,10 +11,11 @@ const { setupTestDb } = require("../test");
 const { makeApp } = require("./index");
 
 describe("/health", () => {
-    let client, container;
+    let app, client, container;
 
     beforeEach(async () => {
         ({ client, container } = await setupTestDb());
+        app = makeApp(client);
     });
 
     afterEach(async () => {
@@ -24,7 +25,6 @@ describe("/health", () => {
 
     test("get should fail if connection is not established", async () => {
         await client.end();
-        const app = makeApp(client);
         const resp = await supertest(app).get("/health");
         expect(resp.status).toEqual(503);
         expect(resp.headers["content-type"]).toMatch(/json/);
@@ -32,7 +32,6 @@ describe("/health", () => {
     });
 
     test("get should succeed when connected to db", async () => {
-        const app = makeApp(client);
         const resp = await supertest(app).get("/health");
         expect(resp.status).toEqual(200);
         expect(resp.headers["content-type"]).toMatch(/json/);
@@ -41,9 +40,9 @@ describe("/health", () => {
 });
 
 describe("/shots", () => {
-    const app = makeApp();
 
     test("get should succeed", async () => {
+        const app = makeApp();
         const resp = await supertest(app).get("/shots");
         expect(resp.status).toEqual(200);
         expect(resp.headers["content-type"]).toMatch(/json/);
