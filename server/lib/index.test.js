@@ -10,7 +10,7 @@ const supertest = require("supertest");
 const { setupTestDb } = require("../test");
 const { makeApp } = require("./index");
 
-describe("/health", () => {
+describe("http endpoints", () => {
     let app, client, container;
 
     beforeEach(async () => {
@@ -23,28 +23,38 @@ describe("/health", () => {
         await container.stop();
     });
 
-    test("get should fail if connection is not established", async () => {
-        await client.end();
-        const resp = await supertest(app).get("/health");
-        expect(resp.status).toEqual(503);
-        expect(resp.headers["content-type"]).toMatch(/json/);
-        expect(resp.body.connected).toBeFalsy();
+    describe("/", () => {
+        test("get should render index page", async () => {
+            const resp = await supertest(app).get("/");
+            expect(resp.status).toEqual(200);
+            expect(resp.headers["content-type"]).toMatch(/html/);
+            expect(resp.text).toContain("Рефлексивная мишень");
+        });
     });
 
-    test("get should succeed when connected to db", async () => {
-        const resp = await supertest(app).get("/health");
-        expect(resp.status).toEqual(200);
-        expect(resp.headers["content-type"]).toMatch(/json/);
-        expect(resp.body.connected).toBeTruthy();
+    describe("/api/health", () => {
+        test("get should fail when db is broken", async () => {
+            await client.end();
+            const resp = await supertest(app).get("/api/health");
+            expect(resp.status).toEqual(503);
+            expect(resp.headers["content-type"]).toMatch(/json/);
+            expect(resp.body.connected).toBeFalsy();
+        });
+
+        test("get should succeed when connected to db", async () => {
+            const resp = await supertest(app).get("/api/health");
+            expect(resp.status).toEqual(200);
+            expect(resp.headers["content-type"]).toMatch(/json/);
+            expect(resp.body.connected).toBeTruthy();
+        });
     });
-});
 
-describe("/shots", () => {
-
-    test("get should succeed", async () => {
-        const app = makeApp();
-        const resp = await supertest(app).get("/shots");
-        expect(resp.status).toEqual(200);
-        expect(resp.headers["content-type"]).toMatch(/json/);
+    describe("/api/shots", () => {
+        test("get should succeed", async () => {
+            const app = makeApp();
+            const resp = await supertest(app).get("/api/shots");
+            expect(resp.status).toEqual(200);
+            expect(resp.headers["content-type"]).toMatch(/json/);
+        });
     });
 });
