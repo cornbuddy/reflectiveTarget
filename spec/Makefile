@@ -1,9 +1,8 @@
 include Makefile.venv
 
-.PHONY: test
-test: $(VENV)/pytest
-	$(VENV)/pytest --verbose --html=report.html --self-contained-html \
-		test/test_authz.py
+.PHONY: spec
+spec: $(VENV)/pytest
+	$(VENV)/pytest --verbose --html=report.html --self-contained-html $(ARGS)
 	- xdg-open report.html
 
 .PHONY: lint
