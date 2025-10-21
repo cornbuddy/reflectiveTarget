@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
+const csrf = require("@dr.pogodin/csurf");
 
 const { healthRouter, shotsRouter } = require("../routers");
 
@@ -18,6 +19,11 @@ function makeApp(client) {
     app.use(express.json());
     app.use(morgan("tiny"));
     app.use(cookieParser());
+    app.use(csrf({ cookie: true }));
+    app.use((req, res, next) => {
+        res.locals.csrfToken = req.csrfToken();
+        next();
+    });
 
     app.use("/api/health", healthRouter(client));
     app.use("/api/shots", shotsRouter(client));

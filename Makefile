@@ -23,7 +23,7 @@ export PORT
 spec:
 	$(MAKE) -C server run & \
 		sleep 30 && \
-		$(MAKE) -C spec test && \
+		$(MAKE) -C spec spec && \
 		$(MAKE) -C server stop
 
 .PHONY: pre-commit
