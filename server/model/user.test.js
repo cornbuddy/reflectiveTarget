@@ -43,17 +43,18 @@ describe("UserModel", () => {
         expect(res).toBeUndefined();
     });
 
-    test.skip(".save should hash password", async () => {
+    test(".save should hash password", async () => {
         const userObj = {
             username: "kek",
             password: "kek",
         };
         const user = await model.save(userObj);
-        const q = "SELECT username, password FROM users WHERE username = $1";
+        const q = "SELECT * FROM users WHERE username = $1";
         const values = [user.username];
         const res = await client.query(q, values);
         const gotUser = res.rows[0];
         expect(gotUser.id).toEqual(1);
         expect(gotUser.username).toEqual(userObj.username);
+        expect(gotUser.password).not.toEqual(userObj.password);
     });
 });
