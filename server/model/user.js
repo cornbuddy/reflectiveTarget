@@ -8,6 +8,10 @@ class UserModel {
         const res = await this.client.query(q, [username]);
         return res.rows[0];
     }
+
+    async save(user) {
+        return user;
+    }
 }
 
 module.exports = UserModel;

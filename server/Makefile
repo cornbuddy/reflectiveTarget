@@ -8,7 +8,7 @@ lint: deps
 
 .PHONY: test
 test: deps lint
-	@npm test
+	@npx jest --detectOpenHandles $(ARGS)
 
 .PHONY: deps
 deps:
