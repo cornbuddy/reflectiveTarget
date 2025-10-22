@@ -1,6 +1,6 @@
 const { Pool } = require("pg");
 
-const { makeApp } = require("./lib");
+const { makeApp } = require("./routers");
 
 const client = new Pool();
 const app = makeApp(client);
