@@ -1,6 +1,7 @@
 create table if not exists users (
     id serial primary key,
-    name varchar(100)
+    username varchar(100),
+    password varchar(100)
 );
 
 create table if not exists targets (
