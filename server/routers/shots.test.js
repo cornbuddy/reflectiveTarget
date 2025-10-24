@@ -23,14 +23,11 @@ describe("http endpoints", () => {
         await container.stop();
     });
 
-    test.each([
-        { url: "/", text: "Reflective target" },
-        { url: "/login", text: "Login" },
-        { url: "/signup", text: "Signup" },
-    ])("view $url", async ({ url, text }) => {
-        const resp = await supertest(app).get(url);
-        expect(resp.status).toEqual(200);
-        expect(resp.headers["content-type"]).toMatch(/html/);
-        expect(resp.text).toContain(text);
+    describe("/api/shots", () => {
+        test("get should succeed", async () => {
+            const resp = await supertest(app).get("/api/shots");
+            expect(resp.status).toEqual(200);
+            expect(resp.headers["content-type"]).toMatch(/json/);
+        });
     });
 });
