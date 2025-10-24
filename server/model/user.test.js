@@ -29,9 +29,12 @@ describe("UserModel", () => {
     });
 
     test(".find should return user if user exists", async () => {
-        const q = "INSERT INTO users(username, password) VALUES($1, $2)";
+        const q = [
+            "INSERT INTO users(username, hashed_password, salt)",
+            "VALUES($1, $2, $3)",
+        ].join("\n");
         const username = "kek";
-        const params = [username, "kek"];
+        const params = [username, "kek", "kek"];
         await client.query(q, params);
         const res = await model.find(username);
         expect(res.username).toEqual(username);
@@ -48,13 +51,14 @@ describe("UserModel", () => {
             username: "kek",
             password: "kek",
         };
-        const user = await model.save(userObj);
+        const gotUser = await model.save(userObj);
         const q = "SELECT * FROM users WHERE username = $1";
-        const values = [user.username];
+        const values = [gotUser.username];
         const res = await client.query(q, values);
-        const gotUser = res.rows[0];
-        expect(gotUser.id).toEqual(1);
-        expect(gotUser.username).toEqual(userObj.username);
-        expect(gotUser.password).not.toEqual(userObj.password);
+        const wantUser = res.rows[0];
+        expect(wantUser.id).toEqual(1);
+        expect(wantUser.username).toEqual(userObj.username);
+        expect(wantUser.hashed_password).not.toEqual(userObj.password);
+        expect(wantUser).toEqual(gotUser);
     });
 });
