@@ -46,7 +46,7 @@ describe("UserModel", () => {
         expect(res).toBeUndefined();
     });
 
-    test(".save should hash password", async () => {
+    test(".save should save user into db", async () => {
         const userObj = {
             username: "kek",
             password: "kek",
