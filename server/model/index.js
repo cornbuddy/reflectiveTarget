@@ -1,5 +1,7 @@
 const fs = require("node:fs/promises");
 
+const UserModel = require("./user");
+
 async function initDatabase(client) {
     const script = await fs.readFile(
         `${__dirname}/tables.sql`,
@@ -8,4 +10,4 @@ async function initDatabase(client) {
     await client.query(script);
 }
 
-module.exports = { initDatabase };
+module.exports = { UserModel, initDatabase };
