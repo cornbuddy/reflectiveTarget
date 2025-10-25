@@ -15,7 +15,7 @@ describe("/signup", () => {
 
     beforeEach(async () => {
         ({ client, container } = await setupTestDb());
-        app = makeApp(client);
+        app = await makeApp(client);
     });
 
     afterEach(async () => {
@@ -33,6 +33,7 @@ describe("/signup", () => {
         await client.end();
         const resp = await createUser(app, "kek", "kek");
         expect(resp.status).toEqual(503);
+        expect(resp.text).toContain("error");
     });
 
     test("should reject when user already exists", async () => {

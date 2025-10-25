@@ -13,7 +13,7 @@ function authzRouter(userModel) {
 
         await userModel.save(username, req.body.password)
             .then(() => res.status(201).write("created"))
-            .catch(() => res.status(503));
+            .catch(() => res.status(503).write("error"));
     });
     return router;
 }

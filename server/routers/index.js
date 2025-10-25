@@ -4,14 +4,17 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
+const bodyParser = require("body-parser");
 const csrf = require("@dr.pogodin/csurf");
 
-const { UserModel } = require("../model");
+const { UserModel, initDatabase } = require("../model");
 const authzRouter = require("./authz");
 const healthRouter = require("./health");
 const shotsRouter = require("./shots");
 
-function makeApp(client) {
+async function makeApp(client) {
+    await initDatabase(client);
+
     const app = express();
     const views = path.join(__dirname, "..", "views");
     app.use(expressLayouts);
@@ -22,6 +25,7 @@ function makeApp(client) {
     app.use(express.json());
     app.use(morgan("tiny"));
     app.use(cookieParser());
+    app.use(bodyParser.urlencoded({ extended: false }));
     app.use(csrf({ cookie: true }));
     app.use((req, res, next) => {
         res.locals.csrfToken = req.csrfToken();

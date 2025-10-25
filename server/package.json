@@ -23,6 +23,7 @@
     "homepage": "https://github.com/cornbuddy/reflectiveTarget#readme",
     "dependencies": {
         "@dr.pogodin/csurf": "^1.16.6",
+        "body-parser": "^2.2.0",
         "cookie-parser": "^1.4.7",
         "ejs": "^3.1.10",
         "express": "^5.1.0",
