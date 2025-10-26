@@ -15,7 +15,7 @@ describe("http endpoints", () => {
 
     beforeEach(async () => {
         ({ client, container } = await setupTestDb());
-        app = makeApp(client);
+        app = await makeApp(client);
     });
 
     afterEach(async () => {

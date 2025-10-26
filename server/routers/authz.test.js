@@ -10,6 +10,7 @@ const supertest = require("supertest");
 const { setupTestDb } = require("../test");
 const { makeApp } = require("./index");
 
+// TODO: process csrf token properly
 describe("/signup", () => {
     let app, client, container;
 
