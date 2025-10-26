@@ -1,30 +1,30 @@
 .PHONY: run
 run:
-	@$(MAKE) -C server run
+	@$(MAKE) -C old-server run
 
 .PHONY: stop
 stop:
-	@$(MAKE) -C server stop
+	@$(MAKE) -C old-server stop
 
 .PHONY: lint
 lint:
 	@$(MAKE) -C client lint
-	@$(MAKE) -C server lint
+	@$(MAKE) -C old-server lint
 	@$(MAKE) -C spec lint
 
 .PHONY: test
 test:
-	@$(MAKE) -C server test
+	@$(MAKE) -C old-server test
 
 PORT := 8080
 export PORT
 
 .PHONY: spec
 spec:
-	$(MAKE) -C server run & \
+	$(MAKE) -C old-server run & \
 		sleep 30 && \
 		$(MAKE) -C spec spec && \
-		$(MAKE) -C server stop
+		$(MAKE) -C old-server stop
 
 .PHONY: pre-commit
 pre-commit:
