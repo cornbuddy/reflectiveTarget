@@ -1,10 +1,10 @@
 .PHONY: run
-run:
-	@$(MAKE) -C old-server run
+run: stop
+	docker compose -f develop/compose.yml up --build
 
 .PHONY: stop
 stop:
-	@$(MAKE) -C old-server stop
+	- docker compose -f develop/compose.yml down
 
 .PHONY: lint
 lint:
