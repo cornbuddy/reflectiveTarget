@@ -9,6 +9,14 @@ max_line_length = 80
 indent_style = space
 indent_size = 4
 
+[*.go]
+indent_style = tab
+indent_size = 8
+
+[go.{sum,mod}]
+indent_style = tab
+max_line_length = 140
+
 [Makefile]
 indent_style = tab
 

@@ -1,6 +1,8 @@
 node_modules
 dist
 
+coverage.out
+
 __pycache__
 .pytest_cache
 .venv
