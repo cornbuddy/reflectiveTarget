@@ -14,7 +14,7 @@ lint:
 
 .PHONY: test
 test:
-	@$(MAKE) -C old-server test
+	@$(MAKE) -C server test
 
 PORT := 8080
 export PORT
