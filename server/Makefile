@@ -17,9 +17,14 @@ vet:
 tidy:
 	go mod tidy
 
+COVERPROFILE=cover.out
+COVERREPORT=cover.html
+
 .PHONY: test
 test: lint
-	go test -cover ./...
+	go test -coverprofile=$(COVERPROFILE) ./...
+	go tool cover -html $(COVERPROFILE) -o $(COVERREPORT)
+	- xdg-open $(COVERREPORT)
 
 .PHONY: deps
 deps: update tidy

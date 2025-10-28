@@ -1,7 +1,8 @@
 node_modules
 dist
 
-coverage.out
+cover.out
+cover.html
 
 __pycache__
 .pytest_cache
