@@ -2,27 +2,56 @@ package db
 
 import (
 	"context"
+	"database/sql"
+	"testing"
 	"time"
 
-	"github.com/testcontainers/testcontainers-go"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	tc "github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
 const Image = "postgres:18-alpine"
 
-func Setup(ctx context.Context) (*postgres.PostgresContainer, error) {
+type Cleanup func() error
+
+func SetupTestDb(ctx context.Context, t *testing.T) (Cleanup, *sql.DB, error) {
+	t.Helper()
+
+	emptyCleanup := func() error { return nil }
+
 	str := wait.ForLog("database system is ready to accept connections").
 		WithOccurrence(2).
 		WithStartupTimeout(5 * time.Second)
-	opts := []testcontainers.ContainerCustomizer{
-		testcontainers.WithWaitStrategy(str),
+	opts := []tc.ContainerCustomizer{
+		tc.WithWaitStrategy(str),
 	}
-
-	db, err := postgres.Run(ctx, Image, opts...)
+	dbContainer, err := postgres.Run(ctx, Image, opts...)
 	if err != nil {
-		return nil, err
+		return emptyCleanup, nil, err
 	}
 
-	return db, nil
+	connStr, err := dbContainer.ConnectionString(ctx, "sslmode=disable")
+	if err != nil {
+		return emptyCleanup, nil, err
+	}
+
+	db, err := sql.Open("pgx", connStr)
+	if err != nil {
+		return emptyCleanup, nil, err
+	}
+
+	cleanup := func() error {
+		if err = db.Close(); err != nil {
+			return err
+		}
+
+		if err := tc.TerminateContainer(dbContainer); err != nil {
+			return err
+		}
+
+		return nil
+	}
+	return cleanup, db, nil
 }
