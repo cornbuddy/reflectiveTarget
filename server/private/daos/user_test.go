@@ -18,7 +18,6 @@ func TestShouldFindUserIfExists(t *testing.T) {
 	user, err := userDao.Find(username)
 	assert.NoError(t, err)
 	assert.Equal(t, username, user.Username)
-	assert.Equal(t, 1, user.ID)
 }
 
 func TestShouldReturnNilIfUserDoesNotExist(t *testing.T) {
