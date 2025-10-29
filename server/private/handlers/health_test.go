@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -15,16 +14,7 @@ import (
 func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.TODO()
-	cleanup, db, err := testdb.SetupTestDb(ctx, t)
-	assert.NoError(t, err)
-
-	t.Cleanup(func() {
-		assert.NoError(t, cleanup())
-	})
-
-	route := HealthRouter{DB: db}
-	res := makeRequest(http.MethodGet, "/healthz", route.Get)
+	res := makeRequest(http.MethodGet, "/healthz", healthRouter.Get)
 	assert.NotNil(t, res)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -42,7 +32,6 @@ func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 func TestHealthHandlerShouldFailWhenDbDoesntWork(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.TODO()
 	cleanup, db, err := testdb.SetupTestDb(ctx, t)
 	assert.NoError(t, err)
 
@@ -51,8 +40,8 @@ func TestHealthHandlerShouldFailWhenDbDoesntWork(t *testing.T) {
 	})
 
 	db.Close()
-	route := HealthRouter{DB: db}
-	res := makeRequest(http.MethodGet, "/healthz", route.Get)
+	router := HealthRouter{DB: db}
+	res := makeRequest(http.MethodGet, "/healthz", router.Get)
 	assert.NotNil(t, res)
 	assert.Equal(t, http.StatusServiceUnavailable, res.StatusCode)
 
