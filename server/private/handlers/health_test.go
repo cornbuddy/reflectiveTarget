@@ -14,7 +14,7 @@ import (
 func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 	t.Parallel()
 
-	res := makeRequest(http.MethodGet, "/healthz", healthRouter.Get)
+	res := makeRequest(http.MethodGet, "/healthz", healthRouter.Get, nil)
 	assert.NotNil(t, res)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -41,7 +41,7 @@ func TestHealthHandlerShouldFailWhenDbDoesntWork(t *testing.T) {
 
 	db.Close()
 	router := HealthRouter{DB: db}
-	res := makeRequest(http.MethodGet, "/healthz", router.Get)
+	res := makeRequest(http.MethodGet, "/healthz", router.Get, nil)
 	assert.NotNil(t, res)
 	assert.Equal(t, http.StatusServiceUnavailable, res.StatusCode)
 
