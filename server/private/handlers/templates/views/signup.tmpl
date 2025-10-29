@@ -1,0 +1,30 @@
+Signup
+
+<form action="/signup" method="post">
+
+    <section>
+        <label for="username">Username</label>
+        <input id="username"
+            name="username"
+            type="text"
+            autocomplete="username"
+            required>
+    </section>
+
+    <section>
+        <label for="password">Password</label>
+        <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="password"
+            required>
+    </section>
+
+    <button type="submit">Sign up</button>
+
+</form>
+
+<hr>
+
+<p class="help">Already have an account? <a href="/login">Sign in</a></p>

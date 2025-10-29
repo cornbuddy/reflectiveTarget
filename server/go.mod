@@ -3,6 +3,7 @@ module github.com/cornbuddy/reflectiveTarget/server
 go 1.25.3
 
 require (
+	github.com/abiosoft/mold v0.0.0-20250328135240-0a4c28cb836a
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/stretchr/testify v1.11.1
 	github.com/testcontainers/testcontainers-go v0.39.0
