@@ -19,11 +19,9 @@ var options = mold.With(
 var engine = mold.Must(mold.New(dir, options))
 
 func (r AuthzRouter) GetSignup(resp http.ResponseWriter, req *http.Request) {
-	resp.Header().Add("Content-Type", "text/html")
 	engine.Render(resp, "views/signup.tmpl", nil)
 }
 
 func (r AuthzRouter) GetLogin(resp http.ResponseWriter, req *http.Request) {
-	resp.Header().Add("Content-Type", "text/html")
 	engine.Render(resp, "views/login.tmpl", nil)
 }
