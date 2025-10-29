@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/private/utils"
 	testdb "github.com/cornbuddy/reflectiveTarget/server/test/db"
 )
@@ -14,6 +15,7 @@ import (
 var (
 	ctx          context.Context
 	db           *sql.DB
+	userDao      daos.UserDao
 	healthRouter HealthRouter
 	authzRouter  AuthzRouter
 )
@@ -32,6 +34,7 @@ func TestMain(m *testing.M) {
 	}
 
 	db = testDb
+	userDao = daos.UserDao{DB: db}
 	healthRouter = HealthRouter{DB: db}
 	authzRouter = AuthzRouter{}
 
