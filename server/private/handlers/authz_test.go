@@ -28,7 +28,8 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		res := makeRequest(http.MethodGet, tc.url, tc.router)
-		assert.Equal(t, "text/html", res.Header.Get("Content-Type"))
+		ct := "text/html; charset=utf-8"
+		assert.Equal(t, ct, res.Header.Get("Content-Type"))
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 
 		data, err := io.ReadAll(res.Body)
