@@ -3,15 +3,15 @@ package daos
 import (
 	"database/sql"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/dsl"
+	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
 
 type UserDao struct {
 	*sql.DB
 }
 
-func (dao UserDao) Find(username string) (*dsl.User, error) {
-	var user dsl.User
+func (dao UserDao) Find(username string) (*model.User, error) {
+	var user model.User
 	query := "SELECT id, username FROM users WHERE username = $1"
 	err := dao.DB.QueryRow(query, username).Scan(&user.ID, &user.Username)
 	if err == sql.ErrNoRows {
