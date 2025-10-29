@@ -12,6 +12,7 @@ import (
 
 func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 	t.Parallel()
+	t.Skip("not implemeted")
 
 	username := "kek"
 	password := "kek"

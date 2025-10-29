@@ -21,9 +21,6 @@ var options = mold.With(
 var engine = mold.Must(mold.New(dir, options))
 
 func (r AuthzRouter) PostSignup(resp http.ResponseWriter, req *http.Request) {
-	dao := r.UserDao
-	req.ParseForm()
-	user, err := dao.Save(user)
 }
 
 func (r AuthzRouter) GetSignup(resp http.ResponseWriter, req *http.Request) {

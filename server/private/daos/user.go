@@ -12,8 +12,8 @@ type UserDao struct {
 
 func (dao UserDao) Find(username string) (*model.User, error) {
 	var user model.User
-	query := "SELECT id, username FROM users WHERE username = $1"
-	err := dao.DB.QueryRow(query, username).Scan(&user.ID, &user.Username)
+	query := "SELECT username FROM users WHERE username = $1"
+	err := dao.DB.QueryRow(query, username).Scan(&user.Username)
 	if err == sql.ErrNoRows {
 		// kinda expected
 		return nil, nil
