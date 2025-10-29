@@ -7,6 +7,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNewUserShouldReturnErrorWhenFormMissingRequiredKeys(t *testing.T) {
+	fields := []string{"username", "password"}
+	for _, field := range fields {
+		form := url.Values{}
+		form.Set(field, "kek")
+		user, err := NewUser(form)
+		assert.ErrorIs(t, err, ErrUserFormMissingKeys)
+		assert.Nil(t, user)
+	}
+}
+
 func TestNewUserShouldHashPassword(t *testing.T) {
 	form := url.Values{}
 	form.Set("username", "username")
@@ -14,4 +25,5 @@ func TestNewUserShouldHashPassword(t *testing.T) {
 	user, err := NewUser(form)
 	assert.NoError(t, err)
 	assert.Equal(t, form.Get("username"), user.Username)
+	assert.NotEqual(t, form.Get("password"), user.Password.Hash)
 }
