@@ -15,6 +15,7 @@ var (
 	ctx          context.Context
 	db           *sql.DB
 	healthRouter HealthRouter
+	authzRouter  AuthzRouter
 )
 
 func TestMain(m *testing.M) {
@@ -32,6 +33,7 @@ func TestMain(m *testing.M) {
 
 	db = testDb
 	healthRouter = HealthRouter{DB: db}
+	authzRouter = AuthzRouter{}
 
 	code := m.Run()
 	defer os.Exit(code)
