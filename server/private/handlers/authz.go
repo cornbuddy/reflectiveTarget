@@ -22,6 +22,10 @@ var options = mold.With(
 var engine = mold.Must(mold.New(dir, options))
 
 func (r AuthzRouter) PostSignup(resp http.ResponseWriter, req *http.Request) {
+	if err := req.ParseForm(); err != nil {
+		http.Error(resp, "Invalid form", http.StatusBadRequest)
+		return
+	}
 }
 
 func (r AuthzRouter) GetSignup(resp http.ResponseWriter, req *http.Request) {

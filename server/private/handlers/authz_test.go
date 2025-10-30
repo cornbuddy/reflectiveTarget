@@ -14,33 +14,30 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		username   string
-		password   string
 		message    string
 		statusCode int
+		body       io.Reader
 	}
 
 	testCases := []testCase{{
-		username:   "kek",
-		password:   "kek",
 		message:    "User successfully created",
 		statusCode: http.StatusCreated,
+		body: strings.NewReader(
+			fmt.Sprintf("username=%s&password=%s", "kek", "kek"),
+		),
 	}, {
-		username:   "kek",
-		password:   "kek",
 		message:    "User already exists",
 		statusCode: http.StatusConflict,
+		body: strings.NewReader(
+			fmt.Sprintf("username=%s&password=%s", "kek", "kek"),
+		),
 	}}
 
 	for _, tc := range testCases {
-		body := strings.NewReader(
-			fmt.Sprintf(
-				"username=%s&password=%s",
-				tc.username, tc.password,
-			),
-		)
 		route := authzRouter.PostSignup
-		res := makeRequest(http.MethodPost, "/signup", route, body)
+		ct := "application/x-www-form-urlencoded"
+		body := tc.body
+		res := makeRequest(ct, http.MethodPost, "/signup", route, body)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
 
 		data, err := io.ReadAll(res.Body)
@@ -73,7 +70,7 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		res := makeRequest(http.MethodGet, tc.url, tc.router, nil)
+		res := makeRequest("", http.MethodGet, tc.url, tc.router, nil)
 		ct := "text/html; charset=utf-8"
 		assert.Equal(t, ct, res.Header.Get("Content-Type"))
 		assert.Equal(t, http.StatusOK, res.StatusCode)
