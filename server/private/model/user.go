@@ -10,6 +10,7 @@ var (
 )
 
 type User struct {
+	Password
 	Username string
 }
 
@@ -19,5 +20,13 @@ func NewUser(form url.Values) (*User, error) {
 		return nil, ErrUserFormMissingKeys
 	}
 
-	return &User{Username: "username"}, nil
+	password, err := NewPassword(form.Get("password"))
+	if err != nil {
+		return nil, err
+	}
+
+	return &User{
+		Username: form.Get("username"),
+		Password: *password,
+	}, nil
 }

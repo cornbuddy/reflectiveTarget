@@ -26,4 +26,5 @@ func TestNewUserShouldHashPassword(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, form.Get("username"), user.Username)
 	assert.NotEqual(t, form.Get("password"), user.Password.Hash)
+	assert.NotEmpty(t, user.Password)
 }
