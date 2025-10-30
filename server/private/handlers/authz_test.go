@@ -12,29 +12,45 @@ import (
 
 func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 	t.Parallel()
-	t.Skip("not implemeted")
 
-	username := "kek"
-	password := "kek"
-	body := strings.NewReader(
-		fmt.Sprintf("username=%s&password=%s", username, password),
-	)
-	res := makeRequest(
-		http.MethodPost, "/signup", authzRouter.PostSignup, body,
-	)
-	assert.Equal(t, http.StatusCreated, res.StatusCode)
+	type testCase struct {
+		username   string
+		password   string
+		message    string
+		statusCode int
+	}
 
-	data, err := io.ReadAll(res.Body)
-	assert.NoError(t, err)
+	testCases := []testCase{{
+		username:   "kek",
+		password:   "kek",
+		message:    "User successfully created",
+		statusCode: http.StatusCreated,
+	}, {
+		username:   "kek",
+		password:   "kek",
+		message:    "User already exists",
+		statusCode: http.StatusConflict,
+	}}
 
-	t.Cleanup(func() { res.Body.Close() })
+	for _, tc := range testCases {
+		body := strings.NewReader(
+			fmt.Sprintf(
+				"username=%s&password=%s",
+				tc.username, tc.password,
+			),
+		)
+		route := authzRouter.PostSignup
+		res := makeRequest(http.MethodPost, "/signup", route, body)
+		assert.Equal(t, tc.statusCode, res.StatusCode)
 
-	gotBody := string(data)
-	assert.Contains(t, gotBody, "User successfully created")
+		data, err := io.ReadAll(res.Body)
+		assert.NoError(t, err)
 
-	user, err := userDao.Find(username)
-	assert.NoError(t, err)
-	assert.Equal(t, username, user.Username)
+		t.Cleanup(func() { res.Body.Close() })
+
+		gotBody := string(data)
+		assert.Contains(t, gotBody, tc.message)
+	}
 }
 
 func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
