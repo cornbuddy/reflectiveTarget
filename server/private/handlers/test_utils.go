@@ -7,13 +7,13 @@ import (
 )
 
 func makeRequest(
-	method, url string, handle http.HandlerFunc, body io.Reader,
+	contentType, method, url string,
+	handle http.HandlerFunc, body io.Reader,
 ) *http.Response {
 
 	req := httptest.NewRequest(method, url, body)
-	if body != nil && method == http.MethodPost {
-		ct := "application/x-www-form-urlencoded"
-		req.Header.Set("Content-Type", ct)
+	if contentType != "" {
+		req.Header.Set("Content-Type", contentType)
 	}
 
 	w := httptest.NewRecorder()
