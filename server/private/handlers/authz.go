@@ -7,6 +7,7 @@ import (
 	"github.com/abiosoft/mold"
 
 	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
 
 type AuthzRouter struct {
@@ -23,9 +24,32 @@ var engine = mold.Must(mold.New(dir, options))
 
 func (r AuthzRouter) PostSignup(resp http.ResponseWriter, req *http.Request) {
 	if err := req.ParseForm(); err != nil {
-		http.Error(resp, "Invalid form", http.StatusBadRequest)
+		http.Error(resp, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	newUser, err := model.NewUser(req.Form)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	user, err := r.UserDao.Find(newUser.Username)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	} else if user != nil {
+		http.Error(resp, "User already exists", http.StatusConflict)
+		return
+	}
+
+	if err := r.UserDao.Save(*newUser); err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	resp.WriteHeader(http.StatusCreated)
+	resp.Write([]byte("User successfully created"))
 }
 
 func (r AuthzRouter) GetSignup(resp http.ResponseWriter, req *http.Request) {
