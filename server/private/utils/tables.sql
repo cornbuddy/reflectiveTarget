@@ -1,8 +1,7 @@
 create table if not exists users (
     id serial primary key,
     username varchar(64) not null,
-    hashed_password varchar(64) not null,
-    salt varchar(64) not null
+    hashed_password varchar(128) not null
 );
 
 create table if not exists targets (
