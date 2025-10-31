@@ -31,6 +31,12 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 		body: strings.NewReader(
 			fmt.Sprintf("username=%s&password=%s", "kek", "kek"),
 		),
+	}, {
+		message:    "missing keys",
+		statusCode: http.StatusBadRequest,
+		body: strings.NewReader(
+			fmt.Sprintf("username=%s", "kek"),
+		),
 	}}
 
 	for _, tc := range testCases {

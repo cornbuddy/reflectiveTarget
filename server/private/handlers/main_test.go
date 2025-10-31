@@ -36,7 +36,7 @@ func TestMain(m *testing.M) {
 	db = testDb
 	userDao = daos.UserDao{DB: db}
 	healthRouter = HealthRouter{DB: db}
-	authzRouter = AuthzRouter{}
+	authzRouter = AuthzRouter{UserDao: userDao}
 
 	code := m.Run()
 	defer os.Exit(code)
