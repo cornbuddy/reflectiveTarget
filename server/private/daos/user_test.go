@@ -4,20 +4,37 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
+
+func TestShouldSaveUser(t *testing.T) {
+	t.Parallel()
+
+	pwd, err := model.NewPassword("kek")
+	assert.NoError(t, err)
+
+	want := model.User{Username: "kek", Password: *pwd}
+	assert.NoError(t, userDao.Save(want))
+
+	var id int
+	query := "SELECT id FROM users WHERE username = $1"
+	assert.NoError(t, db.QueryRow(query, want.Username).Scan(&id))
+	assert.GreaterOrEqual(t, id, 1)
+}
 
 func TestShouldFindUserIfExists(t *testing.T) {
 	t.Parallel()
 
-	query := "INSERT INTO users (username, hashed_password, salt) " +
-		"VALUES ($1, $2, $3)"
+	query := "INSERT INTO users (username, hashed_password) VALUES ($1, $2)"
 	username := "kek"
-	_, err := db.Exec(query, username, "kek", "kek")
+	_, err := db.Exec(query, username, "kek")
 	assert.NoError(t, err)
 
 	user, err := userDao.Find(username)
 	assert.NoError(t, err)
 	assert.Equal(t, username, user.Username)
+	assert.NotEmpty(t, user.Password.Hash)
 }
 
 func TestShouldReturnNilIfUserDoesNotExist(t *testing.T) {
