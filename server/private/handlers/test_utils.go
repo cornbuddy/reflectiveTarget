@@ -4,14 +4,20 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"testing"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func makeRequest(
-	contentType, method, url string,
+	contentType, method string,
 	handle http.HandlerFunc, body io.Reader,
 ) *http.Response {
 
-	req := httptest.NewRequest(method, url, body)
+	req := httptest.NewRequest(method, "/", body)
 	if contentType != "" {
 		req.Header.Set("Content-Type", contentType)
 	}
@@ -20,4 +26,23 @@ func makeRequest(
 	handle(w, req)
 
 	return w.Result()
+}
+
+func assertSessionCookieIsSet(t *testing.T, resp *http.Response) {
+	cookies := resp.Cookies()
+	require.NotEmpty(t, cookies)
+
+	var sessionCookie *http.Cookie
+	for _, cookie := range cookies {
+		if cookie.Name == SessionCookieName {
+			sessionCookie = cookie
+			break
+		}
+	}
+
+	require.NotNil(t, sessionCookie)
+
+	month := time.Now().AddDate(0, 1, 1)
+	assert.True(t, sessionCookie.Expires.After(month))
+	assert.NoError(t, uuid.Validate(sessionCookie.Value))
 }

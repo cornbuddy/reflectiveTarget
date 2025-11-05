@@ -1,19 +1,9 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 )
-
-type HealthResponse struct {
-	Connected   bool `json:"connected"`
-	Connections int  `json:"connections"`
-}
-
-type HealthRouter struct {
-	*sql.DB
-}
 
 func (r HealthRouter) Get(resp http.ResponseWriter, req *http.Request) {
 	var connections, status int
