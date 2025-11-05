@@ -3,16 +3,15 @@ package handlers
 import (
 	"embed"
 	"net/http"
+	"time"
 
 	"github.com/abiosoft/mold"
+	"github.com/google/uuid"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
 
-type AuthzRouter struct {
-	daos.UserDao
-}
+const SessionCookieName = "session-token"
 
 //go:embed templates
 var dir embed.FS
@@ -48,6 +47,11 @@ func (r AuthzRouter) PostSignup(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	http.SetCookie(resp, &http.Cookie{
+		Name:    SessionCookieName,
+		Value:   uuid.NewString(),
+		Expires: time.Now().AddDate(0, 1, 0),
+	})
 	resp.WriteHeader(http.StatusCreated)
 	resp.Write([]byte("User successfully created"))
 }
