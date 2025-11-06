@@ -42,7 +42,9 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response) {
 
 	require.NotNil(t, sessionCookie)
 
-	month := time.Now().AddDate(0, 1, 1)
+	// substracting 1 second because time.Now add ms to the time, while
+	// cookie doesn't count that strictly
+	month := time.Now().AddDate(0, 1, 0).Add(-1 * time.Second).UTC()
 	assert.True(t, sessionCookie.Expires.After(month))
 	assert.NoError(t, uuid.Validate(sessionCookie.Value))
 }

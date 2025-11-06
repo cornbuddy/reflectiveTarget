@@ -50,7 +50,6 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 
 		isSucceed := res.StatusCode >= 200 && res.StatusCode <= 299
 		if isSucceed {
-			t.Logf("tc: %s", tc.message)
 			assertSessionCookieIsSet(t, res)
 		}
 
