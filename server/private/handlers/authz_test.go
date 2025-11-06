@@ -9,7 +9,90 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
+
+func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		message    string
+		statusCode int
+		body       io.Reader
+	}
+
+	wrongPasswordUser, err := makeTestUser(userDao)
+	require.NoError(t, err)
+	require.NotNil(t, wrongPasswordUser)
+
+	testCases := []testCase{{
+		message:    "User does not exist",
+		statusCode: http.StatusUnauthorized,
+		body: strings.NewReader(
+			fmt.Sprintf("username=%s&password=%s", "absent", "kek"),
+		),
+	}, {
+		message:    "Password is wrong",
+		statusCode: http.StatusUnauthorized,
+		body: strings.NewReader(
+			fmt.Sprintf(
+				"username=%s&password=%s",
+				wrongPasswordUser.Username,
+				"wrong-password",
+			),
+		),
+	}}
+
+	for _, tc := range testCases {
+		route := authzRouter.PostLogin
+		ct := "application/x-www-form-urlencoded"
+		body := tc.body
+		res := makeRequest(ct, http.MethodPost, route, body)
+		require.NotNil(t, res)
+		assert.Equal(t, tc.statusCode, res.StatusCode)
+
+		data, err := io.ReadAll(res.Body)
+		assert.NoError(t, err)
+
+		t.Cleanup(func() { res.Body.Close() })
+
+		gotBody := string(data)
+		assert.Contains(t, gotBody, tc.message)
+	}
+}
+
+func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
+	t.Parallel()
+
+	username := "test-login"
+	password := "kek"
+	pwd, err := model.NewPassword(password)
+	require.NoError(t, err)
+
+	user := model.User{
+		Username: username,
+		Password: *pwd,
+	}
+	require.NoError(t, userDao.Save(user))
+
+	ct := "application/x-www-form-urlencoded"
+	body := strings.NewReader(
+		fmt.Sprintf("username=%s&password=%s", username, password),
+	)
+	res := makeRequest(ct, http.MethodPost, authzRouter.PostLogin, body)
+	require.NotNil(t, res)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assertSessionCookieIsSet(t, res)
+
+	data, err := io.ReadAll(res.Body)
+	require.NoError(t, err)
+
+	t.Cleanup(func() { res.Body.Close() })
+
+	gotBody := string(data)
+	assert.Contains(t, gotBody, "Login succeeded")
+}
 
 func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 	t.Parallel()

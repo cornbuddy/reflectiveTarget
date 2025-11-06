@@ -21,6 +21,46 @@ var options = mold.With(
 )
 var engine = mold.Must(mold.New(dir, options))
 
+func (r AuthzRouter) PostLogin(resp http.ResponseWriter, req *http.Request) {
+	if err := req.ParseForm(); err != nil {
+		http.Error(resp, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	userObj, err := model.NewUser(req.Form)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	user, err := r.UserDao.Find(userObj.Username)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	} else if user == nil {
+		http.Error(resp, "User does not exist", http.StatusUnauthorized)
+		return
+	}
+
+	authorized, err := user.Password.Verify(req.Form.Get("password"))
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if authorized {
+		http.SetCookie(resp, &http.Cookie{
+			Name:    SessionCookieName,
+			Value:   uuid.NewString(),
+			Expires: time.Now().AddDate(0, 1, 0),
+		})
+		resp.Write([]byte("Login succeeded"))
+	} else {
+		http.Error(resp, "Password is wrong", http.StatusUnauthorized)
+	}
+
+}
+
 func (r AuthzRouter) PostSignup(resp http.ResponseWriter, req *http.Request) {
 	if err := req.ParseForm(); err != nil {
 		http.Error(resp, err.Error(), http.StatusBadRequest)
