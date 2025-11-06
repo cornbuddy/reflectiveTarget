@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"io"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,7 +11,39 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
+
+var defaultPassword = "default-password"
+
+func makeTestUser(dao daos.UserDao) (*model.User, error) {
+	pwd, err := model.NewPassword(defaultPassword)
+	if err != nil {
+		return nil, err
+	}
+
+	user := model.User{
+		Username: makeRandomString(10),
+		Password: *pwd,
+	}
+	if err := dao.Save(user); err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func makeRandomString(length int) string {
+	letters := []rune("abcdefghijklmnopqrstuvwxyz")
+	result := make([]rune, length)
+	for i := range result {
+		result[i] = letters[rand.Intn(len(letters))]
+	}
+
+	return string(result)
+}
 
 func makeRequest(
 	contentType, method string,

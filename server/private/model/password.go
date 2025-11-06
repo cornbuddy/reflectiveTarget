@@ -8,6 +8,15 @@ type Password struct {
 	Hash string
 }
 
+func (p Password) Verify(plaintext string) (bool, error) {
+	match, err := argon2id.ComparePasswordAndHash(plaintext, p.Hash)
+	if err != nil {
+		return false, err
+	}
+
+	return match, nil
+}
+
 func NewPassword(plaintext string) (*Password, error) {
 	params := &argon2id.Params{
 		Memory:      64 * 1024,

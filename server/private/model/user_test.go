@@ -8,6 +8,8 @@ import (
 )
 
 func TestNewUserShouldReturnErrorWhenFormMissingRequiredKeys(t *testing.T) {
+	t.Parallel()
+
 	fields := []string{"username", "password"}
 	for _, field := range fields {
 		form := url.Values{}
@@ -19,6 +21,8 @@ func TestNewUserShouldReturnErrorWhenFormMissingRequiredKeys(t *testing.T) {
 }
 
 func TestNewUserShouldHashPassword(t *testing.T) {
+	t.Parallel()
+
 	form := url.Values{}
 	form.Set("username", "username")
 	form.Set("password", "password")
