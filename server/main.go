@@ -7,3 +7,7 @@ import (
 func main() {
 	fmt.Println("hello world")
 }
+
+func Init() (*Config, error) {
+	return nil, fmt.Errorf("not implemented")
+}
