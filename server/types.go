@@ -7,6 +7,6 @@ import (
 )
 
 type Config struct {
-	sql.DB
+	*sql.DB
 	daos.UserDao
 }
