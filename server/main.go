@@ -1,8 +1,13 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
+
+	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/private/utils"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 var ErrNoEnvVar = fmt.Errorf("no environment variable")
@@ -38,7 +43,23 @@ func Init() (*Config, error) {
 		host = h
 	}
 
-	fmt.Println(password, user, database, host)
+	connStr := fmt.Sprintf(
+		"postgresql://%s:%s@%s:5432/%s?sslmode=disable",
+		user, password, host, database,
+	)
+	db, err := sql.Open("pgx", connStr)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, fmt.Errorf("not implemented")
+	if err := utils.InitDatabase(db); err != nil {
+		return nil, err
+	}
+
+	return &Config{
+		DB: db,
+		UserDao: daos.UserDao{
+			DB: db,
+		},
+	}, nil
 }

@@ -1,11 +1,18 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"os"
 	"testing"
+	"time"
 
+	"github.com/cornbuddy/reflectiveTarget/server/test/db"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	tc "github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/modules/postgres"
+	"github.com/testcontainers/testcontainers-go/wait"
 )
 
 // those tests are not prarallel because os.Setenv sets env var globally, across
@@ -18,27 +25,68 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 		value string
 	}
 
+	ctx := context.TODO()
+	username := "test_user"
+	password := "kekekeke"
+	database := "testdb"
+
+	str := wait.ForLog("database system is ready to accept connections").
+		WithOccurrence(2).
+		WithStartupTimeout(5 * time.Second)
+	opts := []tc.ContainerCustomizer{
+		tc.WithWaitStrategy(str),
+		postgres.WithUsername(username),
+		postgres.WithPassword(password),
+		postgres.WithDatabase(database),
+	}
+
+	cont, err := postgres.Run(ctx, db.Image, opts...)
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		assert.NoError(t, cont.Terminate(ctx))
+	})
+
+	host, err := cont.ContainerIP(ctx)
+	require.NoError(t, err)
+
 	envVars := []environmentVariable{
-		{"PGPASSWORD", "kek"},
-		{"PGUSER", "kek"},
-		{"PGDATABASE", "kek"},
-		{"PGHOST", "kek"},
+		{"PGPASSWORD", password},
+		{"PGUSER", username},
+		{"PGDATABASE", database},
+		{"PGHOST", host},
 	}
 
 	for _, envVar := range envVars {
-		os.Setenv(envVar.key, envVar.value)
+		require.NoError(t, os.Setenv(envVar.key, envVar.value))
 	}
 
 	t.Cleanup(func() {
 		for _, envVar := range envVars {
-			os.Unsetenv(envVar.key)
+			require.NoError(t, os.Unsetenv(envVar.key))
 		}
 	})
 
 	config, err := Init()
 	require.NoError(t, err)
 	require.NotEmpty(t, config)
+
+	t.Cleanup(func() {
+		assert.NoError(t, config.DB.Close())
+	})
+
 	assert.NoError(t, config.DB.Ping())
+
+	tables := []string{"users", "targets", "questions", "shots"}
+	for _, table := range tables {
+		query := fmt.Sprintf("SELECT * FROM %s", table)
+		rows, err := config.DB.Query(query)
+		require.NoError(t, err)
+
+		cols, err := rows.Columns()
+		assert.NoError(t, err)
+		assert.NotEmpty(t, cols)
+	}
 }
 
 func TestInitShouldReturnErrorWhenRequiredEnvVarsAreNotSet(t *testing.T) {
