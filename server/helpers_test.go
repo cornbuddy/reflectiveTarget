@@ -23,6 +23,18 @@ func TestMakeHttpHandler(t *testing.T) {
 		statusCode int
 	}
 
+	cleanup, err := setDbEnvVars()
+	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		require.NoError(t, cleanup())
+	})
+
+	config, err := MakeConfig()
+	require.NoError(t, err)
+
+	handle := MakeMux(config).ServeHTTP
+
 	testCases := []testCase{{
 		url:        "/login",
 		method:     http.MethodGet,
@@ -49,17 +61,6 @@ func TestMakeHttpHandler(t *testing.T) {
 		statusCode: http.StatusNotFound,
 	}}
 
-	cleanup, err := setDbEnvVars()
-	require.NoError(t, err)
-
-	t.Cleanup(func() {
-		require.NoError(t, cleanup())
-	})
-
-	config, err := MakeConfig()
-	require.NoError(t, err)
-
-	handle := MakeMux(config).ServeHTTP
 	for _, tc := range testCases {
 		resp := utils.MakeRequest("", tc.method, tc.url, handle, nil)
 		msg := fmt.Sprintf("%s %s", tc.method, tc.url)
