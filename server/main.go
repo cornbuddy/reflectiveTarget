@@ -22,7 +22,7 @@ type Config struct {
 var ErrNoEnvVar = fmt.Errorf("no environment variable")
 
 func main() {
-	config, err := Init()
+	config, err := MakeConfig()
 	if err != nil {
 		log.Fatalf("failed to init application: %s", err)
 	}
@@ -48,7 +48,7 @@ func main() {
 	}
 }
 
-func Init() (*Config, error) {
+func MakeConfig() (*Config, error) {
 	var password, user, database, host string
 
 	if pwd, ok := os.LookupEnv("PGPASSWORD"); !ok {
