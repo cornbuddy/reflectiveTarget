@@ -13,7 +13,7 @@ RUN go build \
     -a -v \
     -gcflags=all="-l -B" \
     -ldflags="-w -s" \
-    -o reflecitve-target main.go
+    -o reflecitve-target .
 
 FROM scratch
 COPY --from=builder /workspace/reflecitve-target .
