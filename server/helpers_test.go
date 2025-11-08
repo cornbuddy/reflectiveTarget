@@ -12,9 +12,11 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
-func TestMakeHttpHandler(t *testing.T) {
-	t.Parallel()
+// those tests are not prarallel because os.Setenv sets env var globally, across
+// all goroutines, which messess up test cases when I don't expect env vars to
+// be set
 
+func TestMakeHttpHandler(t *testing.T) {
 	type testCase struct {
 		url        string
 		method     string
@@ -60,13 +62,9 @@ func TestMakeHttpHandler(t *testing.T) {
 	handle := MakeMux(config).ServeHTTP
 	for _, tc := range testCases {
 		resp := utils.MakeRequest("", tc.method, handle, nil)
-		assert.Equal(t, tc.statusCode, resp.StatusCode)
+		assert.Equal(t, tc.statusCode, resp.StatusCode, tc.url)
 	}
 }
-
-// those tests are not prarallel because os.Setenv sets env var globally, across
-// all goroutines, which messess up test cases when I don't expect env vars to
-// be set
 
 func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 	cleanup, err := setDbEnvVars()

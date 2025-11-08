@@ -3,8 +3,10 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
+	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
@@ -69,9 +71,27 @@ func MakeConfig() (*Config, error) {
 		"postgresql://%s:%s@%s:5432/%s?sslmode=disable",
 		user, password, host, database,
 	)
-	db, err := sql.Open("pgx", connStr)
+
+	const retries = 5
+	const delay = 3 * time.Second
+	var db *sql.DB
+	var err error
+
+	for attempt := range retries {
+		log.Printf("connecting to db, attempt #%d", attempt)
+		db, err = sql.Open("pgx", connStr)
+		connected := db.Ping() == nil
+		if connected {
+			log.Println("connected to db")
+			break
+		}
+
+		log.Printf("failed, waiting %v...", delay)
+		time.Sleep(delay)
+	}
+
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to connect to db: %w", err)
 	}
 
 	if err := utils.InitDatabase(db); err != nil {

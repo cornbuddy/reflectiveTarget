@@ -5,7 +5,12 @@ import (
 	"net/http"
 )
 
+func init() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+}
+
 func main() {
+	log.Println("initializing application...")
 	config, err := MakeConfig()
 	if err != nil {
 		log.Fatalf("failed to init application: %s", err)
