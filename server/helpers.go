@@ -29,6 +29,7 @@ func MakeMux(config *Config) http.Handler {
 	authz := handlers.AuthzRouter{
 		UserDao: config.UserDao,
 	}
+	index := handlers.IndexRouter{}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /login", authz.GetLogin)
@@ -36,6 +37,7 @@ func MakeMux(config *Config) http.Handler {
 	mux.HandleFunc("POST /login", authz.PostLogin)
 	mux.HandleFunc("POST /signup", authz.PostSignup)
 	mux.HandleFunc("GET /api/health", health.Get)
+	mux.HandleFunc("GET /", index.Get)
 
 	return mux
 }

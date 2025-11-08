@@ -1,25 +1,15 @@
 package handlers
 
 import (
-	"embed"
 	"net/http"
 	"time"
 
-	"github.com/abiosoft/mold"
 	"github.com/google/uuid"
 
 	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
 
 const SessionCookieName = "session-token"
-
-//go:embed templates
-var dir embed.FS
-var options = mold.With(
-	mold.WithRoot("templates"),
-	mold.WithLayout("layout.tmpl"),
-)
-var engine = mold.Must(mold.New(dir, options))
 
 func (r AuthzRouter) PostLogin(resp http.ResponseWriter, req *http.Request) {
 	if err := req.ParseForm(); err != nil {
