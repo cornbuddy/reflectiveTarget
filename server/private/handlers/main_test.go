@@ -18,6 +18,7 @@ var (
 	userDao      daos.UserDao
 	healthRouter HealthRouter
 	authzRouter  AuthzRouter
+	indexRouter  IndexRouter
 )
 
 func TestMain(m *testing.M) {
@@ -37,6 +38,7 @@ func TestMain(m *testing.M) {
 	userDao = daos.UserDao{DB: db}
 	healthRouter = HealthRouter{DB: db}
 	authzRouter = AuthzRouter{UserDao: userDao}
+	indexRouter = IndexRouter{}
 
 	code := m.Run()
 	defer os.Exit(code)

@@ -56,6 +56,10 @@ func TestMakeHttpHandler(t *testing.T) {
 		method:     http.MethodGet,
 		statusCode: http.StatusOK,
 	}, {
+		url:        "/",
+		method:     http.MethodGet,
+		statusCode: http.StatusOK,
+	}, {
 		url:        "/kek",
 		method:     http.MethodGet,
 		statusCode: http.StatusNotFound,
