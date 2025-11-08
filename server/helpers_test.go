@@ -1,20 +1,14 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	tc "github.com/testcontainers/testcontainers-go"
-	"github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
 
-	"github.com/cornbuddy/reflectiveTarget/server/test/db"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -50,11 +44,20 @@ func TestMakeHttpHandler(t *testing.T) {
 	}, {
 		url:        "/kek",
 		method:     http.MethodGet,
-		statusCode: http.StatusNotFound,
+		statusCode: http.StatusOK,
 	}}
 
-	handle := MakeMux()
+	cleanup, err := setDbEnvVars()
+	require.NoError(t, err)
 
+	t.Cleanup(func() {
+		require.NoError(t, cleanup())
+	})
+
+	config, err := MakeConfig()
+	require.NoError(t, err)
+
+	handle := MakeMux(config).ServeHTTP
 	for _, tc := range testCases {
 		resp := utils.MakeRequest("", tc.method, handle, nil)
 		assert.Equal(t, tc.statusCode, resp.StatusCode)
@@ -66,51 +69,11 @@ func TestMakeHttpHandler(t *testing.T) {
 // be set
 
 func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
-	type environmentVariable struct {
-		key   string
-		value string
-	}
-
-	ctx := context.TODO()
-	username := "test_user"
-	password := "kekekeke"
-	database := "testdb"
-
-	str := wait.ForLog("database system is ready to accept connections").
-		WithOccurrence(2).
-		WithStartupTimeout(5 * time.Second)
-	opts := []tc.ContainerCustomizer{
-		tc.WithWaitStrategy(str),
-		postgres.WithUsername(username),
-		postgres.WithPassword(password),
-		postgres.WithDatabase(database),
-	}
-
-	cont, err := postgres.Run(ctx, db.Image, opts...)
+	cleanup, err := setDbEnvVars()
 	require.NoError(t, err)
 
 	t.Cleanup(func() {
-		assert.NoError(t, cont.Terminate(ctx))
-	})
-
-	host, err := cont.ContainerIP(ctx)
-	require.NoError(t, err)
-
-	envVars := []environmentVariable{
-		{"PGPASSWORD", password},
-		{"PGUSER", username},
-		{"PGDATABASE", database},
-		{"PGHOST", host},
-	}
-
-	for _, envVar := range envVars {
-		require.NoError(t, os.Setenv(envVar.key, envVar.value))
-	}
-
-	t.Cleanup(func() {
-		for _, envVar := range envVars {
-			require.NoError(t, os.Unsetenv(envVar.key))
-		}
+		require.NoError(t, cleanup())
 	})
 
 	config, err := MakeConfig()
@@ -138,4 +101,40 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 func TestInitShouldReturnErrorWhenRequiredEnvVarsAreNotSet(t *testing.T) {
 	_, err := MakeConfig()
 	require.ErrorIs(t, err, ErrNoEnvVar)
+}
+
+type cleanup func() error
+
+type environmentVariable struct {
+	key   string
+	value string
+}
+
+func setDbEnvVars() (cleanup, error) {
+	emptyCleanup := func() error { return nil }
+
+	envVars := []environmentVariable{
+		{"PGPASSWORD", password},
+		{"PGUSER", username},
+		{"PGDATABASE", database},
+		{"PGHOST", host},
+	}
+
+	for _, envVar := range envVars {
+		if err := os.Setenv(envVar.key, envVar.value); err != nil {
+			return emptyCleanup, err
+		}
+	}
+
+	clean := func() error {
+		for _, envVar := range envVars {
+			if err := os.Unsetenv(envVar.key); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
+	return clean, nil
 }
