@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"testing"
 	"time"
@@ -14,7 +15,51 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 
 	"github.com/cornbuddy/reflectiveTarget/server/test/db"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
+
+func TestMakeHttpHandler(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		url        string
+		method     string
+		statusCode int
+	}
+
+	testCases := []testCase{{
+		url:        "/login",
+		method:     http.MethodGet,
+		statusCode: http.StatusOK,
+	}, {
+		url:        "/login",
+		method:     http.MethodPost,
+		statusCode: http.StatusBadRequest,
+	}, {
+		url:        "/signup",
+		method:     http.MethodPost,
+		statusCode: http.StatusOK,
+	}, {
+		url:        "/signup",
+		method:     http.MethodGet,
+		statusCode: http.StatusBadRequest,
+	}, {
+		url:        "/api/health",
+		method:     http.MethodGet,
+		statusCode: http.StatusOK,
+	}, {
+		url:        "/kek",
+		method:     http.MethodGet,
+		statusCode: http.StatusNotFound,
+	}}
+
+	handle := MakeMux()
+
+	for _, tc := range testCases {
+		resp := utils.MakeRequest("", tc.method, handle, nil)
+		assert.Equal(t, tc.statusCode, resp.StatusCode)
+	}
+}
 
 // those tests are not prarallel because os.Setenv sets env var globally, across
 // all goroutines, which messess up test cases when I don't expect env vars to

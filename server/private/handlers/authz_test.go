@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/private/model"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
@@ -48,7 +49,7 @@ func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
 		route := authzRouter.PostLogin
 		ct := "application/x-www-form-urlencoded"
 		body := tc.body
-		res := makeRequest(ct, http.MethodPost, route, body)
+		res := utils.MakeRequest(ct, http.MethodPost, route, body)
 		require.NotNil(t, res)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
 
@@ -80,7 +81,8 @@ func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 	body := strings.NewReader(
 		fmt.Sprintf("username=%s&password=%s", username, password),
 	)
-	res := makeRequest(ct, http.MethodPost, authzRouter.PostLogin, body)
+	handler := authzRouter.PostLogin
+	res := utils.MakeRequest(ct, http.MethodPost, handler, body)
 	require.NotNil(t, res)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assertSessionCookieIsSet(t, res)
@@ -127,7 +129,7 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 		route := authzRouter.PostSignup
 		ct := "application/x-www-form-urlencoded"
 		body := tc.body
-		res := makeRequest(ct, http.MethodPost, route, body)
+		res := utils.MakeRequest(ct, http.MethodPost, route, body)
 		require.NotNil(t, res)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
 
@@ -163,7 +165,7 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		res := makeRequest("", http.MethodGet, tc.router, nil)
+		res := utils.MakeRequest("", http.MethodGet, tc.router, nil)
 		ct := "text/html; charset=utf-8"
 		assert.Equal(t, ct, res.Header.Get("Content-Type"))
 		assert.Equal(t, http.StatusOK, res.StatusCode)

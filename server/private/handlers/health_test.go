@@ -9,13 +9,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	testdb "github.com/cornbuddy/reflectiveTarget/server/test/db"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 	t.Parallel()
 
 	route := healthRouter.Get
-	res := makeRequest("", http.MethodGet, route, nil)
+	res := utils.MakeRequest("", http.MethodGet, route, nil)
 	assert.NotNil(t, res)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -42,7 +43,7 @@ func TestHealthHandlerShouldFailWhenDbDoesntWork(t *testing.T) {
 
 	db.Close()
 	router := HealthRouter{DB: db}
-	res := makeRequest("", http.MethodGet, router.Get, nil)
+	res := utils.MakeRequest("", http.MethodGet, router.Get, nil)
 	assert.NotNil(t, res)
 	assert.Equal(t, http.StatusServiceUnavailable, res.StatusCode)
 
