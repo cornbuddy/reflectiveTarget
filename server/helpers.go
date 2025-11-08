@@ -9,6 +9,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/private/handlers"
 	"github.com/cornbuddy/reflectiveTarget/server/private/utils"
 )
 
@@ -19,8 +20,22 @@ type Config struct {
 
 var ErrNoEnvVar = fmt.Errorf("no environment variable")
 
-func MakeMux() http.Handler {
-	return nil
+func MakeMux(config *Config) http.Handler {
+	health := handlers.HealthRouter{
+		DB: config.DB,
+	}
+	authz := handlers.AuthzRouter{
+		UserDao: config.UserDao,
+	}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /login", authz.GetLogin)
+	mux.HandleFunc("GET /signup", authz.GetSignup)
+	mux.HandleFunc("POST /login", authz.PostLogin)
+	mux.HandleFunc("POST /signup", authz.PostSignup)
+	mux.HandleFunc("GET /api/health", health.Get)
+
+	return mux
 }
 
 func MakeConfig() (*Config, error) {
