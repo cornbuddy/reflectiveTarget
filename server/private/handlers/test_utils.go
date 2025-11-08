@@ -1,10 +1,8 @@
 package handlers
 
 import (
-	"io"
 	"math/rand"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -43,22 +41,6 @@ func makeRandomString(length int) string {
 	}
 
 	return string(result)
-}
-
-func makeRequest(
-	contentType, method string,
-	handle http.HandlerFunc, body io.Reader,
-) *http.Response {
-
-	req := httptest.NewRequest(method, "/", body)
-	if contentType != "" {
-		req.Header.Set("Content-Type", contentType)
-	}
-
-	w := httptest.NewRecorder()
-	handle(w, req)
-
-	return w.Result()
 }
 
 func assertSessionCookieIsSet(t *testing.T, resp *http.Response) {
