@@ -67,7 +67,7 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 		}
 	})
 
-	config, err := Init()
+	config, err := MakeConfig()
 	require.NoError(t, err)
 	require.NotEmpty(t, config)
 
@@ -90,6 +90,6 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 }
 
 func TestInitShouldReturnErrorWhenRequiredEnvVarsAreNotSet(t *testing.T) {
-	_, err := Init()
+	_, err := MakeConfig()
 	require.ErrorIs(t, err, ErrNoEnvVar)
 }
