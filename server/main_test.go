@@ -7,12 +7,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cornbuddy/reflectiveTarget/server/test/db"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	tc "github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
+
+	"github.com/cornbuddy/reflectiveTarget/server/test/db"
 )
 
 // those tests are not prarallel because os.Setenv sets env var globally, across
