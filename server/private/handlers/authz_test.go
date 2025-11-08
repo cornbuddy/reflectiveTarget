@@ -49,7 +49,7 @@ func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
 		route := authzRouter.PostLogin
 		ct := "application/x-www-form-urlencoded"
 		body := tc.body
-		res := utils.MakeRequest(ct, http.MethodPost, route, body)
+		res := utils.MakeRequest(ct, http.MethodPost, "/", route, body)
 		require.NotNil(t, res)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
 
@@ -82,7 +82,7 @@ func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 		fmt.Sprintf("username=%s&password=%s", username, password),
 	)
 	handler := authzRouter.PostLogin
-	res := utils.MakeRequest(ct, http.MethodPost, handler, body)
+	res := utils.MakeRequest(ct, http.MethodPost, "/", handler, body)
 	require.NotNil(t, res)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assertSessionCookieIsSet(t, res)
@@ -129,7 +129,7 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 		route := authzRouter.PostSignup
 		ct := "application/x-www-form-urlencoded"
 		body := tc.body
-		res := utils.MakeRequest(ct, http.MethodPost, route, body)
+		res := utils.MakeRequest(ct, http.MethodPost, "/", route, body)
 		require.NotNil(t, res)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
 
@@ -165,7 +165,8 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		res := utils.MakeRequest("", http.MethodGet, tc.router, nil)
+		get := http.MethodGet
+		res := utils.MakeRequest("", get, "/", tc.router, nil)
 		ct := "text/html; charset=utf-8"
 		assert.Equal(t, ct, res.Header.Get("Content-Type"))
 		assert.Equal(t, http.StatusOK, res.StatusCode)
