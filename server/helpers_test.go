@@ -33,11 +33,11 @@ func TestMakeHttpHandler(t *testing.T) {
 		statusCode: http.StatusBadRequest,
 	}, {
 		url:        "/signup",
-		method:     http.MethodPost,
+		method:     http.MethodGet,
 		statusCode: http.StatusOK,
 	}, {
 		url:        "/signup",
-		method:     http.MethodGet,
+		method:     http.MethodPost,
 		statusCode: http.StatusBadRequest,
 	}, {
 		url:        "/api/health",
@@ -46,7 +46,7 @@ func TestMakeHttpHandler(t *testing.T) {
 	}, {
 		url:        "/kek",
 		method:     http.MethodGet,
-		statusCode: http.StatusOK,
+		statusCode: http.StatusNotFound,
 	}}
 
 	cleanup, err := setDbEnvVars()
@@ -61,8 +61,9 @@ func TestMakeHttpHandler(t *testing.T) {
 
 	handle := MakeMux(config).ServeHTTP
 	for _, tc := range testCases {
-		resp := utils.MakeRequest("", tc.method, handle, nil)
-		assert.Equal(t, tc.statusCode, resp.StatusCode, tc.url)
+		resp := utils.MakeRequest("", tc.method, tc.url, handle, nil)
+		msg := fmt.Sprintf("%s %s", tc.method, tc.url)
+		assert.Equal(t, tc.statusCode, resp.StatusCode, msg)
 	}
 }
 

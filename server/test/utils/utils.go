@@ -7,11 +7,11 @@ import (
 )
 
 func MakeRequest(
-	contentType, method string,
+	contentType, method, url string,
 	handle http.HandlerFunc, body io.Reader,
 ) *http.Response {
 
-	req := httptest.NewRequest(method, "/", body)
+	req := httptest.NewRequest(method, url, body)
 	if contentType != "" {
 		req.Header.Set("Content-Type", contentType)
 	}
