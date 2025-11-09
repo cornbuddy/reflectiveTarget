@@ -14,7 +14,9 @@ func TestSaveShouldReturnErrorIfUsernameIsTaken(t *testing.T) {
 
 	user := model.User{Username: "exists", Password: password}
 	require.NoError(t, userDao.Save(user))
-	require.Error(t, userDao.Save(user))
+
+	err := userDao.Save(user)
+	require.ErrorContains(t, err, "violates unique constraint")
 }
 
 func TestShouldSaveUser(t *testing.T) {
