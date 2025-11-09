@@ -4,17 +4,23 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
 
+func TestSaveShouldReturnErrorIfUsernameIsTaken(t *testing.T) {
+	t.Parallel()
+
+	user := model.User{Username: "exists", Password: password}
+	require.NoError(t, userDao.Save(user))
+	require.Error(t, userDao.Save(user))
+}
+
 func TestShouldSaveUser(t *testing.T) {
 	t.Parallel()
 
-	pwd, err := model.NewPassword("kek")
-	assert.NoError(t, err)
-
-	want := model.User{Username: "kek", Password: *pwd}
+	want := model.User{Username: "kek2", Password: password}
 	assert.NoError(t, userDao.Save(want))
 
 	var id int
@@ -28,7 +34,7 @@ func TestShouldFindUserIfExists(t *testing.T) {
 
 	query := "INSERT INTO users (username, hashed_password) VALUES ($1, $2)"
 	username := "kek"
-	_, err := db.Exec(query, username, "kek")
+	_, err := db.Exec(query, username, "kek1")
 	assert.NoError(t, err)
 
 	user, err := userDao.Find(username)

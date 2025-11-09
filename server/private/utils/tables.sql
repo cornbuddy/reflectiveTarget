@@ -1,25 +1,25 @@
-create table if not exists users (
-    id serial primary key,
-    username varchar(64) not null,
-    hashed_password varchar(128) not null
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(64) NOT NULL UNIQUE,
+    hashed_password VARCHAR(128) NOT NULL
 );
 
-create table if not exists targets (
-    id serial primary key,
-    name varchar(128) not null,
-    owner_id int references users(id) not null
+CREATE TABLE IF NOT EXISTS targets (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(128) NOT NULL,
+    owner_id INT REFERENCES users(id) NOT NULL
 );
 
-create table if not exists questions (
-    id serial primary key not null,
-    text varchar(128) not null,
-    target_id int references targets(id)
+CREATE TABLE IF NOT EXISTS questions (
+    id SERIAL PRIMARY KEY NOT NULL,
+    text VARCHAR(128) NOT NULL,
+    target_id INT REFERENCES targets(id)
 );
 
-create table if not exists shots (
-    id serial primary key,
-    x int not null,
-    y int not null,
-    target_id int references targets(id) not null,
-    shooter_id int references users(id) not null
+CREATE TABLE IF NOT EXISTS shots (
+    id SERIAL PRIMARY KEY,
+    x INT NOT NULL,
+    y INT NOT NULL,
+    target_id INT REFERENCES targets(id) NOT NULL,
+    shooter_id INT REFERENCES users(id) NOT NULL
 );
