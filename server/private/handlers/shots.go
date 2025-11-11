@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/private/model"
@@ -26,12 +27,24 @@ func (r ShotsRouter) Post(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// path value doesn't work out of the box, because it needs to be
+	// registered via mux.HandleFunc at helpers. it's possible to group
+	// routes like here
+	// https://dev.to/kengowada/go-routing-101-handling-and-grouping-routes-with-nethttp-4k0e
+	targetID, err := strconv.Atoi(req.PathValue("targetID"))
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	cookies := req.CookiesNamed(SessionCookieName)
 	if len(cookies) != 1 {
 		http.Error(resp, "bad cookies", http.StatusBadRequest)
+		return
 	}
 
-	if err := r.ShotsDao.Save(shots.Shots); err != nil {
+	shooter := cookies[0].Value
+	if err := r.ShotsDao.Save(shooter, targetID, shots.Shots); err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
 	}
