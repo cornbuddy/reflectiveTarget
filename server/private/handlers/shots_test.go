@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -15,12 +16,14 @@ import (
 func TestShotsShouldSavedIfValid(t *testing.T) {
 	t.Parallel()
 
-	x := rand.IntN(101)
-	y := rand.IntN(101)
+	shot := model.Shot{
+		X: rand.IntN(101),
+		Y: rand.IntN(101),
+	}
 
 	var body bytes.Buffer
 	require.NoError(t, json.NewEncoder(&body).Encode(
-		ShotsRequest{x, y},
+		model.ShotsRequest{Shots: []model.Shot{shot}},
 	))
 
 	ct := "application/json"
@@ -29,9 +32,12 @@ func TestShotsShouldSavedIfValid(t *testing.T) {
 	resp := utils.MakeRequest(ct, method, "/", handle, &body)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
 
-	res, err := db.Query("SELECT * FROM shots WHERE x = ? AND y = ?", x, y)
+	res, err := db.Query(
+		"SELECT * FROM shots WHERE x = $1 AND y = $2",
+		shot.X, shot.Y,
+	)
 	require.NoError(t, err)
-	assert.True(t, res.Next())
+	assert.True(t, res.Next(), "should save shots")
 }
 
 func TestShotsShouldBeValidated(t *testing.T) {
@@ -39,15 +45,15 @@ func TestShotsShouldBeValidated(t *testing.T) {
 
 	type testCase struct {
 		desc string
-		body ShotsRequest
+		body model.ShotsRequest
 	}
 
 	testCases := []testCase{{
 		desc: "should fail when coordinates are greater than 100",
-		body: ShotsRequest{101, 101},
+		body: model.ShotsRequest{Shots: []model.Shot{{X: 101, Y: 101}}},
 	}, {
 		desc: "should fail when coordinates are less than 0",
-		body: ShotsRequest{-1, -1},
+		body: model.ShotsRequest{Shots: []model.Shot{{X: -1, Y: -1}}},
 	}}
 
 	for _, tc := range testCases {
