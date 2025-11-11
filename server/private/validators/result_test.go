@@ -7,13 +7,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidationResultIsValid(t *testing.T) {
+func TestValidationResult(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
 		msg    string
 		result ValidationResult
-		want   bool
+		valid  bool
 	}
 
 	testCases := []testCase{{
@@ -31,7 +31,7 @@ func TestValidationResultIsValid(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		got := tc.result.IsValid()
-		assert.Equal(t, tc.want, got, tc.msg)
+		assert.Equal(t, tc.valid, tc.result.IsValid(), tc.msg)
+		assert.Equal(t, !tc.valid, tc.result.IsInvalid(), tc.msg)
 	}
 }

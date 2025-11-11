@@ -16,6 +16,7 @@ var (
 	ctx      context.Context
 	db       *sql.DB
 	userDao  UserDao
+	shotsDao ShotsDao
 	password model.Password
 )
 
@@ -39,12 +40,13 @@ func TestMain(m *testing.M) {
 
 	db = testDb
 	userDao = UserDao{DB: db}
+	shotsDao = ShotsDao{DB: db}
 	password = *pwd
 
 	code := m.Run()
 	defer os.Exit(code)
 
-	if err = cleanup(); err != nil {
+	if err := cleanup(); err != nil {
 		log.Fatalf("failed to cleanup test suite: %v", err)
 	}
 

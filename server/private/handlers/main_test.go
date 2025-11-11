@@ -9,6 +9,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/private/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/private/validators"
 	testdb "github.com/cornbuddy/reflectiveTarget/server/test/db"
 )
 
@@ -40,7 +41,10 @@ func TestMain(m *testing.M) {
 	healthRouter = HealthRouter{DB: db}
 	authzRouter = AuthzRouter{UserDao: userDao}
 	indexRouter = IndexRouter{}
-	shotsRouter = ShotsRouter{}
+	shotsRouter = ShotsRouter{
+		Validator: validators.ShotsRequestValidator{},
+		ShotsDao:  daos.ShotsDao{DB: db},
+	}
 
 	code := m.Run()
 	defer os.Exit(code)
