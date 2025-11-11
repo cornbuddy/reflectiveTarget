@@ -13,7 +13,7 @@ def test_should_signup(driver):
     driver.find_element(By.NAME, "username").send_keys(USERNAME)
     driver.find_element(By.NAME, "password").send_keys(PASSWORD)
     driver.find_element(By.XPATH, "//button[@type='submit']").click()
-    assert driver.current_url == URL
+    assert driver.current_url == f"{URL}/"
 
 
 @pytest.mark.order(after="test_should_register")
@@ -22,4 +22,4 @@ def test_should_login(driver):
     driver.find_element(By.NAME, "username").send_keys(USERNAME)
     driver.find_element(By.NAME, "password").send_keys(PASSWORD)
     driver.find_element(By.XPATH, "//button[@type='submit']").click()
-    assert driver.current_url == URL
+    assert driver.current_url == f"{URL}/"
