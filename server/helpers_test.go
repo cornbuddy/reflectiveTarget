@@ -36,6 +36,14 @@ func TestMakeHttpHandler(t *testing.T) {
 	handle := MakeMux(config).ServeHTTP
 
 	testCases := []testCase{{
+		url:        "/",
+		method:     http.MethodGet,
+		statusCode: http.StatusOK,
+	}, {
+		url:        "/kek",
+		method:     http.MethodGet,
+		statusCode: http.StatusNotFound,
+	}, {
 		url:        "/login",
 		method:     http.MethodGet,
 		statusCode: http.StatusOK,
@@ -56,13 +64,13 @@ func TestMakeHttpHandler(t *testing.T) {
 		method:     http.MethodGet,
 		statusCode: http.StatusOK,
 	}, {
-		url:        "/",
+		url:        "/api/target/1/shots",
 		method:     http.MethodGet,
 		statusCode: http.StatusOK,
 	}, {
-		url:        "/kek",
-		method:     http.MethodGet,
-		statusCode: http.StatusNotFound,
+		url:        "/api/target/1/shots",
+		method:     http.MethodPost,
+		statusCode: http.StatusBadRequest,
 	}}
 
 	for _, tc := range testCases {
