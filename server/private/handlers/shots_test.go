@@ -67,3 +67,17 @@ func TestShotsShouldBeValidated(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode, tc.desc)
 	}
 }
+
+func TestShotsShouldFailIfRequestIsMalformed(t *testing.T) {
+	t.Parallel()
+
+	var body bytes.Buffer
+	_, err := body.Write([]byte("kek"))
+	require.NoError(t, err)
+
+	ct := "application/json"
+	handle := shotsRouter.Post
+	method := http.MethodPost
+	resp := utils.MakeRequest(ct, method, "/", handle, &body)
+	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
+}

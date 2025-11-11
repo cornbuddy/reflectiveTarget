@@ -11,6 +11,7 @@ var (
 
 type User struct {
 	Password
+	ID       int
 	Username string
 }
 

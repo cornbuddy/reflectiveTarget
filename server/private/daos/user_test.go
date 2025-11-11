@@ -43,6 +43,7 @@ func TestShouldFindUserIfExists(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, username, user.Username)
 	assert.NotEmpty(t, user.Password.Hash)
+	assert.GreaterOrEqual(t, user.ID, 1)
 }
 
 func TestShouldReturnNilIfUserDoesNotExist(t *testing.T) {

@@ -23,10 +23,10 @@ func (dao UserDao) Save(user model.User) error {
 
 func (dao UserDao) Find(username string) (*model.User, error) {
 	var user model.User
-	query := "SELECT username, hashed_password FROM users " +
+	query := "SELECT id, username, hashed_password FROM users " +
 		"WHERE username = $1"
 	err := dao.DB.QueryRow(query, username).
-		Scan(&user.Username, &user.Password.Hash)
+		Scan(&user.ID, &user.Username, &user.Password.Hash)
 	if err == sql.ErrNoRows {
 		// kinda expected
 		return nil, nil
