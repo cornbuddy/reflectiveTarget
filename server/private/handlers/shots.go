@@ -5,17 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/private/model"
-	"github.com/cornbuddy/reflectiveTarget/server/private/validators"
 )
 
-type ShotsRouter struct {
-	daos.ShotsDao
-	Validator validators.ShotsRequestValidator
-}
-
-func (r ShotsRouter) Post(resp http.ResponseWriter, req *http.Request) {
+func (r ShotsHandler) Post(resp http.ResponseWriter, req *http.Request) {
 	var shots model.ShotsRequest
 	if err := json.NewDecoder(req.Body).Decode(&shots); err != nil {
 		http.Error(resp, "bad request", http.StatusBadRequest)

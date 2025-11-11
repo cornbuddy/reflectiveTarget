@@ -10,10 +10,11 @@ type UserDao struct {
 	*sql.DB
 }
 
-func (dao UserDao) Save(user model.User) error {
-	query := "INSERT INTO users(username, hashed_password) " +
-		"VALUES($1, $2)"
-	_, err := dao.Exec(query, user.Username, user.Password.Hash)
+func (dao UserDao) Save(user *model.User) error {
+	q := "INSERT INTO users(username, hashed_password) " +
+		"VALUES($1, $2) " +
+		"RETURNING id"
+	err := dao.QueryRow(q, user.Username, user.Password.Hash).Scan(&user.ID)
 	if err != nil {
 		return err
 	}

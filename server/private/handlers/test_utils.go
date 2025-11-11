@@ -26,7 +26,7 @@ func makeTestUser(dao daos.UserDao) (*model.User, error) {
 		Username: makeRandomString(10),
 		Password: *pwd,
 	}
-	if err := dao.Save(user); err != nil {
+	if err := dao.Save(&user); err != nil {
 		return nil, err
 	}
 
