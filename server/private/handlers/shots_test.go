@@ -3,6 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"math/rand/v2"
 	"net/http"
 	"testing"
 
@@ -10,6 +11,28 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestShotsShouldSavedIfValid(t *testing.T) {
+	t.Parallel()
+
+	x := rand.IntN(101)
+	y := rand.IntN(101)
+
+	var body bytes.Buffer
+	require.NoError(t, json.NewEncoder(&body).Encode(
+		ShotsRequest{x, y},
+	))
+
+	ct := "application/json"
+	handle := shotsRouter.Post
+	method := http.MethodPost
+	resp := utils.MakeRequest(ct, method, "/", handle, &body)
+	assert.Equal(t, http.StatusCreated, resp.StatusCode)
+
+	res, err := db.Query("SELECT * FROM shots WHERE x = ? AND y = ?", x, y)
+	require.NoError(t, err)
+	assert.True(t, res.Next())
+}
 
 func TestShotsShouldBeValidated(t *testing.T) {
 	t.Parallel()

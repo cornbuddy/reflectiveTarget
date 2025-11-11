@@ -6,4 +6,6 @@ import (
 
 type ShotsRouter struct{}
 
-func (r ShotsRouter) Post(resp http.ResponseWriter, req *http.Request) {}
+func (r ShotsRouter) Post(resp http.ResponseWriter, req *http.Request) {
+	http.Error(resp, "kek", http.StatusBadRequest)
+}
