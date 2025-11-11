@@ -31,3 +31,8 @@ type HealthRouter struct {
 }
 
 type IndexRouter struct{}
+
+type ShotsRequest struct {
+	X int `json:"x"`
+	Y int `json:"y"`
+}
