@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 	testdb "github.com/cornbuddy/reflectiveTarget/server/test/db"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -24,7 +25,7 @@ func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 	t.Cleanup(func() { res.Body.Close() })
 	assert.NoError(t, err)
 
-	var got HealthResponse
+	var got model.HealthResponse
 	err = json.Unmarshal(data, &got)
 	assert.NoError(t, err)
 	assert.True(t, got.Connected)
@@ -51,7 +52,7 @@ func TestHealthHandlerShouldFailWhenDbDoesntWork(t *testing.T) {
 	t.Cleanup(func() { res.Body.Close() })
 	assert.NoError(t, err)
 
-	var got HealthResponse
+	var got model.HealthResponse
 	err = json.Unmarshal(data, &got)
 	assert.NoError(t, err)
 	assert.False(t, got.Connected)

@@ -21,18 +21,8 @@ type AuthzRouter struct {
 	daos.UserDao
 }
 
-type HealthResponse struct {
-	Connected   bool `json:"connected"`
-	Connections int  `json:"connections"`
-}
-
 type HealthRouter struct {
 	*sql.DB
 }
 
 type IndexRouter struct{}
-
-type ShotsRequest struct {
-	X int `json:"x"`
-	Y int `json:"y"`
-}

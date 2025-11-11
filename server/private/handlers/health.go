@@ -3,6 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
 
 func (r HealthRouter) Get(resp http.ResponseWriter, req *http.Request) {
@@ -16,7 +18,7 @@ func (r HealthRouter) Get(resp http.ResponseWriter, req *http.Request) {
 		status = http.StatusServiceUnavailable
 	}
 
-	hr, _ := json.Marshal(HealthResponse{
+	hr, _ := json.Marshal(model.HealthResponse{
 		Connected:   connected,
 		Connections: connections,
 	})
