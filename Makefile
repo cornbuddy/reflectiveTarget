@@ -22,9 +22,9 @@ export PORT
 .PHONY: spec
 spec:
 	$(MAKE) run & \
-		sleep 30 && \
-		$(MAKE) -C spec spec && \
-		$(MAKE) stop
+		sleep 15 \
+		&& $(MAKE) -C spec spec \
+		|| $(MAKE) stop
 
 .PHONY: pre-commit
 pre-commit:

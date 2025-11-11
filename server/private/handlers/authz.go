@@ -44,6 +44,7 @@ func (r AuthzRouter) PostLogin(resp http.ResponseWriter, req *http.Request) {
 			Value:   uuid.NewString(),
 			Expires: time.Now().AddDate(0, 1, 0),
 		})
+		http.Redirect(resp, req, "/", http.StatusSeeOther)
 		resp.Write([]byte("Login succeeded"))
 	} else {
 		http.Error(resp, "Password is wrong", http.StatusUnauthorized)
@@ -82,7 +83,7 @@ func (r AuthzRouter) PostSignup(resp http.ResponseWriter, req *http.Request) {
 		Value:   uuid.NewString(),
 		Expires: time.Now().AddDate(0, 1, 0),
 	})
-	resp.WriteHeader(http.StatusCreated)
+	http.Redirect(resp, req, "/", http.StatusSeeOther)
 	resp.Write([]byte("User successfully created"))
 }
 

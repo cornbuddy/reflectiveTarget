@@ -84,7 +84,8 @@ func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 	handler := authzRouter.PostLogin
 	res := utils.MakeRequest(ct, http.MethodPost, "/", handler, body)
 	require.NotNil(t, res)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.Equal(t, http.StatusSeeOther, res.StatusCode)
+	assert.Equal(t, "/", res.Header.Get("Location"))
 	assertSessionCookieIsSet(t, res)
 
 	data, err := io.ReadAll(res.Body)
@@ -107,7 +108,7 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 
 	testCases := []testCase{{
 		message:    "User successfully created",
-		statusCode: http.StatusCreated,
+		statusCode: http.StatusSeeOther,
 		body: strings.NewReader(
 			fmt.Sprintf("username=%s&password=%s", "kek", "kek"),
 		),
@@ -133,8 +134,10 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 		require.NotNil(t, res)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
 
-		isSucceed := res.StatusCode >= 200 && res.StatusCode <= 299
+		isSucceed := res.StatusCode == http.StatusSeeOther
 		if isSucceed {
+			url := res.Header.Get("Location")
+			assert.Equal(t, "/", url)
 			assertSessionCookieIsSet(t, res)
 		}
 
