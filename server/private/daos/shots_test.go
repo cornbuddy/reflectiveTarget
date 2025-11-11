@@ -13,7 +13,7 @@ func TestShotsDaoShouldSaveShots(t *testing.T) {
 	t.Parallel()
 
 	username := "shots"
-	err := userDao.Save(model.User{Username: username, Password: password})
+	err := userDao.Save(&model.User{Username: username, Password: password})
 	require.NoError(t, err)
 
 	user, err := userDao.Find(username)

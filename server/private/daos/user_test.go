@@ -13,9 +13,9 @@ func TestSaveShouldReturnErrorIfUsernameIsTaken(t *testing.T) {
 	t.Parallel()
 
 	user := model.User{Username: "exists", Password: password}
-	require.NoError(t, userDao.Save(user))
+	require.NoError(t, userDao.Save(&user))
 
-	err := userDao.Save(user)
+	err := userDao.Save(&user)
 	require.ErrorContains(t, err, "violates unique constraint")
 }
 
@@ -23,12 +23,13 @@ func TestShouldSaveUser(t *testing.T) {
 	t.Parallel()
 
 	want := model.User{Username: "kek2", Password: password}
-	assert.NoError(t, userDao.Save(want))
+	assert.NoError(t, userDao.Save(&want))
 
 	var id int
 	query := "SELECT id FROM users WHERE username = $1"
 	assert.NoError(t, db.QueryRow(query, want.Username).Scan(&id))
 	assert.GreaterOrEqual(t, id, 1)
+	assert.Equal(t, id, want.ID)
 }
 
 func TestShouldFindUserIfExists(t *testing.T) {

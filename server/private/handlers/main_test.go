@@ -14,13 +14,13 @@ import (
 )
 
 var (
-	ctx          context.Context
-	db           *sql.DB
-	userDao      daos.UserDao
-	healthRouter HealthRouter
-	authzRouter  AuthzRouter
-	indexRouter  IndexRouter
-	shotsRouter  ShotsRouter
+	ctx           context.Context
+	db            *sql.DB
+	userDao       daos.UserDao
+	healthHandler HealthHandler
+	authzHandler  AuthzHandler
+	indexHandler  IndexHandler
+	shotsHandler  ShotsHandler
 )
 
 func TestMain(m *testing.M) {
@@ -38,10 +38,10 @@ func TestMain(m *testing.M) {
 
 	db = testDb
 	userDao = daos.UserDao{DB: db}
-	healthRouter = HealthRouter{DB: db}
-	authzRouter = AuthzRouter{UserDao: userDao}
-	indexRouter = IndexRouter{}
-	shotsRouter = ShotsRouter{
+	healthHandler = HealthHandler{DB: db}
+	authzHandler = AuthzHandler{UserDao: userDao}
+	indexHandler = IndexHandler{}
+	shotsHandler = ShotsHandler{
 		Validator: validators.ShotsRequestValidator{},
 		ShotsDao:  daos.ShotsDao{DB: db},
 	}

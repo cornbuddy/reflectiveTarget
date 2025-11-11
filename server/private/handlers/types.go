@@ -7,6 +7,7 @@ import (
 	"github.com/abiosoft/mold"
 
 	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/private/validators"
 )
 
 //go:embed templates
@@ -17,12 +18,17 @@ var options = mold.With(
 )
 var engine = mold.Must(mold.New(dir, options))
 
-type AuthzRouter struct {
+type AuthzHandler struct {
 	daos.UserDao
 }
 
-type HealthRouter struct {
+type HealthHandler struct {
 	*sql.DB
 }
 
-type IndexRouter struct{}
+type IndexHandler struct{}
+
+type ShotsHandler struct {
+	daos.ShotsDao
+	Validator validators.ShotsRequestValidator
+}

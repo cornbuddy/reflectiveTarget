@@ -7,7 +7,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
 
-func (r HealthRouter) Get(resp http.ResponseWriter, req *http.Request) {
+func (r HealthHandler) Get(resp http.ResponseWriter, req *http.Request) {
 	var connections, status int
 	connected := r.DB.Ping() == nil
 	if connected {

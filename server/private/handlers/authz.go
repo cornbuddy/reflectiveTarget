@@ -11,7 +11,7 @@ import (
 
 const SessionCookieName = "session-token"
 
-func (r AuthzRouter) PostLogin(resp http.ResponseWriter, req *http.Request) {
+func (r AuthzHandler) PostLogin(resp http.ResponseWriter, req *http.Request) {
 	if err := req.ParseForm(); err != nil {
 		http.Error(resp, err.Error(), http.StatusBadRequest)
 		return
@@ -52,7 +52,7 @@ func (r AuthzRouter) PostLogin(resp http.ResponseWriter, req *http.Request) {
 
 }
 
-func (r AuthzRouter) PostSignup(resp http.ResponseWriter, req *http.Request) {
+func (r AuthzHandler) PostSignup(resp http.ResponseWriter, req *http.Request) {
 	if err := req.ParseForm(); err != nil {
 		http.Error(resp, err.Error(), http.StatusBadRequest)
 		return
@@ -73,7 +73,7 @@ func (r AuthzRouter) PostSignup(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if err := r.UserDao.Save(*newUser); err != nil {
+	if err := r.UserDao.Save(newUser); err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -87,10 +87,10 @@ func (r AuthzRouter) PostSignup(resp http.ResponseWriter, req *http.Request) {
 	resp.Write([]byte("User successfully created"))
 }
 
-func (r AuthzRouter) GetSignup(resp http.ResponseWriter, req *http.Request) {
+func (r AuthzHandler) GetSignup(resp http.ResponseWriter, req *http.Request) {
 	engine.Render(resp, "views/signup.tmpl", nil)
 }
 
-func (r AuthzRouter) GetLogin(resp http.ResponseWriter, req *http.Request) {
+func (r AuthzHandler) GetLogin(resp http.ResponseWriter, req *http.Request) {
 	engine.Render(resp, "views/login.tmpl", nil)
 }
