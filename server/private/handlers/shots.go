@@ -15,6 +15,10 @@ type shotsHandler struct {
 	Validator validators.ShotsRequestValidator
 }
 
+func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
+	http.Error(resp, "not found", http.StatusNotFound)
+}
+
 func (h shotsHandler) post(resp http.ResponseWriter, req *http.Request) {
 	var shots model.ShotsRequest
 	if err := json.NewDecoder(req.Body).Decode(&shots); err != nil {
