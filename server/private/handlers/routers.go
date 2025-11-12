@@ -41,7 +41,7 @@ func (r ApiRouter) Routes() http.Handler {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", health.get)
-	mux.HandleFunc("POST /targets/{targetID}/shots", shots.post)
+	mux.HandleFunc("POST /target/{targetID}/shots", shots.post)
 
 	return mux
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"net/http"
 	"os"
 	"testing"
 
@@ -17,10 +18,8 @@ var (
 	ctx     context.Context
 	db      *sql.DB
 	userDao daos.UserDao
-	health  healthHandler
-	authz   authzHandler
-	index   indexHandler
-	shots   shotsHandler
+	views   http.HandlerFunc
+	api     http.HandlerFunc
 )
 
 func TestMain(m *testing.M) {
@@ -38,13 +37,12 @@ func TestMain(m *testing.M) {
 
 	db = testDb
 	userDao = daos.UserDao{DB: db}
-	health = healthHandler{DB: db}
-	authz = authzHandler{UserDao: userDao}
-	index = indexHandler{}
-	shots = shotsHandler{
-		Validator: validators.ShotsRequestValidator{},
-		ShotsDao:  daos.ShotsDao{DB: db},
-	}
+	views = ViewsRouter{UserDao: userDao}.Routes().ServeHTTP
+	api = ApiRouter{
+		DB:                    db,
+		ShotsDao:              daos.ShotsDao{DB: db},
+		ShotsRequestValidator: validators.ShotsRequestValidator{},
+	}.Routes().ServeHTTP
 
 	code := m.Run()
 	defer os.Exit(code)
