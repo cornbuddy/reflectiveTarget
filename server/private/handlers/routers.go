@@ -5,11 +5,13 @@ import (
 	"net/http"
 
 	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/private/validators"
 )
 
 type ApiRouter struct {
 	*sql.DB
-	daos.UserDao
+	daos.ShotsDao
+	validators.ShotsRequestValidator
 }
 
 type ViewsRouter struct {
@@ -17,24 +19,29 @@ type ViewsRouter struct {
 }
 
 func (r ViewsRouter) Routes() http.Handler {
-	authz := AuthzHandler{r.UserDao}
-	index := IndexHandler{}
+	authz := authzHandler{r.UserDao}
+	index := indexHandler{}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /", index.Get)
-	mux.HandleFunc("GET /login", authz.GetLogin)
-	mux.HandleFunc("GET /signup", authz.GetSignup)
-	mux.HandleFunc("POST /login", authz.PostLogin)
-	mux.HandleFunc("POST /signup", authz.PostSignup)
+	mux.HandleFunc("GET /", index.get)
+	mux.HandleFunc("GET /login", authz.getLogin)
+	mux.HandleFunc("GET /signup", authz.getSignup)
+	mux.HandleFunc("POST /login", authz.postLogin)
+	mux.HandleFunc("POST /signup", authz.postSignup)
 
 	return mux
 }
 
 func (r ApiRouter) Routes() http.Handler {
-	health := HealthHandler{DB: r.DB}
+	health := healthHandler{DB: r.DB}
+	shots := shotsHandler{
+		ShotsDao:  r.ShotsDao,
+		Validator: r.ShotsRequestValidator,
+	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /api/health", health.Get)
+	mux.HandleFunc("GET /health", health.get)
+	mux.HandleFunc("POST /targets/{targetID}/shots", shots.post)
 
 	return mux
 }
