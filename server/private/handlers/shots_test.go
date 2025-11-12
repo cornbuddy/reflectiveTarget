@@ -3,20 +3,47 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"math/rand/v2"
 	"net/http"
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
-	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/private/model"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 const shotsUrl = "/target/1/shots"
 
-func TestShotsShouldBeFetched(t *testing.T) {
+func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 	t.Parallel()
+
+	var targetID int
+	q := "INSERT INTO targets (name, owner_id) VALUES($1, $2) " +
+		"RETURNING id"
+	require.NoError(t, db.QueryRow(q, "kek?", 1).Scan(&targetID))
+
+	ct := "application/json"
+	url := fmt.Sprintf("/target/%v/shots", targetID)
+	resp := utils.MakeRequest(ct, http.MethodGet, url, api, nil)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	var shots model.ShotsResponse
+	require.NoError(t, json.NewDecoder(resp.Body).Decode(&shots))
+	assert.Len(t, shots.Shots, 0)
+
+	t.Cleanup(func() { resp.Body.Close() })
+}
+
+func TestShotsShould404TargetDoesNotExist(t *testing.T) {
+	t.Parallel()
+
+	ct := "application/json"
+	url := "/target/69/shots"
+	resp := utils.MakeRequest(ct, http.MethodGet, url, api, nil)
+	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 }
 
 func TestShotsShouldBeSavedIfValid(t *testing.T) {
