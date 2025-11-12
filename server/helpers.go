@@ -12,7 +12,6 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/private/handlers"
-	"github.com/cornbuddy/reflectiveTarget/server/private/routers"
 	"github.com/cornbuddy/reflectiveTarget/server/private/utils"
 )
 
@@ -24,22 +23,17 @@ type Config struct {
 var ErrNoEnvVar = fmt.Errorf("no environment variable")
 
 func MakeMux(config *Config) http.Handler {
-	health := handlers.HealthHandler{
-		DB: config.DB,
-	}
-	authz := handlers.AuthzHandler{
+	views := handlers.ViewsRouter{
 		UserDao: config.UserDao,
 	}
-	index := handlers.IndexHandler{}
-
-	views := routers.ViewsRouter{
-		AuthzHandler: authz,
-		IndexHandler: index,
+	api := handlers.ApiRouter{
+		DB:      config.DB,
+		UserDao: config.UserDao,
 	}
 
 	mux := http.NewServeMux()
 	mux.Handle("/", views.Routes())
-	mux.HandleFunc("GET /api/health", health.Get)
+	mux.Handle("/api/", http.StripPrefix("/api", api.Routes()))
 
 	return mux
 }

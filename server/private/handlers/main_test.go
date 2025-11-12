@@ -14,13 +14,13 @@ import (
 )
 
 var (
-	ctx           context.Context
-	db            *sql.DB
-	userDao       daos.UserDao
-	healthHandler HealthHandler
-	authzHandler  AuthzHandler
-	indexHandler  IndexHandler
-	shotsHandler  ShotsHandler
+	ctx     context.Context
+	db      *sql.DB
+	userDao daos.UserDao
+	health  HealthHandler
+	authz   AuthzHandler
+	index   IndexHandler
+	shots   ShotsHandler
 )
 
 func TestMain(m *testing.M) {
@@ -38,10 +38,10 @@ func TestMain(m *testing.M) {
 
 	db = testDb
 	userDao = daos.UserDao{DB: db}
-	healthHandler = HealthHandler{DB: db}
-	authzHandler = AuthzHandler{UserDao: userDao}
-	indexHandler = IndexHandler{}
-	shotsHandler = ShotsHandler{
+	health = HealthHandler{DB: db}
+	authz = AuthzHandler{UserDao: userDao}
+	index = IndexHandler{}
+	shots = ShotsHandler{
 		Validator: validators.ShotsRequestValidator{},
 		ShotsDao:  daos.ShotsDao{DB: db},
 	}

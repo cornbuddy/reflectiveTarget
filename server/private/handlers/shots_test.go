@@ -27,7 +27,7 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 	))
 
 	ct := "application/json"
-	handle := shotsHandler.Post
+	handle := shots.Post
 	method := http.MethodPost
 	resp := utils.MakeRequest(ct, method, "/", handle, &body)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
@@ -61,7 +61,7 @@ func TestShotsShouldBeValidated(t *testing.T) {
 		require.NoError(t, json.NewEncoder(&body).Encode(tc.body))
 
 		ct := "application/json"
-		handle := shotsHandler.Post
+		handle := shots.Post
 		method := http.MethodPost
 		resp := utils.MakeRequest(ct, method, "/", handle, &body)
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode, tc.desc)
@@ -76,7 +76,7 @@ func TestShotsShouldFailIfRequestIsMalformed(t *testing.T) {
 	require.NoError(t, err)
 
 	ct := "application/json"
-	handle := shotsHandler.Post
+	handle := shots.Post
 	method := http.MethodPost
 	resp := utils.MakeRequest(ct, method, "/", handle, &body)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)

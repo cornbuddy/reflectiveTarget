@@ -46,7 +46,7 @@ func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		route := authzHandler.PostLogin
+		route := authz.PostLogin
 		ct := "application/x-www-form-urlencoded"
 		body := tc.body
 		res := utils.MakeRequest(ct, http.MethodPost, "/", route, body)
@@ -81,7 +81,7 @@ func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 	body := strings.NewReader(
 		fmt.Sprintf("username=%s&password=%s", username, password),
 	)
-	handler := authzHandler.PostLogin
+	handler := authz.PostLogin
 	res := utils.MakeRequest(ct, http.MethodPost, "/", handler, body)
 	require.NotNil(t, res)
 	assert.Equal(t, http.StatusSeeOther, res.StatusCode)
@@ -127,7 +127,7 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		route := authzHandler.PostSignup
+		route := authz.PostSignup
 		ct := "application/x-www-form-urlencoded"
 		body := tc.body
 		res := utils.MakeRequest(ct, http.MethodPost, "/", route, body)
@@ -160,10 +160,10 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 	}
 
 	testCases := []testCase{{
-		router:   authzHandler.GetSignup,
+		router:   authz.GetSignup,
 		contains: "Signup",
 	}, {
-		router:   authzHandler.GetLogin,
+		router:   authz.GetLogin,
 		contains: "Login",
 	}}
 
