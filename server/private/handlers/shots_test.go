@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math/rand/v2"
 	"net/http"
 	"testing"
@@ -20,10 +21,13 @@ const shotsUrl = "/target/1/shots"
 func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 	t.Parallel()
 
+	user, err := makeTestUser(userDao)
+	require.NoError(t, err)
+
 	var targetID int
 	q := "INSERT INTO targets (name, owner_id) VALUES($1, $2) " +
 		"RETURNING id"
-	require.NoError(t, db.QueryRow(q, "kek?", 1).Scan(&targetID))
+	require.NoError(t, db.QueryRow(q, "kek?", user.ID).Scan(&targetID))
 
 	ct := "application/json"
 	url := fmt.Sprintf("/target/%v/shots", targetID)
@@ -59,10 +63,19 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 		model.ShotsRequest{Shots: []model.Shot{shot}},
 	))
 
-	ct := "application/json"
-	method := http.MethodPost
-	resp := utils.MakeRequest(ct, method, shotsUrl, api, &body)
+	resp := utils.MakeRequestWithCookies(
+		"application/json", http.MethodPost, shotsUrl, api, &body,
+		&http.Cookie{Name: SessionCookieName, Value: "kek"},
+	)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
+
+	data, err := io.ReadAll(resp.Body)
+	assert.NoError(t, err)
+
+	t.Cleanup(func() { resp.Body.Close() })
+
+	gotBody := string(data)
+	assert.Equal(t, "ok", gotBody, "should save shots")
 
 	res, err := db.Query(
 		"SELECT * FROM shots WHERE x = $1 AND y = $2",

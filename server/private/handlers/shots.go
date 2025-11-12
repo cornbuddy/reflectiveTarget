@@ -50,4 +50,5 @@ func (h shotsHandler) post(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	resp.WriteHeader(http.StatusCreated)
+	resp.Write([]byte("ok"))
 }
