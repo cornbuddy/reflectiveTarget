@@ -21,7 +21,7 @@ func MakeRequestWithCookies(
 		req.AddCookie(cookie)
 	}
 
-	return MakeRequest(contentType, method, url, handle, body)
+	return makeRequest(req, handle)
 }
 
 func MakeRequest(

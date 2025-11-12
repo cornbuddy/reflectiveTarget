@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"math/rand"
 	"net/http"
 	"testing"
@@ -15,6 +16,17 @@ import (
 )
 
 var defaultPassword = "default-password"
+
+func makeTestTarget(db *sql.DB, userID int) (int, error) {
+	var targetID int
+	q := "INSERT INTO targets (name, owner_id) VALUES($1, $2) " +
+		"RETURNING id"
+	if err := db.QueryRow(q, "kek?", userID).Scan(&targetID); err != nil {
+		return 0, err
+	}
+
+	return targetID, nil
+}
 
 func makeTestUser(dao daos.UserDao) (*model.User, error) {
 	pwd, err := model.NewPassword(defaultPassword)
