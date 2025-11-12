@@ -24,10 +24,8 @@ func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 	user, err := makeTestUser(userDao)
 	require.NoError(t, err)
 
-	var targetID int
-	q := "INSERT INTO targets (name, owner_id) VALUES($1, $2) " +
-		"RETURNING id"
-	require.NoError(t, db.QueryRow(q, "kek?", user.ID).Scan(&targetID))
+	targetID, err := makeTestTarget(db, user.ID)
+	require.NoError(t, err)
 
 	ct := "application/json"
 	url := fmt.Sprintf("/target/%v/shots", targetID)
@@ -53,6 +51,12 @@ func TestShotsShould404TargetDoesNotExist(t *testing.T) {
 func TestShotsShouldBeSavedIfValid(t *testing.T) {
 	t.Parallel()
 
+	user, err := makeTestUser(userDao)
+	require.NoError(t, err)
+
+	targetID, err := makeTestTarget(db, user.ID)
+	require.NoError(t, err)
+
 	shot := model.Shot{
 		X: rand.IntN(101),
 		Y: rand.IntN(101),
@@ -63,8 +67,9 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 		model.ShotsRequest{Shots: []model.Shot{shot}},
 	))
 
+	url := fmt.Sprintf("/target/%v/shots", targetID)
 	resp := utils.MakeRequestWithCookies(
-		"application/json", http.MethodPost, shotsUrl, api, &body,
+		"application/json", http.MethodPost, url, api, &body,
 		&http.Cookie{Name: SessionCookieName, Value: "kek"},
 	)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)

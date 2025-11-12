@@ -9,14 +9,20 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestShotsDaoShouldListShotsForTarget(t *testing.T) {
+	t.Parallel()
+	t.Fatal("not implemented")
+}
+
 func TestShotsDaoShouldSaveShots(t *testing.T) {
 	t.Parallel()
 
 	username := "shots"
-	err := userDao.Save(&model.User{Username: username, Password: password})
-	require.NoError(t, err)
-
-	user, err := userDao.Find(username)
+	user := model.User{
+		Username: username,
+		Password: password,
+	}
+	err := userDao.Save(&user)
 	require.NoError(t, err)
 
 	var targetID int
