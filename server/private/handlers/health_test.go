@@ -13,11 +13,12 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
+const healthUrl = "/health"
+
 func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 	t.Parallel()
 
-	route := health.get
-	res := utils.MakeRequest("", http.MethodGet, "/", route, nil)
+	res := utils.MakeRequest("", http.MethodGet, healthUrl, api, nil)
 	assert.NotNil(t, res)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 
@@ -43,8 +44,8 @@ func TestHealthHandlerShouldFailWhenDbDoesntWork(t *testing.T) {
 	})
 
 	db.Close()
-	router := healthHandler{DB: db}
-	res := utils.MakeRequest("", http.MethodGet, "/", router.get, nil)
+	api := ApiRouter{DB: db}.Routes().ServeHTTP
+	res := utils.MakeRequest("", http.MethodGet, healthUrl, api, nil)
 	assert.NotNil(t, res)
 	assert.Equal(t, http.StatusServiceUnavailable, res.StatusCode)
 

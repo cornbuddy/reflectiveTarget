@@ -13,6 +13,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const shotsUrl = "/target/1/shots"
+
+func TestShotsShouldBeFetched(t *testing.T) {
+	t.Parallel()
+}
+
 func TestShotsShouldBeSavedIfValid(t *testing.T) {
 	t.Parallel()
 
@@ -27,9 +33,8 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 	))
 
 	ct := "application/json"
-	handle := shots.post
 	method := http.MethodPost
-	resp := utils.MakeRequest(ct, method, "/", handle, &body)
+	resp := utils.MakeRequest(ct, method, shotsUrl, api, &body)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
 
 	res, err := db.Query(
@@ -61,9 +66,8 @@ func TestShotsShouldBeValidated(t *testing.T) {
 		require.NoError(t, json.NewEncoder(&body).Encode(tc.body))
 
 		ct := "application/json"
-		handle := shots.post
 		method := http.MethodPost
-		resp := utils.MakeRequest(ct, method, "/", handle, &body)
+		resp := utils.MakeRequest(ct, method, shotsUrl, api, &body)
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode, tc.desc)
 	}
 }
@@ -76,8 +80,7 @@ func TestShotsShouldFailIfRequestIsMalformed(t *testing.T) {
 	require.NoError(t, err)
 
 	ct := "application/json"
-	handle := shots.post
 	method := http.MethodPost
-	resp := utils.MakeRequest(ct, method, "/", handle, &body)
+	resp := utils.MakeRequest(ct, method, shotsUrl, api, &body)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 }

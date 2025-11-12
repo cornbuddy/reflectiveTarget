@@ -23,6 +23,7 @@ func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
 		body       io.Reader
 	}
 
+	const url = "/login"
 	wrongPasswordUser, err := makeTestUser(userDao)
 	require.NoError(t, err)
 	require.NotNil(t, wrongPasswordUser)
@@ -46,10 +47,9 @@ func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		route := authz.postLogin
 		ct := "application/x-www-form-urlencoded"
 		body := tc.body
-		res := utils.MakeRequest(ct, http.MethodPost, "/", route, body)
+		res := utils.MakeRequest(ct, http.MethodPost, url, views, body)
 		require.NotNil(t, res)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
 
@@ -66,6 +66,8 @@ func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
 func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 	t.Parallel()
 
+	const url = "/login"
+
 	username := "test-login"
 	password := "kek"
 	pwd, err := model.NewPassword(password)
@@ -81,8 +83,7 @@ func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 	body := strings.NewReader(
 		fmt.Sprintf("username=%s&password=%s", username, password),
 	)
-	handler := authz.postLogin
-	res := utils.MakeRequest(ct, http.MethodPost, "/", handler, body)
+	res := utils.MakeRequest(ct, http.MethodPost, url, views, body)
 	require.NotNil(t, res)
 	assert.Equal(t, http.StatusSeeOther, res.StatusCode)
 	assert.Equal(t, "/", res.Header.Get("Location"))
@@ -106,6 +107,8 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 		body       io.Reader
 	}
 
+	const url = "/signup"
+
 	testCases := []testCase{{
 		message:    "User successfully created",
 		statusCode: http.StatusSeeOther,
@@ -127,10 +130,9 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		route := authz.postSignup
 		ct := "application/x-www-form-urlencoded"
 		body := tc.body
-		res := utils.MakeRequest(ct, http.MethodPost, "/", route, body)
+		res := utils.MakeRequest(ct, http.MethodPost, url, views, body)
 		require.NotNil(t, res)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
 
@@ -155,21 +157,21 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		router   http.HandlerFunc
+		url      string
 		contains string
 	}
 
 	testCases := []testCase{{
-		router:   authz.getSignup,
+		url:      "/signup",
 		contains: "Signup",
 	}, {
-		router:   authz.getLogin,
+		url:      "/login",
 		contains: "Login",
 	}}
 
 	for _, tc := range testCases {
 		get := http.MethodGet
-		res := utils.MakeRequest("", get, "/", tc.router, nil)
+		res := utils.MakeRequest("", get, tc.url, views, nil)
 		ct := "text/html; charset=utf-8"
 		assert.Equal(t, ct, res.Header.Get("Content-Type"))
 		assert.Equal(t, http.StatusOK, res.StatusCode)
