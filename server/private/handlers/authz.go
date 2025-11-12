@@ -6,12 +6,17 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
 
 const SessionCookieName = "session-token"
 
-func (r AuthzHandler) PostLogin(resp http.ResponseWriter, req *http.Request) {
+type authzHandler struct {
+	daos.UserDao
+}
+
+func (h authzHandler) postLogin(resp http.ResponseWriter, req *http.Request) {
 	if err := req.ParseForm(); err != nil {
 		http.Error(resp, err.Error(), http.StatusBadRequest)
 		return
@@ -23,7 +28,7 @@ func (r AuthzHandler) PostLogin(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, err := r.UserDao.Find(userObj.Username)
+	user, err := h.UserDao.Find(userObj.Username)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
@@ -52,7 +57,7 @@ func (r AuthzHandler) PostLogin(resp http.ResponseWriter, req *http.Request) {
 
 }
 
-func (r AuthzHandler) PostSignup(resp http.ResponseWriter, req *http.Request) {
+func (h authzHandler) postSignup(resp http.ResponseWriter, req *http.Request) {
 	if err := req.ParseForm(); err != nil {
 		http.Error(resp, err.Error(), http.StatusBadRequest)
 		return
@@ -64,7 +69,7 @@ func (r AuthzHandler) PostSignup(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user, err := r.UserDao.Find(newUser.Username)
+	user, err := h.UserDao.Find(newUser.Username)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
@@ -73,7 +78,7 @@ func (r AuthzHandler) PostSignup(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if err := r.UserDao.Save(newUser); err != nil {
+	if err := h.UserDao.Save(newUser); err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -87,10 +92,10 @@ func (r AuthzHandler) PostSignup(resp http.ResponseWriter, req *http.Request) {
 	resp.Write([]byte("User successfully created"))
 }
 
-func (r AuthzHandler) GetSignup(resp http.ResponseWriter, req *http.Request) {
+func (h authzHandler) getSignup(resp http.ResponseWriter, req *http.Request) {
 	engine.Render(resp, "views/signup.tmpl", nil)
 }
 
-func (r AuthzHandler) GetLogin(resp http.ResponseWriter, req *http.Request) {
+func (h authzHandler) getLogin(resp http.ResponseWriter, req *http.Request) {
 	engine.Render(resp, "views/login.tmpl", nil)
 }

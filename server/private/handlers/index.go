@@ -4,7 +4,9 @@ import (
 	"net/http"
 )
 
-func (r IndexHandler) Get(resp http.ResponseWriter, req *http.Request) {
+type indexHandler struct{}
+
+func (h indexHandler) get(resp http.ResponseWriter, req *http.Request) {
 	if req.URL.Path != "/" {
 		http.NotFound(resp, req)
 		return
