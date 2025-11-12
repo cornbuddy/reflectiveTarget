@@ -4,9 +4,10 @@ import (
 	"math/rand/v2"
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
 
 func TestShotsDaoShouldListShotsForTarget(t *testing.T) {
