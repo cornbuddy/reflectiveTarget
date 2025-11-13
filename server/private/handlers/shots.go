@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -16,7 +17,30 @@ type shotsHandler struct {
 }
 
 func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
-	http.Error(resp, "not found", http.StatusNotFound)
+	targetID, err := strconv.Atoi(req.PathValue("targetID"))
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	shots, err := h.ShotsDao.List(targetID)
+	if errors.Is(err, model.ErrNotFound) {
+		http.Error(resp, err.Error(), http.StatusNotFound)
+		return
+	} else if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(model.ShotsResponse{Shots: shots})
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	resp.Header().Set("Content-Type", "application/json")
+	resp.WriteHeader(http.StatusOK)
+	resp.Write(data)
 }
 
 func (h shotsHandler) post(resp http.ResponseWriter, req *http.Request) {
@@ -49,6 +73,7 @@ func (h shotsHandler) post(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	resp.Header().Set("Content-Type", "application/json")
 	resp.WriteHeader(http.StatusCreated)
 	resp.Write([]byte("ok"))
 }

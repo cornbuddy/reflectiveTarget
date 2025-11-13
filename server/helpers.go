@@ -13,11 +13,13 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/private/handlers"
 	"github.com/cornbuddy/reflectiveTarget/server/private/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/private/validators"
 )
 
 type Config struct {
 	*sql.DB
 	daos.UserDao
+	daos.ShotsDao
 }
 
 var ErrNoEnvVar = fmt.Errorf("no environment variable")
@@ -27,7 +29,9 @@ func MakeMux(config *Config) http.Handler {
 		UserDao: config.UserDao,
 	}
 	api := handlers.ApiRouter{
-		DB: config.DB,
+		DB:                    config.DB,
+		ShotsDao:              config.ShotsDao,
+		ShotsRequestValidator: validators.ShotsRequestValidator{},
 	}
 
 	mux := http.NewServeMux()
@@ -96,9 +100,8 @@ func MakeConfig() (*Config, error) {
 	}
 
 	return &Config{
-		DB: db,
-		UserDao: daos.UserDao{
-			DB: db,
-		},
+		DB:       db,
+		UserDao:  daos.UserDao{DB: db},
+		ShotsDao: daos.ShotsDao{DB: db},
 	}, nil
 }

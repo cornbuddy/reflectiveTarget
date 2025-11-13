@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"math/rand/v2"
 	"os"
 	"testing"
 
@@ -17,7 +18,11 @@ var (
 	db       *sql.DB
 	userDao  UserDao
 	shotsDao ShotsDao
+
+	user     model.User
 	password model.Password
+	target   model.Target
+	shots    model.Shots
 )
 
 func TestMain(m *testing.M) {
@@ -41,7 +46,23 @@ func TestMain(m *testing.M) {
 	db = testDb
 	userDao = UserDao{DB: db}
 	shotsDao = ShotsDao{DB: db}
+
 	password = *pwd
+	user = model.User{
+		Password: password,
+		Username: "daos-user",
+	}
+	target = model.Target{
+		Name: "kek?",
+	}
+	shots = model.Shots{
+		model.Shot{X: rand.IntN(101), Y: rand.IntN(101)},
+		model.Shot{X: rand.IntN(101), Y: rand.IntN(101)},
+	}
+
+	if err := fillDatabase(db, &user, &target, shots); err != nil {
+		log.Fatalf("failed to fill db: %v", err)
+	}
 
 	code := m.Run()
 	defer os.Exit(code)
@@ -50,4 +71,37 @@ func TestMain(m *testing.M) {
 		log.Fatalf("failed to cleanup test suite: %v", err)
 	}
 
+}
+
+func fillDatabase(
+	db *sql.DB, user *model.User, target *model.Target, shots model.Shots,
+) error {
+
+	q := "INSERT INTO users(username, hashed_password) " +
+		"VALUES($1, $2) " +
+		"RETURNING id"
+	err := db.QueryRow(q, user.Username, user.Password.Hash).Scan(&user.ID)
+	if err != nil {
+		return err
+	}
+
+	target.OwnerId = user.ID
+
+	q = "INSERT INTO targets (name, owner_id) VALUES ($1, $2) RETURNING id"
+	err = db.QueryRow(q, "kek?", user.ID).Scan(&target.ID)
+	if err != nil {
+		return err
+	}
+
+	q = "INSERT INTO shots (x, y, target_id, shooter) " +
+		"VALUES ($1, $2, $3, $4)"
+	shooter := "i'm-a-shooter"
+	for _, shot := range shots {
+		_, err = db.Query(q, shot.X, shot.Y, target.ID, shooter)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

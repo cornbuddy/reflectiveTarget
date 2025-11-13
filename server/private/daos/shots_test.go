@@ -10,25 +10,36 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/private/model"
 )
 
-func TestShotsDaoShouldListShotsForTarget(t *testing.T) {
+func TestShotsDaoListShouldReturnEmptyListWhenNoShotsForTarget(t *testing.T) {
 	t.Parallel()
-	t.Fatal("not implemented")
-}
-
-func TestShotsDaoShouldSaveShots(t *testing.T) {
-	t.Parallel()
-
-	username := "shots"
-	user := model.User{
-		Username: username,
-		Password: password,
-	}
-	err := userDao.Save(&user)
-	require.NoError(t, err)
 
 	var targetID int
 	q := "INSERT INTO targets (name, owner_id) VALUES ($1, $2) RETURNING id"
 	require.NoError(t, db.QueryRow(q, "kek?", user.ID).Scan(&targetID))
+
+	got, err := shotsDao.List(targetID)
+	require.NoError(t, err)
+	assert.Empty(t, got)
+}
+
+func TestShotsDaoListShouldReturnNotFoundErrorWhenNoSuchTarget(t *testing.T) {
+	t.Parallel()
+
+	got, err := shotsDao.List(69)
+	require.ErrorIs(t, err, model.ErrNotFound)
+	assert.Nil(t, got)
+}
+
+func TestShotsDaoShouldListShotsForTarget(t *testing.T) {
+	t.Parallel()
+
+	got, err := shotsDao.List(target.ID)
+	require.NoError(t, err)
+	assert.NotEmpty(t, got)
+}
+
+func TestShotsDaoShouldSaveShots(t *testing.T) {
+	t.Parallel()
 
 	shooter := "kekekeke"
 	shot := model.Shot{
@@ -36,7 +47,7 @@ func TestShotsDaoShouldSaveShots(t *testing.T) {
 		Y: rand.IntN(101),
 	}
 	shots := model.Shots{shot}
-	require.NoError(t, shotsDao.Save(shooter, targetID, shots))
+	require.NoError(t, shotsDao.Save(shooter, target.ID, shots))
 
 	res, err := db.Query(
 		"SELECT * FROM shots WHERE x = $1 AND y = $2",
