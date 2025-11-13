@@ -22,9 +22,6 @@ lint:
 test:
 	@$(MAKE) -C server test
 
-PORT := 8080
-export PORT
-
 .PHONY: spec
 spec:
 	$(MAKE) build \

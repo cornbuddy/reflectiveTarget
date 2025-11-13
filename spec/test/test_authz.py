@@ -10,7 +10,7 @@ def test_should_signup(dsl):
     assert cookie is not None
 
 
-@pytest.mark.order(after="test_should_register")
+@pytest.mark.order(after="test_should_signup")
 def test_should_login(dsl):
     cookie = dsl.driver.get_cookie("session-token")
     assert cookie is None
