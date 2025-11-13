@@ -7,9 +7,17 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 
+from dsl.dsl import DSL
+from constants import URL
+
 
 @pytest.fixture
-def driver(url):
+def dsl(driver):
+    return DSL(driver, URL)
+
+
+@pytest.fixture
+def driver():
     debug = json.loads(environ.get("DEBUG", "false").lower())
     opts = list(filter(None, [
         "--disable-gpu",
@@ -24,7 +32,6 @@ def driver(url):
     service = Service(executable_path=path)
     _driver = webdriver.Firefox(options=options, service=service)
     _driver.set_window_size(1920, 1080)
-    _driver.get(url)
     _driver.implicitly_wait(10)
     yield _driver
 
