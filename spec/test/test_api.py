@@ -1,6 +1,6 @@
 import requests
 
-from .constants import URL
+from constants import URL
 
 
 def test_should_expose_health_endpoint():
