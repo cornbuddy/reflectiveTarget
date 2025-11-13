@@ -1,12 +1,7 @@
 package model
 
 import (
-	"fmt"
 	"net/url"
-)
-
-var (
-	ErrUserFormMissingKeys = fmt.Errorf("user form missing keys")
 )
 
 type User struct {

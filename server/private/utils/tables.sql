@@ -23,5 +23,5 @@ CREATE TABLE IF NOT EXISTS shots (
     target_id INT REFERENCES targets(id) NOT NULL,
     -- session value; session should be stored somewhere in redis
     shooter VARCHAR(64) NOT NULL,
-    UNIQUE (target_id, shooter)
+    UNIQUE (x, y, target_id, shooter)
 );
