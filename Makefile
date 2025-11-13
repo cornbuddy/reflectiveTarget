@@ -1,10 +1,16 @@
+COMPOSE := develop/compose.yml
+
 .PHONY: run
 run: stop
-	docker compose -f develop/compose.yml up --build
+	docker compose -f $(COMPOSE) up --build
 
 .PHONY: stop
 stop:
-	- docker compose -f develop/compose.yml down
+	- docker compose -f $(COMPOSE) down
+
+.PHONY: build
+build:
+	docker compose -f $(COMPOSE) build --pull
 
 .PHONY: lint
 lint:
@@ -21,8 +27,9 @@ export PORT
 
 .PHONY: spec
 spec:
-	$(MAKE) run & \
-		sleep 15 \
+	$(MAKE) build \
+		&& $(MAKE) run & \
+		sleep 10 \
 		&& $(MAKE) -C spec spec \
 		|| $(MAKE) stop
 
