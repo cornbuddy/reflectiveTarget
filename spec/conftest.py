@@ -11,6 +11,10 @@ from dsl.dsl import DSL
 from constants import URL
 
 
+# let's introduce fixtures for authorized and anonymous users, this might
+# suit my usecase
+# https://stackoverflow.com/a/64693486
+
 @pytest.fixture
 def dsl(driver):
     return DSL(driver, URL)
