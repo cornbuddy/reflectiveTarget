@@ -14,6 +14,27 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
+func TestLogoutShouldRemoveSessionCookie(t *testing.T) {
+	t.Parallel()
+
+	const url = "/logout"
+
+	ct := "application/x-www-form-urlencoded"
+	res := utils.MakeRequest(ct, http.MethodPost, url, views, nil)
+	require.NotNil(t, res)
+	assert.Equal(t, http.StatusSeeOther, res.StatusCode)
+	assert.Equal(t, "/", res.Header.Get("Location"))
+	assertSessionCookieIsUnset(t, res)
+
+	data, err := io.ReadAll(res.Body)
+	assert.NoError(t, err)
+
+	t.Cleanup(func() { res.Body.Close() })
+
+	gotBody := string(data)
+	assert.Contains(t, gotBody, "Logout succeeded")
+}
+
 func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
 	t.Parallel()
 

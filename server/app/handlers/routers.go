@@ -27,6 +27,7 @@ func (r ViewsRouter) Routes() http.Handler {
 	mux.HandleFunc("GET /login", authz.getLogin)
 	mux.HandleFunc("GET /signup", authz.getSignup)
 	mux.HandleFunc("POST /login", authz.postLogin)
+	mux.HandleFunc("POST /logout", authz.postLogout)
 	mux.HandleFunc("POST /signup", authz.postSignup)
 
 	return mux

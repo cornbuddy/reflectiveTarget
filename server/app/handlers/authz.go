@@ -16,6 +16,16 @@ type authzHandler struct {
 	daos.UserDao
 }
 
+func (h authzHandler) postLogout(resp http.ResponseWriter, req *http.Request) {
+	http.SetCookie(resp, &http.Cookie{
+		Name:   SessionCookieName,
+		Value:  "",
+		MaxAge: -1,
+	})
+	http.Redirect(resp, req, "/", http.StatusSeeOther)
+	resp.Write([]byte("Logout succeeded"))
+}
+
 func (h authzHandler) postLogin(resp http.ResponseWriter, req *http.Request) {
 	if err := req.ParseForm(); err != nil {
 		http.Error(resp, err.Error(), http.StatusBadRequest)

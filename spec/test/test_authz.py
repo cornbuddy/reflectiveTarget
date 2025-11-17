@@ -1,6 +1,20 @@
-from constants import PASSWORD, USERNAME
+from constants import PASSWORD, USERNAME, URL
 
 
-def test_should_login(authorized_user):
-    authorized_user.login(USERNAME, PASSWORD)
-    authorized_user.assert_authorized()
+def test_user_should_be_able_to_logout(authorized_user):
+    driver = authorized_user.logout()
+    authorized_user.assert_unauthorized()
+    assert driver.current_url == f"{URL}/"
+
+
+def test_user_should_be_able_to_login(authorized_user):
+    driver = authorized_user.login(USERNAME, PASSWORD)
+    assert driver.current_url == f"{URL}/"
+
+
+def test_password_should_be_validated_upon_signup(anonymous_user):
+    raise RuntimeError("not implemented")
+
+
+def test_username_should_be_validated_upon_signup(anonymous_user):
+    raise RuntimeError("not implemented")

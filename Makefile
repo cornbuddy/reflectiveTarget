@@ -2,7 +2,7 @@ COMPOSE := develop/compose.yml
 
 .PHONY: run
 run: stop
-	docker compose -f $(COMPOSE) up --build
+	docker compose -f $(COMPOSE) up
 
 .PHONY: stop
 stop:

@@ -75,3 +75,19 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response) {
 	assert.True(t, sessionCookie.Expires.After(month))
 	assert.NoError(t, uuid.Validate(sessionCookie.Value))
 }
+
+func assertSessionCookieIsUnset(t *testing.T, resp *http.Response) {
+	cookies := resp.Cookies()
+	require.NotEmpty(t, cookies)
+
+	var sessionCookie *http.Cookie
+	for _, cookie := range cookies {
+		if cookie.Name == SessionCookieName {
+			sessionCookie = cookie
+			break
+		}
+	}
+
+	require.NotNil(t, sessionCookie)
+	assert.Equal(t, -1, sessionCookie.MaxAge)
+}
