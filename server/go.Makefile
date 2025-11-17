@@ -21,7 +21,7 @@ COVERPROFILE=cover.out
 COVERREPORT=cover.html
 
 .PHONY: test
-test: lint
+test:
 	GOTOOLCHAIN=go1.25.3+auto go test -coverprofile=$(COVERPROFILE) ./...
 	go tool cover -html $(COVERPROFILE) -o $(COVERREPORT)
 	- xdg-open $(COVERREPORT)

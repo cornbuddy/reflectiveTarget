@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
 )
 
 var defaultPassword = "default-password"
@@ -28,13 +28,13 @@ func makeTestTarget(db *sql.DB, userID int) (int, error) {
 	return targetID, nil
 }
 
-func makeTestUser(dao daos.UserDao) (*model.User, error) {
-	pwd, err := model.NewPassword(defaultPassword)
+func makeTestUser(dao daos.UserDao) (*entities.User, error) {
+	pwd, err := entities.NewPassword(defaultPassword)
 	if err != nil {
 		return nil, err
 	}
 
-	user := model.User{
+	user := entities.User{
 		Username: makeRandomString(10),
 		Password: *pwd,
 	}

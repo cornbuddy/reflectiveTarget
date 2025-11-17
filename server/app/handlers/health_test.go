@@ -8,8 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
-	testdb "github.com/cornbuddy/reflectiveTarget/server/test/db"
+	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -26,7 +25,7 @@ func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 	t.Cleanup(func() { res.Body.Close() })
 	assert.NoError(t, err)
 
-	var got model.HealthResponse
+	var got entities.HealthResponse
 	err = json.Unmarshal(data, &got)
 	assert.NoError(t, err)
 	assert.True(t, got.Connected)
@@ -36,7 +35,7 @@ func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 func TestHealthHandlerShouldFailWhenDbDoesntWork(t *testing.T) {
 	t.Parallel()
 
-	cleanup, db, err := testdb.SetupTestDb(ctx, t)
+	cleanup, db, err := utils.SetupTestDb(ctx, t)
 	assert.NoError(t, err)
 
 	t.Cleanup(func() {
@@ -53,7 +52,7 @@ func TestHealthHandlerShouldFailWhenDbDoesntWork(t *testing.T) {
 	t.Cleanup(func() { res.Body.Close() })
 	assert.NoError(t, err)
 
-	var got model.HealthResponse
+	var got entities.HealthResponse
 	err = json.Unmarshal(data, &got)
 	assert.NoError(t, err)
 	assert.False(t, got.Connected)

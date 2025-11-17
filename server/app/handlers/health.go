@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
+	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
 )
 
 type healthHandler struct {
@@ -23,7 +23,7 @@ func (h healthHandler) get(resp http.ResponseWriter, req *http.Request) {
 		status = http.StatusServiceUnavailable
 	}
 
-	hr, _ := json.Marshal(model.HealthResponse{
+	hr, _ := json.Marshal(entities.HealthResponse{
 		Connected:   connected,
 		Connections: connections,
 	})

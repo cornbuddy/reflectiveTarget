@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
 )
 
 const SessionCookieName = "session-token"
@@ -22,7 +22,7 @@ func (h authzHandler) postLogin(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	userObj, err := model.NewUser(req.Form)
+	userObj, err := entities.NewUser(req.Form)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusBadRequest)
 		return
@@ -63,7 +63,7 @@ func (h authzHandler) postSignup(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	newUser, err := model.NewUser(req.Form)
+	newUser, err := entities.NewUser(req.Form)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusBadRequest)
 		return

@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 func TestShouldRenderIndexPage(t *testing.T) {

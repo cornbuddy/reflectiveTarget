@@ -2,9 +2,17 @@ module github.com/cornbuddy/reflectiveTarget/server/app
 
 go 1.25.3
 
+replace github.com/cornbuddy/reflectiveTarget/server/infra => ../infra
+
+replace github.com/cornbuddy/reflectiveTarget/server/model => ../model
+
+replace github.com/cornbuddy/reflectiveTarget/server/test => ../test
+
 require (
 	github.com/abiosoft/mold v0.0.0-20250328135240-0a4c28cb836a
-	github.com/cornbuddy/reflectiveTarget/server v0.0.0-20251113173345-f003dcf4cba9
+	github.com/cornbuddy/reflectiveTarget/server/infra v0.0.0-00010101000000-000000000000
+	github.com/cornbuddy/reflectiveTarget/server/model v0.0.0-00010101000000-000000000000
+	github.com/cornbuddy/reflectiveTarget/server/test v0.0.0-00010101000000-000000000000
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/stretchr/testify v1.11.1
@@ -66,7 +74,5 @@ require (
 	golang.org/x/sync v0.18.0 // indirect
 	golang.org/x/sys v0.38.0 // indirect
 	golang.org/x/text v0.31.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20250929231259-57b25ae835d4 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250929231259-57b25ae835d4 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

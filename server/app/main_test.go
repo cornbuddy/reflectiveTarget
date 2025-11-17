@@ -11,7 +11,7 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 
-	"github.com/cornbuddy/reflectiveTarget/server/test/db"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 var (
@@ -34,7 +34,7 @@ func TestMain(m *testing.M) {
 		postgres.WithDatabase(database),
 	}
 
-	cont, err := postgres.Run(ctx, db.Image, opts...)
+	cont, err := postgres.Run(ctx, utils.Image, opts...)
 	if err != nil {
 		log.Fatal("failed to run db: %w", err)
 	}

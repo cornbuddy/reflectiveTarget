@@ -10,10 +10,10 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
-	"github.com/cornbuddy/reflectiveTarget/server/private/handlers"
-	"github.com/cornbuddy/reflectiveTarget/server/private/utils"
-	"github.com/cornbuddy/reflectiveTarget/server/private/validators"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/model/validators"
 )
 
 type Config struct {

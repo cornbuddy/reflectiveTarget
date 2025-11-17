@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
-	"github.com/cornbuddy/reflectiveTarget/server/private/validators"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/model/validators"
 )
 
 type shotsHandler struct {
@@ -24,7 +24,7 @@ func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	shots, err := h.ShotsDao.List(targetID)
-	if errors.Is(err, model.ErrNotFound) {
+	if errors.Is(err, entities.ErrNotFound) {
 		http.Error(resp, err.Error(), http.StatusNotFound)
 		return
 	} else if err != nil {
@@ -32,7 +32,7 @@ func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	data, err := json.Marshal(model.ShotsResponse{Shots: shots})
+	data, err := json.Marshal(entities.ShotsResponse{Shots: shots})
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
@@ -44,7 +44,7 @@ func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (h shotsHandler) post(resp http.ResponseWriter, req *http.Request) {
-	var shots model.ShotsRequest
+	var shots entities.ShotsRequest
 	if err := json.NewDecoder(req.Body).Decode(&shots); err != nil {
 		http.Error(resp, "bad request", http.StatusBadRequest)
 		return

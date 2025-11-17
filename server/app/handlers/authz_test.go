@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
+	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -70,10 +70,10 @@ func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 
 	username := "test-login"
 	password := "kek"
-	pwd, err := model.NewPassword(password)
+	pwd, err := entities.NewPassword(password)
 	require.NoError(t, err)
 
-	user := model.User{
+	user := entities.User{
 		Username: username,
 		Password: *pwd,
 	}

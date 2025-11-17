@@ -8,10 +8,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/daos"
-	"github.com/cornbuddy/reflectiveTarget/server/private/utils"
-	"github.com/cornbuddy/reflectiveTarget/server/private/validators"
-	testdb "github.com/cornbuddy/reflectiveTarget/server/test/db"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/model/validators"
+	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 var (
@@ -26,7 +26,7 @@ func TestMain(m *testing.M) {
 	ctx = context.TODO()
 
 	t := &testing.T{}
-	cleanup, testDb, err := testdb.SetupTestDb(ctx, t)
+	cleanup, testDb, err := testutils.SetupTestDb(ctx, t)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
 	}

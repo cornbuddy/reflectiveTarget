@@ -5,10 +5,8 @@ ENV GOOS=$TARGETOS
 ENV GOARCH=$TARGETARCH
 ENV CGO_ENABLED=0
 WORKDIR /workspace
-COPY go.mod go.mod
-COPY go.sum go.sum
-RUN go mod download
 COPY . .
+WORKDIR /workspace/app
 RUN go build \
     -a -v \
     -gcflags=all="-l -B" \
@@ -16,6 +14,6 @@ RUN go build \
     -o reflecitve-target .
 
 FROM scratch
-COPY --from=builder /workspace/reflecitve-target .
+COPY --from=builder /workspace/app/reflecitve-target .
 USER 65534:65534
 ENTRYPOINT ["/reflecitve-target"]
