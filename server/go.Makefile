@@ -1,7 +1,3 @@
-.PHONY: run
-run:
-	go run .
-
 .PHONY: lint
 lint: fmt vet tidy
 
