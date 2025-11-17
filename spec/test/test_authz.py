@@ -1,8 +1,6 @@
-from constants import PASSWORD, USERNAME, URL, SESSION_TOKEN
+from constants import PASSWORD, USERNAME
 
 
 def test_should_login(authorized_user):
-    driver = authorized_user.login(USERNAME, PASSWORD)
-    session = driver.get_cookie(SESSION_TOKEN)
-    assert session is not None
-    assert driver.current_url == f"{URL}/"
+    authorized_user.login(USERNAME, PASSWORD)
+    authorized_user.assert_authorized()

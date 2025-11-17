@@ -16,11 +16,7 @@ class DSL:
         self.driver.find_element(By.NAME, "username").send_keys(username)
         self.driver.find_element(By.NAME, "password").send_keys(password)
         self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
-
-        session = self.driver.get_cookie(SESSION_TOKEN)
-        assert session is not None
-        assert self.driver.current_url == f"{self._url}/"
-
+        self.assert_authorized()
         return self.driver
 
     def login(self, username: str, password: str) -> WebDriver:
@@ -28,9 +24,10 @@ class DSL:
         self.driver.find_element(By.NAME, "username").send_keys(username)
         self.driver.find_element(By.NAME, "password").send_keys(password)
         self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
+        self.assert_authorized()
+        return self.driver
 
+    def assert_authorized(self):
         session = self.driver.get_cookie(SESSION_TOKEN)
         assert session is not None
         assert self.driver.current_url == f"{self._url}/"
-
-        return self.driver
