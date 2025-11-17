@@ -8,19 +8,22 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 
 from dsl.dsl import DSL
-from constants import URL
+from constants import URL, USERNAME, PASSWORD
 
 
-# let's introduce fixtures for authorized and anonymous users, this might
-# suit my usecase
-# https://stackoverflow.com/a/64693486
-
-@pytest.fixture
-def dsl(driver):
+@pytest.fixture(scope="session")
+def anonymous_user(driver):
     return DSL(driver, URL)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
+def authorized_user(driver):
+    dsl = DSL(driver, URL)
+    dsl.signup(USERNAME, PASSWORD)
+    return dsl
+
+
+@pytest.fixture(scope="session")
 def driver():
     debug = json.loads(environ.get("DEBUG", "false").lower())
     opts = list(filter(None, [
