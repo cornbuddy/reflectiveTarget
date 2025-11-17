@@ -1,4 +1,4 @@
-package model
+package entities
 
 type Shot struct {
 	X int `json:"x"`

@@ -1,4 +1,4 @@
-package model
+package entities
 
 import (
 	"github.com/alexedwards/argon2id"

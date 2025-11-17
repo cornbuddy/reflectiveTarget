@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
-	"github.com/cornbuddy/reflectiveTarget/server/private/utils"
-	testdb "github.com/cornbuddy/reflectiveTarget/server/test/db"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
+	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 var (
@@ -19,17 +19,17 @@ var (
 	userDao  UserDao
 	shotsDao ShotsDao
 
-	user     model.User
-	password model.Password
-	target   model.Target
-	shots    model.Shots
+	user     entities.User
+	password entities.Password
+	target   entities.Target
+	shots    entities.Shots
 )
 
 func TestMain(m *testing.M) {
 	ctx = context.TODO()
 
 	t := &testing.T{}
-	cleanup, testDb, err := testdb.SetupTestDb(ctx, t)
+	cleanup, testDb, err := testutils.SetupTestDb(ctx, t)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
 	}
@@ -38,7 +38,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("failed to init db: %v", err)
 	}
 
-	pwd, err := model.NewPassword("kek")
+	pwd, err := entities.NewPassword("kek")
 	if err != nil {
 		log.Fatalf("failed to create password: %v", err)
 	}
@@ -48,16 +48,16 @@ func TestMain(m *testing.M) {
 	shotsDao = ShotsDao{DB: db}
 
 	password = *pwd
-	user = model.User{
+	user = entities.User{
 		Password: password,
 		Username: "daos-user",
 	}
-	target = model.Target{
+	target = entities.Target{
 		Name: "kek?",
 	}
-	shots = model.Shots{
-		model.Shot{X: rand.IntN(101), Y: rand.IntN(101)},
-		model.Shot{X: rand.IntN(101), Y: rand.IntN(101)},
+	shots = entities.Shots{
+		entities.Shot{X: rand.IntN(101), Y: rand.IntN(101)},
+		entities.Shot{X: rand.IntN(101), Y: rand.IntN(101)},
 	}
 
 	if err := fillDatabase(db, &user, &target, shots); err != nil {
@@ -74,7 +74,7 @@ func TestMain(m *testing.M) {
 }
 
 func fillDatabase(
-	db *sql.DB, user *model.User, target *model.Target, shots model.Shots,
+	db *sql.DB, user *entities.User, target *entities.Target, shots entities.Shots,
 ) error {
 
 	q := "INSERT INTO users(username, hashed_password) " +

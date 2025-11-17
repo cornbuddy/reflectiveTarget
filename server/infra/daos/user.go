@@ -3,14 +3,14 @@ package daos
 import (
 	"database/sql"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
+	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
 )
 
 type UserDao struct {
 	*sql.DB
 }
 
-func (dao UserDao) Save(user *model.User) error {
+func (dao UserDao) Save(user *entities.User) error {
 	q := "INSERT INTO users(username, hashed_password) " +
 		"VALUES($1, $2) " +
 		"RETURNING id"
@@ -22,8 +22,8 @@ func (dao UserDao) Save(user *model.User) error {
 	return nil
 }
 
-func (dao UserDao) Find(username string) (*model.User, error) {
-	var user model.User
+func (dao UserDao) Find(username string) (*entities.User, error) {
+	var user entities.User
 	query := "SELECT id, username, hashed_password FROM users " +
 		"WHERE username = $1"
 	err := dao.DB.QueryRow(query, username).

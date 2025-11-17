@@ -1,34 +1,19 @@
-.PHONY: run
-run:
-	go run .
-
-.PHONY: lint
-lint: fmt vet tidy
-
-.PHONY: fmt
-fmt:
-	go fmt ./...
-
-.PHONY: vet
-vet:
-	go vet ./...
+LAYERS = app model infra
 
 .PHONY: tidy
 tidy:
-	go mod tidy
+	for layer in $(LAYERS) test; do \
+		$(MAKE) -C $$layer tidy; \
+	done
 
-COVERPROFILE=cover.out
-COVERREPORT=cover.html
+.PHONY: lint
+lint:
+	for layer in $(LAYERS) test; do \
+		$(MAKE) -C $$layer lint; \
+	done
 
 .PHONY: test
-test: lint
-	GOTOOLCHAIN=go1.25.3+auto go test -coverprofile=$(COVERPROFILE) ./...
-	go tool cover -html $(COVERPROFILE) -o $(COVERREPORT)
-	- xdg-open $(COVERREPORT)
-
-.PHONY: deps
-deps: update tidy
-
-.PHONY: update
-update:
-	go get -u ./...
+test:
+	for layer in $(LAYERS); do \
+		$(MAKE) -C $$layer test; \
+	done

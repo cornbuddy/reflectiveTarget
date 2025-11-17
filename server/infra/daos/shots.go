@@ -4,18 +4,18 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
+	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
 )
 
 type ShotsDao struct {
 	*sql.DB
 }
 
-func (d ShotsDao) List(targetID int) (model.Shots, error) {
+func (d ShotsDao) List(targetID int) (entities.Shots, error) {
 	q := "SELECT * FROM targets WHERE id = $1"
 	err := d.DB.QueryRow(q, targetID).Scan()
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, model.ErrNotFound
+		return nil, entities.ErrNotFound
 	}
 
 	q = "SELECT x, y FROM shots WHERE target_id = $1"
@@ -24,9 +24,9 @@ func (d ShotsDao) List(targetID int) (model.Shots, error) {
 		return nil, err
 	}
 
-	shots := model.Shots{}
+	shots := entities.Shots{}
 	for rows.Next() {
-		shot := model.Shot{}
+		shot := entities.Shot{}
 		if err := rows.Scan(&shot.X, &shot.Y); err != nil {
 			return nil, err
 		}
@@ -37,7 +37,10 @@ func (d ShotsDao) List(targetID int) (model.Shots, error) {
 	return shots, nil
 }
 
-func (d ShotsDao) Save(shooter string, targetID int, shots model.Shots) error {
+func (d ShotsDao) Save(
+	shooter string, targetID int, shots entities.Shots,
+) error {
+
 	q := "INSERT INTO shots (x, y, target_id, shooter) " +
 		"VALUES ($1, $2, $3, $4)"
 	for _, shot := range shots {

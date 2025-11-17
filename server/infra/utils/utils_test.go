@@ -8,14 +8,14 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/stretchr/testify/assert"
 
-	testdb "github.com/cornbuddy/reflectiveTarget/server/test/db"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 func TestInitDatabase(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.TODO()
-	cleanup, db, err := testdb.SetupTestDb(ctx, t)
+	cleanup, db, err := utils.SetupTestDb(ctx, t)
 	assert.NoError(t, err)
 
 	t.Cleanup(func() {

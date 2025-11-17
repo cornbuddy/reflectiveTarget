@@ -1,7 +1,7 @@
 package validators
 
 import (
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
+	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
 )
 
 const (
@@ -12,7 +12,7 @@ const (
 type ShotsRequestValidator struct{}
 
 func (v ShotsRequestValidator) Validate(
-	req model.ShotsRequest,
+	req entities.ShotsRequest,
 ) ValidationResult {
 
 	res := ValidationResult{}

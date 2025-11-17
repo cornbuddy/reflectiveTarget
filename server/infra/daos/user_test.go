@@ -6,13 +6,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/private/model"
+	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
 )
 
 func TestSaveShouldReturnErrorIfUsernameIsTaken(t *testing.T) {
 	t.Parallel()
 
-	user := model.User{Username: "exists", Password: password}
+	user := entities.User{Username: "exists", Password: password}
 	require.NoError(t, userDao.Save(&user))
 
 	err := userDao.Save(&user)
@@ -22,7 +22,7 @@ func TestSaveShouldReturnErrorIfUsernameIsTaken(t *testing.T) {
 func TestShouldSaveUser(t *testing.T) {
 	t.Parallel()
 
-	want := model.User{Username: "kek2", Password: password}
+	want := entities.User{Username: "kek2", Password: password}
 	assert.NoError(t, userDao.Save(&want))
 
 	var id int
