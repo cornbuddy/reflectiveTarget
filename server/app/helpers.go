@@ -28,9 +28,8 @@ func MakeMux(config *Config) http.Handler {
 		UserDao: config.UserDao,
 	}
 	api := handlers.ApiRouter{
-		DB:                    config.DB,
-		ShotsDao:              config.ShotsDao,
-		ShotsRequestValidator: handlers.ShotsRequestValidator{},
+		DB:       config.DB,
+		ShotsDao: config.ShotsDao,
 	}
 
 	mux := http.NewServeMux()

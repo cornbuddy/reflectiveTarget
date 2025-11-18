@@ -38,9 +38,8 @@ func TestMain(m *testing.M) {
 	userDao = daos.UserDao{DB: db}
 	views = ViewsRouter{UserDao: userDao}.Routes().ServeHTTP
 	api = ApiRouter{
-		DB:                    db,
-		ShotsDao:              daos.ShotsDao{DB: db},
-		ShotsRequestValidator: ShotsRequestValidator{},
+		DB:       db,
+		ShotsDao: daos.ShotsDao{DB: db},
 	}.Routes().ServeHTTP
 
 	code := m.Run()

@@ -10,7 +10,6 @@ import (
 type ApiRouter struct {
 	*sql.DB
 	daos.ShotsDao
-	ShotsRequestValidator
 }
 
 type ViewsRouter struct {
@@ -36,7 +35,7 @@ func (r ApiRouter) Routes() http.Handler {
 	health := healthHandler{DB: r.DB}
 	shots := shotsHandler{
 		ShotsDao:  r.ShotsDao,
-		Validator: r.ShotsRequestValidator,
+		Validator: ShotsRequestValidator{},
 	}
 
 	mux := http.NewServeMux()
