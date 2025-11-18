@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 )
 
 func TestSaveShouldReturnErrorIfUsernameIsTaken(t *testing.T) {

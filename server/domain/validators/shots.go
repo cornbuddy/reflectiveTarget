@@ -1,7 +1,7 @@
 package validators
 
 import (
-	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 )
 
 const (

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 )
 
 type healthHandler struct {

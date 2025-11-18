@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"net/http"
 
+	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
-	"github.com/cornbuddy/reflectiveTarget/server/model/validators"
 )
 
 type ApiRouter struct {

@@ -1,4 +1,4 @@
-module github.com/cornbuddy/reflectiveTarget/server/model
+module github.com/cornbuddy/reflectiveTarget/server/domain
 
 go 1.25.3
 

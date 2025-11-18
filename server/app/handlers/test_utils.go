@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
-	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
 )
 
 var defaultPassword = "default-password"

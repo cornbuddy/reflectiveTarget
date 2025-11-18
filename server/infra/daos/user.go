@@ -3,7 +3,7 @@ package daos
 import (
 	"database/sql"
 
-	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 )
 
 type UserDao struct {

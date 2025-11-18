@@ -1,4 +1,4 @@
-LAYERS = app model infra
+LAYERS = app domain infra
 
 .PHONY: tidy
 tidy:

@@ -8,8 +8,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
-	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
 	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 

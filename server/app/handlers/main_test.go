@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
-	"github.com/cornbuddy/reflectiveTarget/server/model/validators"
 	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 

@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
-	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
-	"github.com/cornbuddy/reflectiveTarget/server/model/validators"
 )
 
 type shotsHandler struct {

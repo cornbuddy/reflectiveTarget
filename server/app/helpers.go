@@ -11,9 +11,9 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
-	"github.com/cornbuddy/reflectiveTarget/server/model/validators"
 )
 
 type Config struct {

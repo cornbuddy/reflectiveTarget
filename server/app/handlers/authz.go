@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
-	"github.com/cornbuddy/reflectiveTarget/server/model/entities"
 )
 
 const SessionCookieName = "session-token"

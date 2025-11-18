@@ -2,12 +2,12 @@ module github.com/cornbuddy/reflectiveTarget/server/infra
 
 go 1.25.3
 
-replace github.com/cornbuddy/reflectiveTarget/server/model => ../model
+replace github.com/cornbuddy/reflectiveTarget/server/domain => ../domain
 
 replace github.com/cornbuddy/reflectiveTarget/server/test => ../test
 
 require (
-	github.com/cornbuddy/reflectiveTarget/server/model v0.0.0-00010101000000-000000000000
+	github.com/cornbuddy/reflectiveTarget/server/domain v0.0.0-00010101000000-000000000000
 	github.com/cornbuddy/reflectiveTarget/server/test v0.0.0-00010101000000-000000000000
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/stretchr/testify v1.11.1
