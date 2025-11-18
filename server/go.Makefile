@@ -13,8 +13,8 @@ vet:
 tidy:
 	go mod tidy
 
-COVERPROFILE=cover.out
-COVERREPORT=cover.html
+COVERPROFILE = cover.out
+COVERREPORT = cover.html
 
 .PHONY: test
 test:

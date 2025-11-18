@@ -1,11 +1,5 @@
 LAYERS = app domain infra
 
-.PHONY: tidy
-tidy:
-	for layer in $(LAYERS) test; do \
-		$(MAKE) -C $$layer tidy; \
-	done
-
 .PHONY: lint
 lint:
 	for layer in $(LAYERS) test; do \

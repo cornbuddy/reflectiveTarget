@@ -1,4 +1,4 @@
-COMPOSE := develop/compose.yml
+COMPOSE = develop/compose.yml
 
 .PHONY: run
 run: stop
