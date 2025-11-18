@@ -103,9 +103,9 @@ func (h authzHandler) postSignup(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (h authzHandler) getSignup(resp http.ResponseWriter, req *http.Request) {
-	engine.Render(resp, "views/signup.tmpl", nil)
+	layout.Render(resp, "views/signup.tmpl", nil)
 }
 
 func (h authzHandler) getLogin(resp http.ResponseWriter, req *http.Request) {
-	engine.Render(resp, "views/login.tmpl", nil)
+	layout.Render(resp, "views/login.tmpl", nil)
 }

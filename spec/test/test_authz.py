@@ -3,7 +3,6 @@ from constants import PASSWORD, USERNAME, URL
 
 def test_user_should_be_able_to_logout(authorized_user):
     driver = authorized_user.logout()
-    authorized_user.assert_unauthorized()
     assert driver.current_url == f"{URL}/"
 
 

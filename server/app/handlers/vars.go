@@ -8,8 +8,7 @@ import (
 
 //go:embed templates
 var dir embed.FS
-var options = mold.With(
+var layout = mold.Must(mold.New(dir, mold.With(
 	mold.WithRoot("templates"),
 	mold.WithLayout("layout.tmpl"),
-)
-var engine = mold.Must(mold.New(dir, options))
+)))
