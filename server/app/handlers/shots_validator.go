@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/cornbuddy/reflectiveTarget/server/infra/validator"
 )
 
@@ -18,11 +20,13 @@ func (v ShotsRequestValidator) Validate(
 	res := validator.ValidationResult{}
 	for _, shot := range req.Shots {
 		if shot.X > MaxCoordinate || shot.X < MinCoordinate {
-			res.Errors = append(res.Errors, ErrShotBadCoordinate)
+			err := fmt.Errorf("%w: x", ErrShotBadCoordinate)
+			res.Errors = append(res.Errors, err)
 		}
 
 		if shot.Y > MaxCoordinate || shot.Y < MinCoordinate {
-			res.Errors = append(res.Errors, ErrShotBadCoordinate)
+			err := fmt.Errorf("%w: y", ErrShotBadCoordinate)
+			res.Errors = append(res.Errors, err)
 		}
 	}
 

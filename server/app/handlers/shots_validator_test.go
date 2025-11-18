@@ -62,6 +62,12 @@ func TestShotsValidator(t *testing.T) {
 	v := ShotsRequestValidator{}
 	for _, tc := range testCases {
 		res := v.Validate(tc.request)
-		assert.EqualValues(t, tc.result, res, tc.description)
+		assert.Len(t, res.Errors, len(tc.result.Errors))
+
+		for i := range res.Errors {
+			got := res.Errors[i]
+			want := tc.result.Errors[i]
+			assert.ErrorIs(t, got, want)
+		}
 	}
 }
