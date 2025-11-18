@@ -1,5 +1,8 @@
 COMPOSE = develop/compose.yml
 
+.PHONY: all
+all: build run
+
 .PHONY: run
 run: stop
 	docker compose -f $(COMPOSE) up

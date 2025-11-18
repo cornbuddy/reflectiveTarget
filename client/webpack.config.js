@@ -1,12 +1,15 @@
+const { readdirSync } = require('fs');
+const path = require("path");
+
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const path = require("path");
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
     mode: "production",
     entry: [
         "./js/index.js",
-        "./css/index.css",
+        ...findFilesWithExtension("./css", ".css"),
     ],
     output: {
         filename: "[name].js",
@@ -24,10 +27,20 @@ module.exports = {
                 MiniCssExtractPlugin.loader,
                 "css-loader",
             ],
-        },],
+        }],
     },
     optimization: {
-        minimizer: [new CssMinimizerPlugin()],
+        minimize: true,
+        minimizer: [
+            new TerserPlugin(),
+            new CssMinimizerPlugin(),
+        ],
     },
     plugins: [new MiniCssExtractPlugin()],
 };
+
+function findFilesWithExtension(dir, extension) {
+    return readdirSync(dir)
+        .filter(file => file.endsWith(extension))
+        .map(file => `${dir}/${file}`);
+}

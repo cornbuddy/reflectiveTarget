@@ -33,8 +33,10 @@ func TestShouldRenderIndexPage(t *testing.T) {
 	}, {
 		msg:  "should contain navigation",
 		want: "<nav>",
+	}, {
+		msg:  "should contain sidebar toggler",
+		want: "id=\"sidebar-toggler\"",
 	}} {
 		assert.Contains(t, body, tc.want, tc.msg)
 	}
-
 }
