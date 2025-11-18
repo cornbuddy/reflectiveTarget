@@ -1,4 +1,8 @@
-package validators
+package validator
+
+type Validator interface {
+	Validate(any) ValidationResult
+}
 
 type ValidationResult struct {
 	Errors []error

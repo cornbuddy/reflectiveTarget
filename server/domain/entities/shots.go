@@ -6,11 +6,3 @@ type Shot struct {
 }
 
 type Shots []Shot
-
-type ShotsRequest struct {
-	Shots `json:"shots"`
-}
-
-type ShotsResponse struct {
-	Shots `json:"shots"`
-}

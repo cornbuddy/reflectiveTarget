@@ -4,14 +4,13 @@ import (
 	"database/sql"
 	"net/http"
 
-	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
 type ApiRouter struct {
 	*sql.DB
 	daos.ShotsDao
-	validators.ShotsRequestValidator
+	ShotsRequestValidator
 }
 
 type ViewsRouter struct {

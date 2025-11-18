@@ -32,7 +32,7 @@ func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 	resp := utils.MakeRequest(ct, http.MethodGet, url, api, nil)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-	var shots entities.ShotsResponse
+	var shots ShotsResponse
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&shots))
 	assert.Len(t, shots.Shots, 0)
 
@@ -64,7 +64,7 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 
 	var body bytes.Buffer
 	require.NoError(t, json.NewEncoder(&body).Encode(
-		entities.ShotsRequest{Shots: []entities.Shot{shot}},
+		ShotsRequest{Shots: []entities.Shot{shot}},
 	))
 
 	url := fmt.Sprintf("/target/%v/shots", targetID)
@@ -95,15 +95,15 @@ func TestShotsShouldBeValidated(t *testing.T) {
 
 	type testCase struct {
 		desc string
-		body entities.ShotsRequest
+		body ShotsRequest
 	}
 
 	testCases := []testCase{{
 		desc: "should fail when coordinates are greater than 100",
-		body: entities.ShotsRequest{Shots: []entities.Shot{{X: 101, Y: 101}}},
+		body: ShotsRequest{Shots: []entities.Shot{{X: 101, Y: 101}}},
 	}, {
 		desc: "should fail when coordinates are less than 0",
-		body: entities.ShotsRequest{Shots: []entities.Shot{{X: -1, Y: -1}}},
+		body: ShotsRequest{Shots: []entities.Shot{{X: -1, Y: -1}}},
 	}}
 
 	for _, tc := range testCases {

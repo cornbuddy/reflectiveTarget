@@ -8,7 +8,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
@@ -41,7 +40,7 @@ func TestMain(m *testing.M) {
 	api = ApiRouter{
 		DB:                    db,
 		ShotsDao:              daos.ShotsDao{DB: db},
-		ShotsRequestValidator: validators.ShotsRequestValidator{},
+		ShotsRequestValidator: ShotsRequestValidator{},
 	}.Routes().ServeHTTP
 
 	code := m.Run()

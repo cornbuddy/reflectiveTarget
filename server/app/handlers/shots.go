@@ -7,13 +7,20 @@ import (
 	"strconv"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
+type ShotsRequest struct {
+	entities.Shots `json:"shots"`
+}
+
+type ShotsResponse struct {
+	entities.Shots `json:"shots"`
+}
+
 type shotsHandler struct {
 	daos.ShotsDao
-	Validator validators.ShotsRequestValidator
+	Validator ShotsRequestValidator
 }
 
 func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
@@ -32,7 +39,7 @@ func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	data, err := json.Marshal(entities.ShotsResponse{Shots: shots})
+	data, err := json.Marshal(ShotsResponse{Shots: shots})
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
@@ -44,7 +51,7 @@ func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (h shotsHandler) post(resp http.ResponseWriter, req *http.Request) {
-	var shots entities.ShotsRequest
+	var shots ShotsRequest
 	if err := json.NewDecoder(req.Body).Decode(&shots); err != nil {
 		http.Error(resp, "bad request", http.StatusBadRequest)
 		return
