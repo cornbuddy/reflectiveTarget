@@ -18,10 +18,23 @@ func TestShouldRenderIndexPage(t *testing.T) {
 	require.NotNil(t, resp)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-	body, err := io.ReadAll(resp.Body)
+	bytes, err := io.ReadAll(resp.Body)
 	assert.NoError(t, err)
 
 	t.Cleanup(func() { resp.Body.Close() })
+	body := string(bytes)
 
-	assert.Contains(t, string(body), "Reflective target")
+	for _, tc := range []struct {
+		msg  string
+		want string
+	}{{
+		msg:  "should contain title",
+		want: "Reflective target",
+	}, {
+		msg:  "should contain navigation",
+		want: "<nav>",
+	}} {
+		assert.Contains(t, body, tc.want, tc.msg)
+	}
+
 }
