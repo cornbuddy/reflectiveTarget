@@ -30,7 +30,7 @@ class DSL:
         return self.driver
 
     def logout(self) -> WebDriver:
-        self.driver.find_element(By.ID, "sidebar-toggle").click()
+        self.driver.find_element(By.ID, "sidebar-toggler").click()
         sidebar = self.driver.find_element(By.TAG_NAME, "nav")
         assert sidebar.is_displayed()
 
