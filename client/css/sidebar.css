@@ -1,6 +1,7 @@
 nav {
     height: 100%;
     width: 0;
+    margin-left: 0;
     position: fixed;
     z-index: 1;
     top: 0;
@@ -9,6 +10,11 @@ nav {
     overflow-x: hidden;
     transition: 0.5s;
     padding-top: 60px;
+}
+
+nav.opened {
+    width: 250px;
+    margin-left: 250px;
 }
 
 nav a {
