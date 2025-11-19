@@ -20,6 +20,8 @@ services:
     depends_on: [server]
     build:
       context: ../client
+      args:
+        - node_env=$NODE_ENV
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:

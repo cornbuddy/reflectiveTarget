@@ -1,6 +1,8 @@
+"use strict";
+
 import htmx from "htmx.org";
 
-import "./handlers";
+import { toggleNavigation } from "./handlers";
 
 window.htmx = htmx;
 window.toggleNavigation = toggleNavigation;
