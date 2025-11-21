@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 )
 
 func TestShotsDaoListShouldReturnEmptyListWhenNoShotsForTarget(t *testing.T) {
@@ -26,7 +27,7 @@ func TestShotsDaoListShouldReturnNotFoundErrorWhenNoSuchTarget(t *testing.T) {
 	t.Parallel()
 
 	got, err := shotsDao.List(69)
-	require.ErrorIs(t, err, entities.ErrNotFound)
+	require.ErrorIs(t, err, errors.ErrNotFound)
 	assert.Nil(t, got)
 }
 

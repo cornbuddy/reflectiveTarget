@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	myerrors "github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
@@ -32,7 +33,7 @@ func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	shots, err := h.ShotsDao.List(targetID)
-	if errors.Is(err, entities.ErrNotFound) {
+	if errors.Is(err, myerrors.ErrNotFound) {
 		http.Error(resp, err.Error(), http.StatusNotFound)
 		return
 	} else if err != nil {

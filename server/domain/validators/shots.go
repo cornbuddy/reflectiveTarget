@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 )
 
 const (
@@ -17,12 +18,12 @@ func (v ShotsRequestValidator) Validate(shots entities.Shots) ValidationResult {
 	res := ValidationResult{}
 	for _, shot := range shots {
 		if shot.X > MaxCoordinate || shot.X < MinCoordinate {
-			err := fmt.Errorf("%w: x", ErrShotBadCoordinate)
+			err := fmt.Errorf("%w: x", errors.ErrShotBadCoordinate)
 			res.Errors = append(res.Errors, err)
 		}
 
 		if shot.Y > MaxCoordinate || shot.Y < MinCoordinate {
-			err := fmt.Errorf("%w: y", ErrShotBadCoordinate)
+			err := fmt.Errorf("%w: y", errors.ErrShotBadCoordinate)
 			res.Errors = append(res.Errors, err)
 		}
 	}

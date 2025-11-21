@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 )
 
 func TestShotsValidator(t *testing.T) {
@@ -33,28 +34,31 @@ func TestShotsValidator(t *testing.T) {
 		"should not be valid if coordinate is less than 0",
 		[]entities.Shot{{X: -1, Y: 0}},
 		ValidationResult{
-			Errors: []error{ErrShotBadCoordinate},
+			Errors: []error{errors.ErrShotBadCoordinate},
 		},
 	}, {
 		"should not be valid if both coordinates are less than 0",
 		[]entities.Shot{{X: -1, Y: -1}},
 		ValidationResult{
 			Errors: []error{
-				ErrShotBadCoordinate, ErrShotBadCoordinate,
+				errors.ErrShotBadCoordinate,
+				errors.ErrShotBadCoordinate,
 			}},
 	}, {
 		"should not be valid if x > 100 and y < 0",
 		[]entities.Shot{{X: 101, Y: -1}},
 		ValidationResult{
 			Errors: []error{
-				ErrShotBadCoordinate, ErrShotBadCoordinate,
+				errors.ErrShotBadCoordinate,
+				errors.ErrShotBadCoordinate,
 			}},
 	}, {
 		"should not be valid if x < 0 and y > 100",
 		[]entities.Shot{{X: -1, Y: 101}},
 		ValidationResult{
 			Errors: []error{
-				ErrShotBadCoordinate, ErrShotBadCoordinate,
+				errors.ErrShotBadCoordinate,
+				errors.ErrShotBadCoordinate,
 			}},
 	}}
 

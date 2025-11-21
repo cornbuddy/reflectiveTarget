@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	myerrors "github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 )
 
 type ShotsDao struct {
@@ -15,7 +16,7 @@ func (d ShotsDao) List(targetID int) (entities.Shots, error) {
 	q := "SELECT * FROM targets WHERE id = $1"
 	err := d.DB.QueryRow(q, targetID).Scan()
 	if errors.Is(err, sql.ErrNoRows) {
-		return nil, entities.ErrNotFound
+		return nil, myerrors.ErrNotFound
 	}
 
 	q = "SELECT x, y FROM shots WHERE target_id = $1"
