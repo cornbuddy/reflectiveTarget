@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
 	"github.com/redis/go-redis/v9"
@@ -23,10 +24,10 @@ var (
 	shotsDao ShotsDao
 	store    SessionStore
 
-	user     entities.User
-	password entities.Password
 	target   entities.Target
-	shots    entities.Shots
+	user     entities.User
+	password valueobjects.Password
+	shots    valueobjects.Shots
 )
 
 func TestMain(m *testing.M) {
@@ -56,7 +57,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("failed to init db: %v", err)
 	}
 
-	pwd, err := entities.NewPassword("kek")
+	pwd, err := valueobjects.NewPassword("kek")
 	if err != nil {
 		log.Fatalf("failed to create password: %v", err)
 	}
@@ -75,9 +76,9 @@ func TestMain(m *testing.M) {
 	target = entities.Target{
 		Name: "kek?",
 	}
-	shots = entities.Shots{
-		entities.Shot{X: rand.IntN(101), Y: rand.IntN(101)},
-		entities.Shot{X: rand.IntN(101), Y: rand.IntN(101)},
+	shots = valueobjects.Shots{
+		valueobjects.Shot{X: rand.IntN(101), Y: rand.IntN(101)},
+		valueobjects.Shot{X: rand.IntN(101), Y: rand.IntN(101)},
 	}
 
 	if err := fillDatabase(db, &user, &target, shots); err != nil {
@@ -88,7 +89,8 @@ func TestMain(m *testing.M) {
 }
 
 func fillDatabase(
-	db *sql.DB, user *entities.User, target *entities.Target, shots entities.Shots,
+	db *sql.DB, user *entities.User, target *entities.Target,
+	shots valueobjects.Shots,
 ) error {
 
 	q := "INSERT INTO users(username, hashed_password) " +

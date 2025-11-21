@@ -1,4 +1,4 @@
-package entities
+package valueobjects
 
 import (
 	"github.com/alexedwards/argon2id"

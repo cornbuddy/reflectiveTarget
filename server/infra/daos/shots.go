@@ -4,15 +4,15 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	myerrors "github.com/cornbuddy/reflectiveTarget/server/domain/errors"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
 type ShotsDao struct {
 	*sql.DB
 }
 
-func (d ShotsDao) List(targetID int) (entities.Shots, error) {
+func (d ShotsDao) List(targetID int) (valueobjects.Shots, error) {
 	q := "SELECT * FROM targets WHERE id = $1"
 	err := d.DB.QueryRow(q, targetID).Scan()
 	if errors.Is(err, sql.ErrNoRows) {
@@ -25,9 +25,9 @@ func (d ShotsDao) List(targetID int) (entities.Shots, error) {
 		return nil, err
 	}
 
-	shots := entities.Shots{}
+	shots := valueobjects.Shots{}
 	for rows.Next() {
-		shot := entities.Shot{}
+		shot := valueobjects.Shot{}
 		if err := rows.Scan(&shot.X, &shot.Y); err != nil {
 			return nil, err
 		}
@@ -39,7 +39,7 @@ func (d ShotsDao) List(targetID int) (entities.Shots, error) {
 }
 
 func (d ShotsDao) Save(
-	shooter string, targetID int, shots entities.Shots,
+	shooter string, targetID int, shots valueobjects.Shots,
 ) error {
 
 	q := "INSERT INTO shots (x, y, target_id, shooter) " +

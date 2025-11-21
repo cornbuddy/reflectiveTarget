@@ -6,18 +6,18 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	myerrors "github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
 type ShotsRequest struct {
-	entities.Shots `json:"shots"`
+	valueobjects.Shots `json:"shots"`
 }
 
 type ShotsResponse struct {
-	entities.Shots `json:"shots"`
+	valueobjects.Shots `json:"shots"`
 }
 
 type shotsHandler struct {

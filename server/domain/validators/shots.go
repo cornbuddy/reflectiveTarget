@@ -3,8 +3,8 @@ package validators
 import (
 	"fmt"
 
-	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
 const (
@@ -14,7 +14,10 @@ const (
 
 type ShotsRequestValidator struct{}
 
-func (v ShotsRequestValidator) Validate(shots entities.Shots) ValidationResult {
+func (v ShotsRequestValidator) Validate(
+	shots valueobjects.Shots,
+) ValidationResult {
+
 	res := ValidationResult{}
 	for _, shot := range shots {
 		if shot.X > MaxCoordinate || shot.X < MinCoordinate {

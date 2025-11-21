@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
 func TestShotsDaoListShouldReturnEmptyListWhenNoShotsForTarget(t *testing.T) {
@@ -43,11 +43,11 @@ func TestShotsDaoShouldSaveShots(t *testing.T) {
 	t.Parallel()
 
 	shooter := "kekekeke"
-	shot := entities.Shot{
+	shot := valueobjects.Shot{
 		X: rand.IntN(101),
 		Y: rand.IntN(101),
 	}
-	shots := entities.Shots{shot}
+	shots := valueobjects.Shots{shot}
 	require.NoError(t, shotsDao.Save(shooter, target.ID, shots))
 
 	res, err := db.Query(

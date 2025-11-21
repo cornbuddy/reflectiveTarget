@@ -1,11 +1,16 @@
 package entities
 
 import (
+	"errors"
 	"net/url"
+
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
+var ErrUserFormMissingKeys = errors.New("user form missing keys")
+
 type User struct {
-	Password
+	valueobjects.Password
 	ID       int
 	Username string
 }
@@ -16,7 +21,7 @@ func NewUser(form url.Values) (*User, error) {
 		return nil, ErrUserFormMissingKeys
 	}
 
-	password, err := NewPassword(form.Get("password"))
+	password, err := valueobjects.NewPassword(form.Get("password"))
 	if err != nil {
 		return nil, err
 	}

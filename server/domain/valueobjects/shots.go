@@ -1,4 +1,4 @@
-package entities
+package valueobjects
 
 type Shot struct {
 	X int `json:"x"`
