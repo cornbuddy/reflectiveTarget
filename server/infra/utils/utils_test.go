@@ -7,6 +7,7 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -16,14 +17,13 @@ func TestInitDatabase(t *testing.T) {
 
 	ctx := context.TODO()
 	cleanup, db, err := utils.SetupTestDb(ctx)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	t.Cleanup(func() {
 		assert.NoError(t, cleanup())
 	})
 
-	err = InitDatabase(db)
-	assert.NoError(t, err)
+	require.NoError(t, InitDatabase(db))
 
 	tables := []string{"users", "targets", "questions", "shots"}
 	for _, table := range tables {
