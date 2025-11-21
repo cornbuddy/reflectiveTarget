@@ -12,7 +12,7 @@ import (
 
 var (
 	store daos.SessionStore
-	mv    Middleware
+	mw    Middleware
 )
 
 func TestMain(m *testing.M) {
@@ -34,7 +34,7 @@ func TestMain(m *testing.M) {
 		Ctx:   ctx,
 		Cache: cache,
 	}
-	mv = Middleware{
+	mw = Middleware{
 		SessionStore: store,
 	}
 

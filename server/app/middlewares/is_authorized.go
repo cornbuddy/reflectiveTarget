@@ -14,7 +14,7 @@ type Middleware struct {
 	daos.SessionStore
 }
 
-func (mv Middleware) IsAuthorized(next http.Handler) http.Handler {
+func (mw Middleware) IsAuthorized(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var cookie *http.Cookie
 		for _, c := range r.CookiesNamed(handlers.SessionCookieName) {
@@ -29,7 +29,7 @@ func (mv Middleware) IsAuthorized(next http.Handler) http.Handler {
 		}
 
 		token := cookie.Value
-		username, err := mv.SessionStore.GetUsernameFromSession(token)
+		username, err := mw.SessionStore.GetUsernameFromSession(token)
 		if err != nil {
 			msg := err.Error()
 			http.Error(w, msg, http.StatusInternalServerError)
