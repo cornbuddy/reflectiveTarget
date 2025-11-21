@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/cornbuddy/reflectiveTarget/server/domain/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
@@ -57,7 +58,7 @@ func (h authzHandler) postLogin(resp http.ResponseWriter, req *http.Request) {
 		http.SetCookie(resp, &http.Cookie{
 			Name:    SessionCookieName,
 			Value:   uuid.NewString(),
-			Expires: time.Now().AddDate(0, 1, 0),
+			Expires: time.Now().Add(constants.SessionDuration),
 		})
 		http.Redirect(resp, req, "/", http.StatusSeeOther)
 		resp.Write([]byte("Login succeeded"))
@@ -96,7 +97,7 @@ func (h authzHandler) postSignup(resp http.ResponseWriter, req *http.Request) {
 	http.SetCookie(resp, &http.Cookie{
 		Name:    SessionCookieName,
 		Value:   uuid.NewString(),
-		Expires: time.Now().AddDate(0, 1, 0),
+		Expires: time.Now().Add(constants.SessionDuration),
 	})
 	http.Redirect(resp, req, "/", http.StatusSeeOther)
 	resp.Write([]byte("User successfully created"))

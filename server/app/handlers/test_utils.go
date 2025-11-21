@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/cornbuddy/reflectiveTarget/server/domain/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
@@ -60,7 +61,7 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response) {
 
 	// substracting 1 second because time.Now add ms to the time, while
 	// cookie doesn't count that strictly
-	month := time.Now().AddDate(0, 1, 0).Add(-1 * time.Second).UTC()
+	month := time.Now().Add(constants.SessionDuration).Add(-1 * time.Second)
 	assert.True(t, sessionCookie.Expires.After(month))
 	assert.NoError(t, uuid.Validate(sessionCookie.Value))
 }
