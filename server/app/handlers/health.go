@@ -4,9 +4,12 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
-
-	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 )
+
+type HealthResponse struct {
+	Connected   bool `json:"connected"`
+	Connections int  `json:"connections"`
+}
 
 type healthHandler struct {
 	*sql.DB
@@ -23,7 +26,7 @@ func (h healthHandler) get(resp http.ResponseWriter, req *http.Request) {
 		status = http.StatusServiceUnavailable
 	}
 
-	hr, _ := json.Marshal(entities.HealthResponse{
+	hr, _ := json.Marshal(HealthResponse{
 		Connected:   connected,
 		Connections: connections,
 	})
