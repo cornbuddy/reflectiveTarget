@@ -1,4 +1,4 @@
-package handlers
+package validators
 
 import (
 	"testing"
@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
-	"github.com/cornbuddy/reflectiveTarget/server/infra/validator"
 )
 
 func TestShotsValidator(t *testing.T) {
@@ -14,46 +13,46 @@ func TestShotsValidator(t *testing.T) {
 
 	type testCase struct {
 		description string
-		request     ShotsRequest
-		result      validator.ValidationResult
+		shots       entities.Shots
+		result      ValidationResult
 	}
 
 	testCases := []testCase{{
 		"should be valid if everything is 0",
-		ShotsRequest{Shots: []entities.Shot{{X: 0, Y: 0}}},
-		validator.ValidationResult{Errors: nil},
+		[]entities.Shot{{X: 0, Y: 0}},
+		ValidationResult{Errors: nil},
 	}, {
 		"should be valid if everything is on range (0; 100)",
-		ShotsRequest{Shots: []entities.Shot{{X: 69, Y: 69}}},
-		validator.ValidationResult{Errors: nil},
+		[]entities.Shot{{X: 69, Y: 69}},
+		ValidationResult{Errors: nil},
 	}, {
 		"should be valid if everything is 100",
-		ShotsRequest{Shots: []entities.Shot{{X: 100, Y: 100}}},
-		validator.ValidationResult{Errors: nil},
+		[]entities.Shot{{X: 100, Y: 100}},
+		ValidationResult{Errors: nil},
 	}, {
 		"should not be valid if coordinate is less than 0",
-		ShotsRequest{Shots: []entities.Shot{{X: -1, Y: 0}}},
-		validator.ValidationResult{
+		[]entities.Shot{{X: -1, Y: 0}},
+		ValidationResult{
 			Errors: []error{ErrShotBadCoordinate},
 		},
 	}, {
 		"should not be valid if both coordinates are less than 0",
-		ShotsRequest{Shots: []entities.Shot{{X: -1, Y: -1}}},
-		validator.ValidationResult{
+		[]entities.Shot{{X: -1, Y: -1}},
+		ValidationResult{
 			Errors: []error{
 				ErrShotBadCoordinate, ErrShotBadCoordinate,
 			}},
 	}, {
 		"should not be valid if x > 100 and y < 0",
-		ShotsRequest{Shots: []entities.Shot{{X: 101, Y: -1}}},
-		validator.ValidationResult{
+		[]entities.Shot{{X: 101, Y: -1}},
+		ValidationResult{
 			Errors: []error{
 				ErrShotBadCoordinate, ErrShotBadCoordinate,
 			}},
 	}, {
 		"should not be valid if x < 0 and y > 100",
-		ShotsRequest{Shots: []entities.Shot{{X: -1, Y: 101}}},
-		validator.ValidationResult{
+		[]entities.Shot{{X: -1, Y: 101}},
+		ValidationResult{
 			Errors: []error{
 				ErrShotBadCoordinate, ErrShotBadCoordinate,
 			}},
@@ -61,7 +60,7 @@ func TestShotsValidator(t *testing.T) {
 
 	v := ShotsRequestValidator{}
 	for _, tc := range testCases {
-		res := v.Validate(tc.request)
+		res := v.Validate(tc.shots)
 		assert.Len(t, res.Errors, len(tc.result.Errors))
 
 		for i := range res.Errors {

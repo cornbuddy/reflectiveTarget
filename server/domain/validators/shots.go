@@ -1,9 +1,9 @@
-package handlers
+package validators
 
 import (
 	"fmt"
 
-	"github.com/cornbuddy/reflectiveTarget/server/infra/validator"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 )
 
 const (
@@ -13,12 +13,9 @@ const (
 
 type ShotsRequestValidator struct{}
 
-func (v ShotsRequestValidator) Validate(
-	req ShotsRequest,
-) validator.ValidationResult {
-
-	res := validator.ValidationResult{}
-	for _, shot := range req.Shots {
+func (v ShotsRequestValidator) Validate(shots entities.Shots) ValidationResult {
+	res := ValidationResult{}
+	for _, shot := range shots {
 		if shot.X > MaxCoordinate || shot.X < MinCoordinate {
 			err := fmt.Errorf("%w: x", ErrShotBadCoordinate)
 			res.Errors = append(res.Errors, err)

@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
@@ -20,7 +21,7 @@ type ShotsResponse struct {
 
 type shotsHandler struct {
 	daos.ShotsDao
-	Validator ShotsRequestValidator
+	Validator validators.ShotsRequestValidator
 }
 
 func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
@@ -57,7 +58,7 @@ func (h shotsHandler) post(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if res := h.Validator.Validate(shots); res.IsInvalid() {
+	if res := h.Validator.Validate(shots.Shots); res.IsInvalid() {
 		http.Error(resp, "invalid payload", http.StatusBadRequest)
 		return
 	}

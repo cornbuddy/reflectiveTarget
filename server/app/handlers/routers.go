@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 
+	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
@@ -35,7 +36,7 @@ func (r ApiRouter) Routes() http.Handler {
 	health := healthHandler{DB: r.DB}
 	shots := shotsHandler{
 		ShotsDao:  r.ShotsDao,
-		Validator: ShotsRequestValidator{},
+		Validator: validators.ShotsRequestValidator{},
 	}
 
 	mux := http.NewServeMux()
