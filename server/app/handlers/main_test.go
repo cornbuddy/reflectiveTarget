@@ -24,8 +24,7 @@ var (
 func TestMain(m *testing.M) {
 	ctx = context.TODO()
 
-	t := &testing.T{}
-	cleanup, testDb, err := testutils.SetupTestDb(ctx, t)
+	cleanup, testDb, err := testutils.SetupTestDb(ctx)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
 	}

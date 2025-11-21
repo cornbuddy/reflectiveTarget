@@ -34,7 +34,7 @@ func TestMain(m *testing.M) {
 		postgres.WithDatabase(database),
 	}
 
-	cont, err := postgres.Run(ctx, utils.Image, opts...)
+	cont, err := postgres.Run(ctx, utils.DbImage, opts...)
 	if err != nil {
 		log.Fatal("failed to run db: %w", err)
 	}

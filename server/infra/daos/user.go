@@ -11,10 +11,11 @@ type UserDao struct {
 }
 
 func (dao UserDao) Save(user *entities.User) error {
-	q := "INSERT INTO users(username, hashed_password) " +
+	query := "INSERT INTO users(username, hashed_password) " +
 		"VALUES($1, $2) " +
 		"RETURNING id"
-	err := dao.QueryRow(q, user.Username, user.Password.Hash).Scan(&user.ID)
+	err := dao.QueryRow(query, user.Username, user.Password.Hash).
+		Scan(&user.ID)
 	if err != nil {
 		return err
 	}

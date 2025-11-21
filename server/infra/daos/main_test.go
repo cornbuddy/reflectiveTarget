@@ -11,13 +11,17 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
+	"github.com/redis/go-redis/v9"
 )
 
 var (
-	ctx      context.Context
+	ctx = context.TODO()
+
 	db       *sql.DB
+	cache    *redis.Client
 	userDao  UserDao
 	shotsDao ShotsDao
+	store    SessionStore
 
 	user     entities.User
 	password entities.Password
@@ -26,13 +30,27 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	ctx = context.TODO()
-
-	t := &testing.T{}
-	cleanup, testDb, err := testutils.SetupTestDb(ctx, t)
+	cleanUpDb, testDb, err := testutils.SetupTestDb(ctx)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
 	}
+
+	defer func() {
+		if err := cleanUpDb(); err != nil {
+			log.Fatalf("failed to clean up db: %v", err)
+		}
+	}()
+
+	cleanUpCache, testCache, err := testutils.SetupCache(ctx)
+	if err != nil {
+		log.Fatalf("failed to setup db: %v", err)
+	}
+
+	defer func() {
+		if err := cleanUpCache(); err != nil {
+			log.Fatalf("failed to clean up cache: %v", err)
+		}
+	}()
 
 	if err := utils.InitDatabase(testDb); err != nil {
 		log.Fatalf("failed to init db: %v", err)
@@ -43,9 +61,11 @@ func TestMain(m *testing.M) {
 		log.Fatalf("failed to create password: %v", err)
 	}
 
+	cache = testCache
 	db = testDb
 	userDao = UserDao{DB: db}
 	shotsDao = ShotsDao{DB: db}
+	store = SessionStore{Ctx: ctx, Cache: cache}
 
 	password = *pwd
 	user = entities.User{
@@ -64,13 +84,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("failed to fill db: %v", err)
 	}
 
-	code := m.Run()
-	defer os.Exit(code)
-
-	if err := cleanup(); err != nil {
-		log.Fatalf("failed to cleanup test suite: %v", err)
-	}
-
+	os.Exit(m.Run())
 }
 
 func fillDatabase(

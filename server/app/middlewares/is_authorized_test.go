@@ -3,29 +3,43 @@ package middlewares
 import (
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
-func TestIsAuthorized(t *testing.T) {
+func TestIsAuthorizedShouldAddToCtxIfCookieIsInTheSessionStore(t *testing.T) {
 	t.Parallel()
-	t.Fatal("not implemeted")
 
-	type testCase struct {
-		desc string
-		stub http.HandlerFunc
-	}
+	cookie := "cookie"
+	username := "username"
+	require.NoError(t, store.SaveSessionForUser(username, cookie))
 
-	testCases := []testCase{{
-		desc: "should add nil when no cookie",
-		stub: nil,
-	}, {
-		desc: "should add nil when there's cookie in session storage",
-		stub: nil,
-	}, {
-		desc: "should add user object when cookie is good",
-		stub: nil,
+	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		got := r.Context().Value(Username)
+		require.NotNil(t, got)
+		assert.Equal(t, username, got.(string))
+	})
+	cookies := []*http.Cookie{{
+		Name:  handlers.SessionCookieName,
+		Value: cookie,
 	}}
+	handler := mv.IsAuthorized(stub).ServeHTTP
+	utils.MakeRequestWithCookies(
+		"", http.MethodGet, "/", handler, nil, cookies...,
+	)
+}
 
-	for _, tc := range testCases {
+func TestIsAuthorizedShouldAddNilToCtxIfNoCookieInRequest(t *testing.T) {
+	t.Parallel()
 
-	}
+	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Nil(t, r.Context().Value(Username))
+	})
+
+	handler := mv.IsAuthorized(stub).ServeHTTP
+	utils.MakeRequest("", http.MethodGet, "/", handler, nil)
 }
