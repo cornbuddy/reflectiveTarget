@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -11,23 +12,23 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
-func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
+func TestSaveSessionShouldResetRequestCookieWhenItsNotInStore(t *testing.T) {
 	t.Parallel()
 
-	token := "i'm a session token"
-	require.NoError(t, store.SaveSession(token, false))
-
+	token := uuid.NewString()
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie(handlers.SessionCookieName)
+		header := w.Header().Get("Set-Cookie")
+		cookie, err := http.ParseSetCookie(header)
 		require.NoError(t, err)
 		require.NotNil(t, cookie)
-		assert.Equal(t, token, cookie.Value)
+		assert.NoError(t, uuid.Validate(cookie.Value))
+		assert.NotEqual(t, token, cookie.Value)
 	})
 
 	handler := mw.SaveSession(stub).ServeHTTP
 	cookies := []*http.Cookie{{
 		Name:  handlers.SessionCookieName,
-		Value: "kek",
+		Value: token,
 	}}
 	utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/", handler, nil, cookies...,
@@ -38,12 +39,34 @@ func TestSaveSessionShouldAddSessionCookieIfNotPresent(t *testing.T) {
 	t.Parallel()
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie(handlers.SessionCookieName)
+		header := w.Header().Get("Set-Cookie")
+		cookie, err := http.ParseSetCookie(header)
 		require.NoError(t, err)
 		require.NotNil(t, cookie)
-		assert.NotEmpty(t, cookie.Value)
+		assert.NoError(t, uuid.Validate(cookie.Value))
 	})
 
 	handler := mw.SaveSession(stub).ServeHTTP
 	utils.MakeRequest("", http.MethodGet, "/", handler, nil)
+}
+
+func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
+	t.Parallel()
+
+	token := uuid.NewString()
+	require.NoError(t, store.SaveSession(token, false))
+
+	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		header := w.Header().Get("Set-Cookie")
+		assert.Empty(t, header)
+	})
+
+	handler := mw.SaveSession(stub).ServeHTTP
+	cookies := []*http.Cookie{{
+		Name:  handlers.SessionCookieName,
+		Value: token,
+	}}
+	utils.MakeRequestWithCookies(
+		"", http.MethodGet, "/", handler, nil, cookies...,
+	)
 }
