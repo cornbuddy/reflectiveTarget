@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
@@ -55,11 +56,13 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if authorized {
-		http.SetCookie(w, &http.Cookie{
-			Name:    SessionCookieName,
-			Value:   uuid.NewString(),
-			Expires: time.Now().Add(constants.SessionDuration),
-		})
+		_, err := utils.SaveSession(h.SessionStore, true, w)
+		if err != nil {
+			msg := err.Error()
+			http.Error(w, msg, http.StatusInternalServerError)
+			return
+		}
+
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		w.Write([]byte("Login succeeded"))
 	} else {
@@ -94,11 +97,13 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:    SessionCookieName,
-		Value:   uuid.NewString(),
-		Expires: time.Now().Add(constants.SessionDuration),
-	})
+	_, err := utils.SaveSession(h.SessionStore, true, w)
+	if err != nil {
+		msg := err.Error()
+		http.Error(w, msg, http.StatusInternalServerError)
+		return
+	}
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	w.Write([]byte("User successfully created"))
 }
