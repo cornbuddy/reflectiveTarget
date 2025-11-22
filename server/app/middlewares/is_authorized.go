@@ -5,14 +5,9 @@ import (
 	"net/http"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
-	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
 const Authenticated = "isAuthenticated"
-
-type Middleware struct {
-	daos.SessionStore
-}
 
 func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
