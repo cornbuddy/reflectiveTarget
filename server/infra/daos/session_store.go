@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/redis/go-redis/v9"
 
@@ -15,33 +16,44 @@ type SessionStore struct {
 	Cache *redis.Client
 }
 
-const SessionPrefix = "session"
-
-func (s SessionStore) GetUsernameFromSession(token string) (string, error) {
+func (s SessionStore) IsAuthenitcated(token string) (*bool, error) {
 	ctx := s.Ctx
 	cache := s.Cache
-	key := fmt.Sprintf("%s:%s", SessionPrefix, token)
+	key := s.isAuthenticatedKey(token)
 
-	username, err := cache.Get(ctx, key).Result()
+	value, err := cache.Get(ctx, key).Result()
 	if errors.Is(err, redis.Nil) {
-		return "", nil
+		return nil, nil
 	} else if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return username, nil
+	isAuthenticated, err := strconv.ParseBool(value)
+	if err != nil {
+		return nil, err
+	}
+
+	return &isAuthenticated, nil
 }
 
-func (s SessionStore) SaveSessionForUser(username, token string) error {
+func (s SessionStore) SaveSession(token string, isAuthenticated bool) error {
 	ctx := s.Ctx
 	cache := s.Cache
 	expiration := constants.SessionDuration
-	key := fmt.Sprintf("%s:%s", SessionPrefix, token)
+	key := s.isAuthenticatedKey(token)
+	value := strconv.FormatBool(isAuthenticated)
 
-	_, err := cache.Set(ctx, key, username, expiration).Result()
+	_, err := cache.Set(ctx, key, value, expiration).Result()
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (s SessionStore) isAuthenticatedKey(token string) string {
+	const prefix = "session"
+	const postfix = "isAuthenticated"
+
+	return fmt.Sprintf("%s:%s:%s", prefix, token, postfix)
 }

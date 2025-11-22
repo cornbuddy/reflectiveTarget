@@ -16,7 +16,6 @@ var (
 )
 
 func TestMain(m *testing.M) {
-
 	ctx := context.TODO()
 
 	cleanup, cache, err := utils.SetupCache(ctx)

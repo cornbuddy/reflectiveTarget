@@ -1,8 +1,6 @@
 package daos
 
 import (
-	"context"
-	"fmt"
 	"testing"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/constants"
@@ -11,50 +9,46 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSessionStoreShouldFetchUsername(t *testing.T) {
+func TestSessionStoreShouldReturnNilWhenNoSessionFound(t *testing.T) {
 	t.Parallel()
 
-	username := "username"
-	token := "kek-token"
-	require.NoError(t, store.SaveSessionForUser(username, token))
+	token := "not-exists"
+	got, err := store.IsAuthenitcated(token)
+	require.NoError(t, err)
+	assert.Nil(t, got)
+}
+
+func TestSessionStoreShouldSaveAndRestoreSession(t *testing.T) {
+	t.Parallel()
 
 	type testCase struct {
-		desc  string
-		token string
-		want  string
+		desc            string
+		token           string
+		isAuthenticated bool
 	}
 
 	testCases := []testCase{{
-		desc:  "should return nil when no session exists",
-		token: "not exists",
-		want:  "",
+		desc:            "should add entry for authenticated user",
+		token:           "kek",
+		isAuthenticated: true,
 	}, {
-		desc:  "should return username when session exists",
-		token: token,
-		want:  username,
+		desc:            "should add entry for anonymous user",
+		token:           "kek1",
+		isAuthenticated: false,
 	}}
 
 	for _, tc := range testCases {
-		got, err := store.GetUsernameFromSession(tc.token)
+		err := store.SaveSession(tc.token, tc.isAuthenticated)
 		require.NoError(t, err)
-		assert.Equal(t, tc.want, got)
+
+		got, err := store.IsAuthenitcated(tc.token)
+		require.NoError(t, err)
+		assert.NotNil(t, got)
+		assert.Equal(t, tc.isAuthenticated, *got)
+
+		key := store.isAuthenticatedKey(tc.token)
+		ttl, err := cache.TTL(ctx, key).Result()
+		require.NoError(t, err)
+		assert.Equal(t, ttl, constants.SessionDuration)
 	}
-}
-
-func TestSessionStoreShouldSaveSessionForUser(t *testing.T) {
-	t.Parallel()
-
-	username := "kek"
-	token := "kek"
-	require.NoError(t, store.SaveSessionForUser(username, token))
-
-	ctx := context.TODO()
-	key := fmt.Sprintf("%s:%s", SessionPrefix, token)
-	got, err := cache.Get(ctx, key).Result()
-	require.NoError(t, err)
-	assert.Equal(t, username, got)
-
-	ttl, err := cache.TTL(ctx, key).Result()
-	require.NoError(t, err)
-	assert.Equal(t, ttl, constants.SessionDuration)
 }
