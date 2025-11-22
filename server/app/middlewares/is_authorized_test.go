@@ -14,20 +14,20 @@ import (
 func TestIsAuthorizedShouldAddToCtxIfCookieIsInTheSessionStore(t *testing.T) {
 	t.Parallel()
 
-	cookie := "cookie"
-	username := "username"
-	require.NoError(t, store.SaveSessionForUser(username, cookie))
+	token := "cookie"
+	authenticated := false
+	require.NoError(t, store.SaveSession(token, authenticated))
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		got := r.Context().Value(Username)
+		got := (r.Context().Value(Authenticated)).(*bool)
 		require.NotNil(t, got)
-		assert.Equal(t, username, got.(string))
+		assert.Equal(t, authenticated, *got)
 	})
 	cookies := []*http.Cookie{{
 		Name:  handlers.SessionCookieName,
-		Value: cookie,
+		Value: token,
 	}}
-	handler := mw.IsAuthorized(stub).ServeHTTP
+	handler := mw.IsAuthenticated(stub).ServeHTTP
 	utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/", handler, nil, cookies...,
 	)
@@ -37,9 +37,9 @@ func TestIsAuthorizedShouldAddNilToCtxIfNoCookieInRequest(t *testing.T) {
 	t.Parallel()
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Nil(t, r.Context().Value(Username))
+		assert.Nil(t, r.Context().Value(Authenticated))
 	})
 
-	handler := mw.IsAuthorized(stub).ServeHTTP
+	handler := mw.IsAuthenticated(stub).ServeHTTP
 	utils.MakeRequest("", http.MethodGet, "/", handler, nil)
 }

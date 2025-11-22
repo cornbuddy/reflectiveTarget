@@ -8,13 +8,13 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
-const Username = "username"
+const Authenticated = "isAuthenticated"
 
 type Middleware struct {
 	daos.SessionStore
 }
 
-func (mw Middleware) IsAuthorized(next http.Handler) http.Handler {
+func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var cookie *http.Cookie
 		for _, c := range r.CookiesNamed(handlers.SessionCookieName) {
@@ -29,14 +29,14 @@ func (mw Middleware) IsAuthorized(next http.Handler) http.Handler {
 		}
 
 		token := cookie.Value
-		username, err := mw.SessionStore.GetUsernameFromSession(token)
+		value, err := mw.SessionStore.IsAuthenitcated(token)
 		if err != nil {
 			msg := err.Error()
 			http.Error(w, msg, http.StatusInternalServerError)
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), Username, username)
+		ctx := context.WithValue(r.Context(), Authenticated, value)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
