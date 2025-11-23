@@ -27,8 +27,8 @@ func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 	var got HealthResponse
 	err = json.Unmarshal(data, &got)
 	assert.NoError(t, err)
-	assert.True(t, got.Connected)
-	assert.GreaterOrEqual(t, got.Connections, 1)
+	assert.True(t, got.DbConnected)
+	assert.GreaterOrEqual(t, got.DbConnections, 1)
 }
 
 func TestHealthHandlerShouldFailWhenDbDoesntWork(t *testing.T) {
@@ -54,6 +54,6 @@ func TestHealthHandlerShouldFailWhenDbDoesntWork(t *testing.T) {
 	var got HealthResponse
 	err = json.Unmarshal(data, &got)
 	assert.NoError(t, err)
-	assert.False(t, got.Connected)
-	assert.Equal(t, got.Connections, 0)
+	assert.False(t, got.DbConnected)
+	assert.Equal(t, got.DbConnections, 0)
 }

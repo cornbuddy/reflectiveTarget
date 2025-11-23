@@ -7,8 +7,8 @@ import (
 )
 
 type HealthResponse struct {
-	Connected   bool `json:"connected"`
-	Connections int  `json:"connections"`
+	DbConnected   bool `json:"database-connected"`
+	DbConnections int  `json:"database-connections"`
 }
 
 type healthHandler struct {
@@ -27,8 +27,8 @@ func (h healthHandler) get(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	hr, _ := json.Marshal(HealthResponse{
-		Connected:   connected,
-		Connections: connections,
+		DbConnected:   connected,
+		DbConnections: connections,
 	})
 	resp.WriteHeader(status)
 	resp.Write(hr)
