@@ -50,6 +50,5 @@ func TestMain(m *testing.M) {
 		log.Fatal("failed to fetch db ip: %w", err)
 	}
 
-	code := m.Run()
-	defer os.Exit(code)
+	os.Exit(m.Run())
 }

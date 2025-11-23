@@ -63,6 +63,7 @@ func TestMain(m *testing.M) {
 	api = ApiRouter{
 		DB:       db,
 		ShotsDao: daos.ShotsDao{DB: db},
+		Cache:    testCache,
 	}.Routes().ServeHTTP
 
 	os.Exit(m.Run())

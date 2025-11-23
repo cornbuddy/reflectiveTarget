@@ -6,11 +6,13 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/redis/go-redis/v9"
 )
 
 type ApiRouter struct {
 	*sql.DB
 	daos.ShotsDao
+	Cache *redis.Client
 }
 
 type ViewsRouter struct {
@@ -34,7 +36,10 @@ func (r ViewsRouter) Routes() http.Handler {
 }
 
 func (r ApiRouter) Routes() http.Handler {
-	health := healthHandler{DB: r.DB}
+	health := healthHandler{
+		DB:    r.DB,
+		Cache: r.Cache,
+	}
 	shots := shotsHandler{
 		ShotsDao:  r.ShotsDao,
 		Validator: validators.ShotsRequestValidator{},

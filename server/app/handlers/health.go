@@ -4,31 +4,47 @@ import (
 	"database/sql"
 	"encoding/json"
 	"net/http"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type HealthResponse struct {
-	DbConnected   bool `json:"database-connected"`
-	DbConnections int  `json:"database-connections"`
+	DbConnected      bool `json:"database-connected"`
+	DbConnections    int  `json:"database-connections"`
+	CacheConnected   bool `json:"cache-connected"`
+	CacheConnections int  `json:"cache-connections"`
 }
 
 type healthHandler struct {
 	*sql.DB
+	Cache *redis.Client
 }
 
 func (h healthHandler) get(resp http.ResponseWriter, req *http.Request) {
-	var connections, status int
-	connected := h.DB.Ping() == nil
-	if connected {
-		connections = h.DB.Stats().OpenConnections
+	dbConnections := 0
+	dbConnected := h.DB.Ping() == nil
+	if dbConnected {
+		dbConnections = h.DB.Stats().OpenConnections
+	}
+
+	cacheConnections := 0
+	cacheConnected := h.Cache.Ping(req.Context()).Err() == nil
+	if cacheConnected {
+		cacheConnections = int(h.Cache.PoolStats().TotalConns)
+	}
+
+	var status int
+	if dbConnected && cacheConnected {
 		status = http.StatusOK
 	} else {
-		connections = 0
 		status = http.StatusServiceUnavailable
 	}
 
 	hr, _ := json.Marshal(HealthResponse{
-		DbConnected:   connected,
-		DbConnections: connections,
+		DbConnected:      dbConnected,
+		DbConnections:    dbConnections,
+		CacheConnected:   cacheConnected,
+		CacheConnections: cacheConnections,
 	})
 	resp.WriteHeader(status)
 	resp.Write(hr)

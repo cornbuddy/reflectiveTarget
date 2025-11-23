@@ -19,11 +19,13 @@ type Config struct {
 	*sql.DB
 	daos.UserDao
 	daos.ShotsDao
+	daos.SessionStore
 }
 
 func MakeMux(config *Config) http.Handler {
 	views := handlers.ViewsRouter{
-		UserDao: config.UserDao,
+		UserDao:      config.UserDao,
+		SessionStore: config.SessionStore,
 	}
 	api := handlers.ApiRouter{
 		DB:       config.DB,

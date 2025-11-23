@@ -28,21 +28,34 @@ func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 	err = json.Unmarshal(data, &got)
 	assert.NoError(t, err)
 	assert.True(t, got.DbConnected)
+	assert.True(t, got.CacheConnected)
 	assert.GreaterOrEqual(t, got.DbConnections, 1)
+	assert.GreaterOrEqual(t, got.CacheConnections, 1)
 }
 
-func TestHealthHandlerShouldFailWhenDbDoesntWork(t *testing.T) {
+func TestHealthHandlerShouldFailWhenDbsDontWork(t *testing.T) {
 	t.Parallel()
 
-	cleanup, db, err := utils.SetupTestDb(ctx)
+	dbCleanup, db, err := utils.SetupTestDb(ctx)
 	assert.NoError(t, err)
 
 	t.Cleanup(func() {
-		assert.NoError(t, cleanup())
+		assert.NoError(t, dbCleanup())
+	})
+
+	cacheCleanup, cache, err := utils.SetupCache(ctx)
+	assert.NoError(t, err)
+
+	t.Cleanup(func() {
+		cacheCleanup()
 	})
 
 	db.Close()
-	api := ApiRouter{DB: db}.Routes().ServeHTTP
+	cache.Close()
+	api := ApiRouter{
+		DB:    db,
+		Cache: cache,
+	}.Routes().ServeHTTP
 	res := utils.MakeRequest("", http.MethodGet, healthUrl, api, nil)
 	assert.NotNil(t, res)
 	assert.Equal(t, http.StatusServiceUnavailable, res.StatusCode)
@@ -55,5 +68,7 @@ func TestHealthHandlerShouldFailWhenDbDoesntWork(t *testing.T) {
 	err = json.Unmarshal(data, &got)
 	assert.NoError(t, err)
 	assert.False(t, got.DbConnected)
+	assert.False(t, got.CacheConnected)
 	assert.Equal(t, got.DbConnections, 0)
+	assert.Equal(t, got.CacheConnections, 0)
 }
