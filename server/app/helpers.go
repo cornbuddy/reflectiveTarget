@@ -55,27 +55,20 @@ func MakeConfig() (*Config, error) {
 		cfg.DbUser, cfg.DbPassword, cfg.DbHost, cfg.Db,
 	)
 
-	const retries = 5
-	const delay = 3 * time.Second
 	var db *sql.DB
-	var err error
-
-	for attempt := range retries {
-		log.Printf("connecting to db, attempt #%d", attempt)
+	retry("connect to db", func() error {
+		var err error
 		db, err = sql.Open("pgx", connStr)
-		connected := db.Ping() == nil
-		if connected {
-			log.Println("connected to db")
-			break
+		if err != nil {
+			return err
 		}
 
-		log.Printf("failed, waiting %v...", delay)
-		time.Sleep(delay)
-	}
+		if err := db.Ping(); err != nil {
+			return err
+		}
 
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to db: %w", err)
-	}
+		return nil
+	})
 
 	if err := utils.InitDatabase(db); err != nil {
 		return nil, err
@@ -86,4 +79,23 @@ func MakeConfig() (*Config, error) {
 		UserDao:  daos.UserDao{DB: db},
 		ShotsDao: daos.ShotsDao{DB: db},
 	}, nil
+}
+
+const attempts = 5
+const delay = 3 * time.Second
+
+func retry(operation string, f func() error) error {
+	var err error
+	for attempt := range attempts {
+		log.Printf("%s, attempt #%d", operation, attempt)
+		if err = f(); err != nil {
+			log.Printf("%s failed, waiting %v...", operation, delay)
+			time.Sleep(delay)
+		} else {
+			log.Printf("%s is succeeded", operation)
+			break
+		}
+	}
+
+	return err
 }
