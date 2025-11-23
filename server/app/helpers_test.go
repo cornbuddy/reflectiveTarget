@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -23,12 +22,7 @@ func TestMakeHttpHandler(t *testing.T) {
 		statusCode int
 	}
 
-	cleanup, err := setDbEnvVars()
-	require.NoError(t, err)
-
-	t.Cleanup(func() {
-		require.NoError(t, cleanup())
-	})
+	setEnvVars(t)
 
 	config, err := MakeConfig()
 	require.NoError(t, err)
@@ -80,12 +74,7 @@ func TestMakeHttpHandler(t *testing.T) {
 }
 
 func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
-	cleanup, err := setDbEnvVars()
-	require.NoError(t, err)
-
-	t.Cleanup(func() {
-		require.NoError(t, cleanup())
-	})
+	setEnvVars(t)
 
 	config, err := MakeConfig()
 	require.NoError(t, err)
@@ -111,18 +100,14 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 
 func TestInitShouldReturnErrorWhenRequiredEnvVarsAreNotSet(t *testing.T) {
 	_, err := MakeConfig()
-	require.ErrorIs(t, err, ErrNoEnvVar)
+	require.Contains(t, err.Error(), "is not set")
 }
 
-type cleanup func() error
-
-type environmentVariable struct {
-	key   string
-	value string
-}
-
-func setDbEnvVars() (cleanup, error) {
-	emptyCleanup := func() error { return nil }
+func setEnvVars(t *testing.T) {
+	type environmentVariable struct {
+		key   string
+		value string
+	}
 
 	envVars := []environmentVariable{
 		{"PGPASSWORD", password},
@@ -132,20 +117,6 @@ func setDbEnvVars() (cleanup, error) {
 	}
 
 	for _, envVar := range envVars {
-		if err := os.Setenv(envVar.key, envVar.value); err != nil {
-			return emptyCleanup, err
-		}
+		t.Setenv(envVar.key, envVar.value)
 	}
-
-	clean := func() error {
-		for _, envVar := range envVars {
-			if err := os.Unsetenv(envVar.key); err != nil {
-				return err
-			}
-		}
-
-		return nil
-	}
-
-	return clean, nil
 }

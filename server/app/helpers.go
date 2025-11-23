@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
+	"github.com/caarlos0/env/v11"
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
@@ -20,8 +20,6 @@ type Config struct {
 	daos.UserDao
 	daos.ShotsDao
 }
-
-var ErrNoEnvVar = fmt.Errorf("no environment variable")
 
 func MakeMux(config *Config) http.Handler {
 	views := handlers.ViewsRouter{
@@ -40,35 +38,21 @@ func MakeMux(config *Config) http.Handler {
 }
 
 func MakeConfig() (*Config, error) {
-	var password, user, database, host string
-
-	if pwd, ok := os.LookupEnv("PGPASSWORD"); !ok {
-		return nil, fmt.Errorf("%w: %s", ErrNoEnvVar, "PGPASSWORD")
-	} else {
-		password = pwd
+	type config struct {
+		DbPassword string `env:"PGPASSWORD,notEmpty,required"`
+		DbUser     string `env:"PGUSER,notEmpty,required"`
+		Db         string `env:"PGDATABASE,notEmpty,required"`
+		DbHost     string `env:"PGHOST,notEmpty,required"`
 	}
 
-	if usr, ok := os.LookupEnv("PGUSER"); !ok {
-		return nil, fmt.Errorf("%w: %s", ErrNoEnvVar, "PGUSER")
-	} else {
-		user = usr
-	}
-
-	if db, ok := os.LookupEnv("PGDATABASE"); !ok {
-		return nil, fmt.Errorf("%w: %s", ErrNoEnvVar, "PGDATABASE")
-	} else {
-		database = db
-	}
-
-	if h, ok := os.LookupEnv("PGHOST"); !ok {
-		return nil, fmt.Errorf("%w: %s", ErrNoEnvVar, "PGHOST")
-	} else {
-		host = h
+	var cfg config
+	if err := env.Parse(&cfg); err != nil {
+		return nil, err
 	}
 
 	connStr := fmt.Sprintf(
 		"postgresql://%s:%s@%s:5432/%s?sslmode=disable",
-		user, password, host, database,
+		cfg.DbUser, cfg.DbPassword, cfg.DbHost, cfg.Db,
 	)
 
 	const retries = 5
