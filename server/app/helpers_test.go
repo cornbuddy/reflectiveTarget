@@ -82,9 +82,11 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 
 	t.Cleanup(func() {
 		assert.NoError(t, config.DB.Close())
+		assert.NoError(t, config.Cache.Close())
 	})
 
 	assert.NoError(t, config.DB.Ping())
+	assert.NoError(t, config.Cache.Ping(ctx).Err())
 
 	tables := []string{"users", "targets", "questions", "shots"}
 	for _, table := range tables {
