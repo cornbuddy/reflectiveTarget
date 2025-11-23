@@ -11,7 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/domain/constants"
+	appconst "github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	domconst "github.com/cornbuddy/reflectiveTarget/server/domain/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
@@ -63,7 +64,7 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response) {
 
 	var sessionCookie *http.Cookie
 	for _, cookie := range cookies {
-		if cookie.Name == SessionCookieName {
+		if cookie.Name == appconst.SessionCookieName {
 			sessionCookie = cookie
 			break
 		}
@@ -73,7 +74,7 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response) {
 
 	// substracting 1 second because time.Now add ms to the time, while
 	// cookie doesn't count that strictly
-	month := time.Now().Add(constants.SessionDuration).Add(-1 * time.Second)
+	month := time.Now().Add(domconst.SessionDuration).Add(-1 * time.Second)
 	assert.True(t, sessionCookie.Expires.After(month))
 	assert.NoError(t, uuid.Validate(sessionCookie.Value))
 }
@@ -84,7 +85,7 @@ func assertSessionCookieIsUnset(t *testing.T, resp *http.Response) {
 
 	var sessionCookie *http.Cookie
 	for _, cookie := range cookies {
-		if cookie.Name == SessionCookieName {
+		if cookie.Name == appconst.SessionCookieName {
 			sessionCookie = cookie
 			break
 		}

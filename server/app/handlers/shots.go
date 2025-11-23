@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	myerrors "github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
@@ -70,7 +71,7 @@ func (h shotsHandler) post(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	cookies := req.CookiesNamed(SessionCookieName)
+	cookies := req.CookiesNamed(constants.SessionCookieName)
 	if len(cookies) != 1 {
 		http.Error(resp, "bad cookies", http.StatusBadRequest)
 		return

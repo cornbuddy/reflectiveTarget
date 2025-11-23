@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
+	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -19,12 +19,12 @@ func TestIsAuthorizedShouldAddToCtxIfCookieIsInTheSessionStore(t *testing.T) {
 	require.NoError(t, store.SaveSession(token, authenticated))
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		got := (r.Context().Value(Authenticated)).(*bool)
+		got := r.Context().Value(constants.AuthenticatedCtx).(*bool)
 		require.NotNil(t, got)
 		assert.Equal(t, authenticated, *got)
 	})
 	cookies := []*http.Cookie{{
-		Name:  handlers.SessionCookieName,
+		Name:  constants.SessionCookieName,
 		Value: token,
 	}}
 	handler := mw.IsAuthenticated(stub).ServeHTTP
@@ -37,7 +37,7 @@ func TestIsAuthorizedShouldAddNilToCtxIfNoCookieInRequest(t *testing.T) {
 	t.Parallel()
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Nil(t, r.Context().Value(Authenticated))
+		assert.Nil(t, r.Context().Value(constants.AuthenticatedCtx))
 	})
 
 	handler := mw.IsAuthenticated(stub).ServeHTTP

@@ -15,10 +15,11 @@ type ApiRouter struct {
 
 type ViewsRouter struct {
 	daos.UserDao
+	daos.SessionStore
 }
 
 func (r ViewsRouter) Routes() http.Handler {
-	authz := authzHandler{r.UserDao}
+	authz := authzHandler{r.UserDao, r.SessionStore}
 	index := indexHandler{}
 
 	mux := http.NewServeMux()

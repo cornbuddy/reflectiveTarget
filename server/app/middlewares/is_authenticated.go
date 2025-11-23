@@ -4,21 +4,13 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
+	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 )
-
-const Authenticated = "isAuthenticated"
 
 func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var cookie *http.Cookie
-		for _, c := range r.CookiesNamed(handlers.SessionCookieName) {
-			if c.Name == handlers.SessionCookieName {
-				cookie = c
-			}
-		}
-
-		if cookie == nil {
+		cookie, err := r.Cookie(constants.SessionCookieName)
+		if err != nil {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -26,12 +18,12 @@ func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
 		token := cookie.Value
 		value, err := mw.SessionStore.IsAuthenitcated(token)
 		if err != nil {
-			msg := err.Error()
-			http.Error(w, msg, http.StatusInternalServerError)
+			internalServerError(w, err.Error())
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), Authenticated, value)
+		key := constants.AuthenticatedCtx
+		ctx := context.WithValue(r.Context(), key, value)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

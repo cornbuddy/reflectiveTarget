@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -70,7 +71,7 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 	url := fmt.Sprintf("/target/%v/shots", targetID)
 	resp := utils.MakeRequestWithCookies(
 		"application/json", http.MethodPost, url, api, &body,
-		&http.Cookie{Name: SessionCookieName, Value: "kek"},
+		&http.Cookie{Name: constants.SessionCookieName, Value: "kek"},
 	)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
 

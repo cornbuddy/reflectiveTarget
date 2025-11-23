@@ -2,25 +2,21 @@ package handlers
 
 import (
 	"net/http"
-	"time"
 
-	"github.com/google/uuid"
-
+	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
-const SessionCookieName = "session-token"
-
 type authzHandler struct {
 	daos.UserDao
+	daos.SessionStore
 }
 
 func (h authzHandler) postLogout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
-		Name:   SessionCookieName,
+		Name:   constants.SessionCookieName,
 		Value:  "",
 		MaxAge: -1,
 	})
@@ -97,8 +93,7 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := utils.SaveSession(h.SessionStore, true, w)
-	if err != nil {
+	if _, err := utils.SaveSession(h.SessionStore, true, w); err != nil {
 		msg := err.Error()
 		http.Error(w, msg, http.StatusInternalServerError)
 		return

@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/constants"
+	appconst "github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	domconst "github.com/cornbuddy/reflectiveTarget/server/domain/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
@@ -26,9 +26,9 @@ func SaveSession(
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:    handlers.SessionCookieName,
+		Name:    appconst.SessionCookieName,
 		Value:   token,
-		Expires: time.Now().Add(constants.SessionDuration),
+		Expires: time.Now().Add(domconst.SessionDuration),
 	})
 
 	return token, nil

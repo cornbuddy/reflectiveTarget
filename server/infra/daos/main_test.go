@@ -42,6 +42,10 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
+	if err := utils.InitDatabase(testDb); err != nil {
+		log.Fatalf("failed to init db: %v", err)
+	}
+
 	cleanUpCache, testCache, err := testutils.SetupCache(ctx)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
@@ -52,10 +56,6 @@ func TestMain(m *testing.M) {
 			log.Fatalf("failed to clean up cache: %v", err)
 		}
 	}()
-
-	if err := utils.InitDatabase(testDb); err != nil {
-		log.Fatalf("failed to init db: %v", err)
-	}
 
 	pwd, err := valueobjects.NewPassword("kek")
 	if err != nil {

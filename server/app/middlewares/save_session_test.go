@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
+	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -27,7 +27,7 @@ func TestSaveSessionShouldResetRequestCookieWhenItsNotInStore(t *testing.T) {
 
 	handler := mw.SaveSession(stub).ServeHTTP
 	cookies := []*http.Cookie{{
-		Name:  handlers.SessionCookieName,
+		Name:  constants.SessionCookieName,
 		Value: token,
 	}}
 	utils.MakeRequestWithCookies(
@@ -63,7 +63,7 @@ func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
 
 	handler := mw.SaveSession(stub).ServeHTTP
 	cookies := []*http.Cookie{{
-		Name:  handlers.SessionCookieName,
+		Name:  constants.SessionCookieName,
 		Value: token,
 	}}
 	utils.MakeRequestWithCookies(

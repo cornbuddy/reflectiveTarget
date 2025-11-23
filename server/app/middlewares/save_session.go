@@ -3,17 +3,13 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
+	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
 func (mw Middleware) SaveSession(next http.Handler) http.Handler {
-	internalServerError := func(w http.ResponseWriter, msg string) {
-		http.Error(w, msg, http.StatusInternalServerError)
-	}
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie(handlers.SessionCookieName)
+		cookie, err := r.Cookie(constants.SessionCookieName)
 
 		// not empty error means cookie doesn't exist, hence should be
 		// set
