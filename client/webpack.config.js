@@ -8,7 +8,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const mode = process.env.NODE_ENV == "development"
     ? "development"
     : "production";
-const devtool = mode == "development"
+const devtool = process.env.NODE_ENV == "development"
     ? "source-map"
     : false;
 
