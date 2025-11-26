@@ -17,7 +17,7 @@ type healthHandler struct {
 
 func (h healthHandler) get(resp http.ResponseWriter, req *http.Request) {
 	status := h.HealthDao.CheckHealth()
-	code := http.StatusServiceUnavailable
+	code := http.StatusInternalServerError
 	if status.CacheConnected && status.DbConnected {
 		code = http.StatusOK
 	}
