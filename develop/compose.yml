@@ -1,6 +1,8 @@
 ---
 
 services:
+  cache:
+    image: redis:8-alpine
   db:
     image: postgres:18-alpine
     environment:
@@ -8,15 +10,16 @@ services:
       POSTGRES_USER: &pguser reflective_target
       POSTGRES_DB: &pgdatabase reflective_target
   server:
-    depends_on: [db]
+    depends_on: [db, cache]
     build:
       context: ../server
     environment:
+      CACHE_ADDRESS: cache:6379
       PGPASSWORD: *pgpassword
       PGUSER: *pguser
       PGDATABASE: *pgdatabase
       PGHOST: db
-  client:
+  frontend:
     depends_on: [server]
     build:
       context: ../client

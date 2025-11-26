@@ -4,23 +4,18 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
 )
-
-const timeout = 30 * time.Second
 
 func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
 	log.Println("initializing application...")
+	ctx := context.Background()
 	config, err := config.MakeConfig(ctx)
 	if err != nil {
 		log.Fatalf("failed to init application: %s", err)

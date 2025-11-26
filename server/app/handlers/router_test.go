@@ -11,6 +11,8 @@ import (
 )
 
 func TestMakeHttpHandler(t *testing.T) {
+	t.Parallel()
+
 	type testCase struct {
 		url        string
 		method     string
