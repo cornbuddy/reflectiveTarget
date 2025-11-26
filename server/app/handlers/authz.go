@@ -3,7 +3,6 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
@@ -15,11 +14,11 @@ type authzHandler struct {
 }
 
 func (h authzHandler) postLogout(w http.ResponseWriter, r *http.Request) {
-	http.SetCookie(w, &http.Cookie{
-		Name:   constants.SessionCookieName,
-		Value:  "",
-		MaxAge: -1,
-	})
+	if _, err := utils.SaveSession(h.SessionStore, false, w); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 	w.Write([]byte("Logout succeeded"))
 }

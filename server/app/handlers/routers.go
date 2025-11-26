@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
+	"github.com/cornbuddy/reflectiveTarget/server/app/middlewares"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 )
 
@@ -12,8 +13,11 @@ func NewRouter(config *config.Config) http.Handler {
 	index := indexHandler{}
 	health := healthHandler{config.HealthDao}
 	shots := shotsHandler{
-		ShotsDao:  config.ShotsDao,
-		Validator: validators.ShotsRequestValidator{},
+		config.ShotsDao,
+		validators.ShotsRequestValidator{},
+	}
+	mv := middlewares.Middleware{
+		SessionStore: config.SessionStore,
 	}
 
 	mux := http.NewServeMux()
@@ -27,5 +31,5 @@ func NewRouter(config *config.Config) http.Handler {
 	mux.HandleFunc("GET /api/target/{targetID}/shots", shots.get)
 	mux.HandleFunc("POST /api/target/{targetID}/shots", shots.post)
 
-	return mux
+	return mv.SaveSession(mux)
 }

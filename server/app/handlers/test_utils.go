@@ -72,25 +72,9 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response) {
 
 	require.NotNil(t, sessionCookie)
 
-	// substracting 1 second because time.Now add ms to the time, while
-	// cookie doesn't count that strictly
-	month := time.Now().Add(domconst.SessionDuration).Add(-1 * time.Second)
+	// substracting few seconds because actual tests can happen after
+	// time.Now()
+	month := time.Now().Add(domconst.SessionDuration).Add(-10 * time.Second)
 	assert.True(t, sessionCookie.Expires.After(month))
 	assert.NoError(t, uuid.Validate(sessionCookie.Value))
-}
-
-func assertSessionCookieIsUnset(t *testing.T, resp *http.Response) {
-	cookies := resp.Cookies()
-	require.NotEmpty(t, cookies)
-
-	var sessionCookie *http.Cookie
-	for _, cookie := range cookies {
-		if cookie.Name == appconst.SessionCookieName {
-			sessionCookie = cookie
-			break
-		}
-	}
-
-	require.NotNil(t, sessionCookie)
-	assert.Equal(t, -1, sessionCookie.MaxAge)
 }

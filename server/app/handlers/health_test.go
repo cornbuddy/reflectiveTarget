@@ -43,5 +43,5 @@ func TestHealthHandlerShouldFailWhenDbsDontWork(t *testing.T) {
 	router := NewRouter(config).ServeHTTP
 	res := utils.MakeRequest("", http.MethodGet, healthUrl, router, nil)
 	assert.NotNil(t, res)
-	assert.Equal(t, http.StatusServiceUnavailable, res.StatusCode)
+	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
 }
