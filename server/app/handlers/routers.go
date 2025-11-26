@@ -31,5 +31,5 @@ func NewRouter(config *config.Config) http.Handler {
 	mux.HandleFunc("GET /api/target/{targetID}/shots", shots.get)
 	mux.HandleFunc("POST /api/target/{targetID}/shots", shots.post)
 
-	return mv.SaveSession(mux)
+	return mv.SaveSession(mv.IsAuthenticated(mux))
 }
