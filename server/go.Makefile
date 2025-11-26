@@ -1,3 +1,6 @@
+.PHONY: all
+all: lint test
+
 .PHONY: lint
 lint: fmt vet tidy
 

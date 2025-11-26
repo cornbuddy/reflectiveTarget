@@ -2,12 +2,12 @@ package config
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/redis/go-redis/v9"
 	tc "github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	tcredis "github.com/testcontainers/testcontainers-go/modules/redis"
@@ -39,37 +39,42 @@ func TestMain(m *testing.M) {
 
 	dbCont, err := postgres.Run(ctx, utils.DbImage, opts...)
 	if err != nil {
-		log.Fatal("failed to run db: %w", err)
+		log.Fatalf("failed to run db: %v", err)
 	}
 
 	defer func() {
 		if err := dbCont.Terminate(ctx); err != nil {
-			log.Fatal("failed to stop db: %w", err)
+			log.Fatalf("failed to stop db: %v", err)
 		}
 	}()
 
 	dbHost, err = dbCont.ContainerIP(ctx)
 	if err != nil {
-		log.Fatal("failed to fetch db ip: %w", err)
+		log.Fatalf("failed to fetch db ip: %v", err)
 	}
 
 	cacheCont, err := tcredis.Run(ctx, utils.CacheImage)
 	if err != nil {
-		log.Fatal("failed to run cache: %w", err)
+		log.Fatalf("failed to run cache: %v", err)
 	}
 
 	defer func() {
 		if err := cacheCont.Terminate(ctx); err != nil {
-			log.Fatal("failed to stop cache: %w", err)
+			log.Fatalf("failed to stop cache: %v", err)
 		}
 	}()
 
-	cacheIp, err := cacheCont.ContainerIP(ctx)
+	uri, err := cacheCont.ConnectionString(ctx)
 	if err != nil {
-		log.Fatal("failed to fetch cache ip: %w", err)
+		log.Fatalf("failed to fetch uri for cache: %v", err)
 	}
 
-	cacheAddr = fmt.Sprintf("%s:6789", cacheIp)
+	cacheOpts, err := redis.ParseURL(uri)
+	if err != nil {
+		log.Fatalf("failed to parse cache uri: %v", err)
+	}
+
+	cacheAddr = cacheOpts.Addr
 
 	os.Exit(m.Run())
 }

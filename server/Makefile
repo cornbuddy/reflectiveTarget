@@ -1,5 +1,8 @@
 LAYERS = app domain infra
 
+.PHONY: all
+all: lint test
+
 .PHONY: lint
 lint:
 	for layer in $(LAYERS) test; do \

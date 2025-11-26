@@ -37,7 +37,7 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 	}
 
 	var cache *redis.Client
-	retry("connect to cache", func() error {
+	if err := retry("connect to cache", func() error {
 		cache = redis.NewClient(&redis.Options{
 			Addr: cfg.CacheAddr,
 		})
@@ -47,15 +47,16 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 		}
 
 		return nil
-	})
+	}); err != nil {
+		return nil, err
+	}
 
+	var db *sql.DB
 	dbConnStr := fmt.Sprintf(
 		"postgresql://%s:%s@%s:5432/%s?sslmode=disable",
 		cfg.DbUser, cfg.DbPassword, cfg.DbHost, cfg.Db,
 	)
-
-	var db *sql.DB
-	retry("connect to db", func() error {
+	if err := retry("connect to db", func() error {
 		var err error
 		db, err = sql.Open("pgx", dbConnStr)
 		if err != nil {
@@ -67,7 +68,9 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 		}
 
 		return nil
-	})
+	}); err != nil {
+		return nil, err
+	}
 
 	if err := utils.InitDatabase(db); err != nil {
 		return nil, err
@@ -81,10 +84,10 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 	}, nil
 }
 
-const attempts = 5
-const delay = 3 * time.Second
-
 func retry(operation string, f func() error) error {
+	const attempts = 5
+	const delay = 3 * time.Second
+
 	var err error
 	for attempt := range attempts {
 		log.Printf("%s, attempt #%d", operation, attempt)
