@@ -14,7 +14,7 @@ import (
 func TestShouldRenderIndexPage(t *testing.T) {
 	t.Parallel()
 
-	resp := utils.MakeRequest("", http.MethodGet, "/", views, nil)
+	resp := utils.MakeRequest("", http.MethodGet, "/", router, nil)
 	require.NotNil(t, resp)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 

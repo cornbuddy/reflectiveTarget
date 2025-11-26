@@ -17,7 +17,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
-const shotsUrl = "/target/1/shots"
+const shotsUrl = "/api/target/1/shots"
 
 func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 	t.Parallel()
@@ -29,8 +29,8 @@ func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 	require.NoError(t, err)
 
 	ct := "application/json"
-	url := fmt.Sprintf("/target/%v/shots", targetID)
-	resp := utils.MakeRequest(ct, http.MethodGet, url, api, nil)
+	url := fmt.Sprintf("/api/target/%v/shots", targetID)
+	resp := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 	var shots ShotsResponse
@@ -44,8 +44,8 @@ func TestShotsShould404TargetDoesNotExist(t *testing.T) {
 	t.Parallel()
 
 	ct := "application/json"
-	url := "/target/69/shots"
-	resp := utils.MakeRequest(ct, http.MethodGet, url, api, nil)
+	url := "/api/target/69/shots"
+	resp := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
 	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 }
 
@@ -68,9 +68,9 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 		ShotsRequest{Shots: []valueobjects.Shot{shot}},
 	))
 
-	url := fmt.Sprintf("/target/%v/shots", targetID)
+	url := fmt.Sprintf("/api/target/%v/shots", targetID)
 	resp := utils.MakeRequestWithCookies(
-		"application/json", http.MethodPost, url, api, &body,
+		"application/json", http.MethodPost, url, router, &body,
 		&http.Cookie{Name: constants.SessionCookieName, Value: "kek"},
 	)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
@@ -113,7 +113,7 @@ func TestShotsShouldBeValidated(t *testing.T) {
 
 		ct := "application/json"
 		method := http.MethodPost
-		resp := utils.MakeRequest(ct, method, shotsUrl, api, &body)
+		resp := utils.MakeRequest(ct, method, shotsUrl, router, &body)
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode, tc.desc)
 	}
 }
@@ -127,6 +127,6 @@ func TestShotsShouldFailIfRequestIsMalformed(t *testing.T) {
 
 	ct := "application/json"
 	method := http.MethodPost
-	resp := utils.MakeRequest(ct, method, shotsUrl, api, &body)
+	resp := utils.MakeRequest(ct, method, shotsUrl, router, &body)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 }

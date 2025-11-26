@@ -1,51 +1,30 @@
 package handlers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"net/http"
 
-	"github.com/redis/go-redis/v9"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
 type HealthResponse struct {
-	DbConnected      bool `json:"database-connected"`
-	DbConnections    int  `json:"database-connections"`
-	CacheConnected   bool `json:"cache-connected"`
-	CacheConnections int  `json:"cache-connections"`
+	daos.HealthStatus `json:",inline"`
 }
 
 type healthHandler struct {
-	*sql.DB
-	Cache *redis.Client
+	daos.HealthDao
 }
 
 func (h healthHandler) get(resp http.ResponseWriter, req *http.Request) {
-	dbConnections := 0
-	dbConnected := h.DB.Ping() == nil
-	if dbConnected {
-		dbConnections = h.DB.Stats().OpenConnections
-	}
-
-	cacheConnections := 0
-	cacheConnected := h.Cache.Ping(req.Context()).Err() == nil
-	if cacheConnected {
-		cacheConnections = int(h.Cache.PoolStats().TotalConns)
-	}
-
-	var status int
-	if dbConnected && cacheConnected {
-		status = http.StatusOK
-	} else {
-		status = http.StatusServiceUnavailable
+	status := h.HealthDao.CheckHealth()
+	code := http.StatusServiceUnavailable
+	if status.CacheConnected && status.DbConnected {
+		code = http.StatusOK
 	}
 
 	hr, _ := json.Marshal(HealthResponse{
-		DbConnected:      dbConnected,
-		DbConnections:    dbConnections,
-		CacheConnected:   cacheConnected,
-		CacheConnections: cacheConnections,
+		HealthStatus: status,
 	})
-	resp.WriteHeader(status)
+	resp.WriteHeader(code)
 	resp.Write(hr)
 }

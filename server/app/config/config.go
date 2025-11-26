@@ -1,46 +1,30 @@
-package main
+package config
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/caarlos0/env/v11"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/redis/go-redis/v9"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 )
 
 type Config struct {
-	*sql.DB
-	daos.UserDao
-	daos.ShotsDao
+	daos.HealthDao
 	daos.SessionStore
+	daos.ShotsDao
+	daos.UserDao
 }
 
-func MakeMux(config *Config) http.Handler {
-	views := handlers.ViewsRouter{
-		UserDao:      config.UserDao,
-		SessionStore: config.SessionStore,
-	}
-	api := handlers.ApiRouter{
-		DB:       config.DB,
-		ShotsDao: config.ShotsDao,
-	}
-
-	mux := http.NewServeMux()
-	mux.Handle("/", views.Routes())
-	mux.Handle("/api/", http.StripPrefix("/api", api.Routes()))
-
-	return mux
-}
-
-func MakeConfig() (*Config, error) {
+func MakeConfig(ctx context.Context) (*Config, error) {
 	type config struct {
+		CacheAddr  string `env:"CACHE_ADDRESS,notEmpty,required"`
 		DbPassword string `env:"PGPASSWORD,notEmpty,required"`
 		DbUser     string `env:"PGUSER,notEmpty,required"`
 		Db         string `env:"PGDATABASE,notEmpty,required"`
@@ -52,7 +36,20 @@ func MakeConfig() (*Config, error) {
 		return nil, err
 	}
 
-	connStr := fmt.Sprintf(
+	var cache *redis.Client
+	retry("connect to cache", func() error {
+		cache = redis.NewClient(&redis.Options{
+			Addr: cfg.CacheAddr,
+		})
+
+		if err := cache.Ping(ctx).Err(); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	dbConnStr := fmt.Sprintf(
 		"postgresql://%s:%s@%s:5432/%s?sslmode=disable",
 		cfg.DbUser, cfg.DbPassword, cfg.DbHost, cfg.Db,
 	)
@@ -60,7 +57,7 @@ func MakeConfig() (*Config, error) {
 	var db *sql.DB
 	retry("connect to db", func() error {
 		var err error
-		db, err = sql.Open("pgx", connStr)
+		db, err = sql.Open("pgx", dbConnStr)
 		if err != nil {
 			return err
 		}
@@ -77,9 +74,10 @@ func MakeConfig() (*Config, error) {
 	}
 
 	return &Config{
-		DB:       db,
-		UserDao:  daos.UserDao{DB: db},
-		ShotsDao: daos.ShotsDao{DB: db},
+		HealthDao:    daos.HealthDao{Ctx: ctx, DB: db, Cache: cache},
+		SessionStore: daos.SessionStore{Ctx: ctx, Cache: cache},
+		ShotsDao:     daos.ShotsDao{DB: db},
+		UserDao:      daos.UserDao{DB: db},
 	}, nil
 }
 

@@ -8,19 +8,19 @@ import (
 	"os"
 	"testing"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/config"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
+	"github.com/redis/go-redis/v9"
 )
 
 var (
 	ctx = context.TODO()
 
-	db           *sql.DB
-	userDao      daos.UserDao
-	sessionStore daos.SessionStore
-	views        http.HandlerFunc
-	api          http.HandlerFunc
+	db      *sql.DB
+	userDao daos.UserDao
+	router  http.HandlerFunc
 )
 
 func TestMain(m *testing.M) {
@@ -51,20 +51,30 @@ func TestMain(m *testing.M) {
 	}()
 
 	db = testDb
-	userDao = daos.UserDao{DB: db}
-	sessionStore = daos.SessionStore{
-		Ctx:   ctx,
-		Cache: testCache,
-	}
-	views = ViewsRouter{
-		UserDao:      userDao,
-		SessionStore: sessionStore,
-	}.Routes().ServeHTTP
-	api = ApiRouter{
-		DB:       db,
-		ShotsDao: daos.ShotsDao{DB: db},
-		Cache:    testCache,
-	}.Routes().ServeHTTP
+	userDao = daos.UserDao{DB: testDb}
+
+	config := makeTestConfig(ctx, testDb, testCache)
+	router = NewRouter(config).ServeHTTP
 
 	os.Exit(m.Run())
+}
+
+func makeTestConfig(
+	ctx context.Context, db *sql.DB, cache *redis.Client,
+) *config.Config {
+
+	health := daos.HealthDao{Ctx: ctx, DB: db, Cache: cache}
+	shots := daos.ShotsDao{DB: db}
+	userDao := daos.UserDao{DB: db}
+	sessionStore := daos.SessionStore{
+		Ctx:   ctx,
+		Cache: cache,
+	}
+
+	return &config.Config{
+		HealthDao:    health,
+		SessionStore: sessionStore,
+		ShotsDao:     shots,
+		UserDao:      userDao,
+	}
 }

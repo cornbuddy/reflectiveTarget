@@ -1,7 +1,8 @@
-package main
+package config
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -9,13 +10,15 @@ import (
 
 	tc "github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
+	tcredis "github.com/testcontainers/testcontainers-go/modules/redis"
 	"github.com/testcontainers/testcontainers-go/wait"
 
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 var (
-	host string
+	dbHost    string
+	cacheAddr string
 
 	ctx      = context.TODO()
 	username = "test_user"
@@ -34,21 +37,39 @@ func TestMain(m *testing.M) {
 		postgres.WithDatabase(database),
 	}
 
-	cont, err := postgres.Run(ctx, utils.DbImage, opts...)
+	dbCont, err := postgres.Run(ctx, utils.DbImage, opts...)
 	if err != nil {
 		log.Fatal("failed to run db: %w", err)
 	}
 
 	defer func() {
-		if err := cont.Terminate(ctx); err != nil {
+		if err := dbCont.Terminate(ctx); err != nil {
 			log.Fatal("failed to stop db: %w", err)
 		}
 	}()
 
-	host, err = cont.ContainerIP(ctx)
+	dbHost, err = dbCont.ContainerIP(ctx)
 	if err != nil {
 		log.Fatal("failed to fetch db ip: %w", err)
 	}
+
+	cacheCont, err := tcredis.Run(ctx, utils.CacheImage)
+	if err != nil {
+		log.Fatal("failed to run cache: %w", err)
+	}
+
+	defer func() {
+		if err := cacheCont.Terminate(ctx); err != nil {
+			log.Fatal("failed to stop cache: %w", err)
+		}
+	}()
+
+	cacheIp, err := cacheCont.ContainerIP(ctx)
+	if err != nil {
+		log.Fatal("failed to fetch cache ip: %w", err)
+	}
+
+	cacheAddr = fmt.Sprintf("%s:6789", cacheIp)
 
 	os.Exit(m.Run())
 }

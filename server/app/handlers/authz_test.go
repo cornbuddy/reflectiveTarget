@@ -21,7 +21,7 @@ func TestLogoutShouldRemoveSessionCookie(t *testing.T) {
 	const url = "/logout"
 
 	ct := "application/x-www-form-urlencoded"
-	res := utils.MakeRequest(ct, http.MethodPost, url, views, nil)
+	res := utils.MakeRequest(ct, http.MethodPost, url, router, nil)
 	require.NotNil(t, res)
 	assert.Equal(t, http.StatusSeeOther, res.StatusCode)
 	assert.Equal(t, "/", res.Header.Get("Location"))
@@ -71,7 +71,7 @@ func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
 	for _, tc := range testCases {
 		ct := "application/x-www-form-urlencoded"
 		body := tc.body
-		res := utils.MakeRequest(ct, http.MethodPost, url, views, body)
+		res := utils.MakeRequest(ct, http.MethodPost, url, router, body)
 		require.NotNil(t, res)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
 
@@ -105,7 +105,7 @@ func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 	body := strings.NewReader(
 		fmt.Sprintf("username=%s&password=%s", username, password),
 	)
-	res := utils.MakeRequest(ct, http.MethodPost, url, views, body)
+	res := utils.MakeRequest(ct, http.MethodPost, url, router, body)
 	require.NotNil(t, res)
 	assert.Equal(t, http.StatusSeeOther, res.StatusCode)
 	assert.Equal(t, "/", res.Header.Get("Location"))
@@ -154,7 +154,7 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 	for _, tc := range testCases {
 		ct := "application/x-www-form-urlencoded"
 		body := tc.body
-		res := utils.MakeRequest(ct, http.MethodPost, url, views, body)
+		res := utils.MakeRequest(ct, http.MethodPost, url, router, body)
 		require.NotNil(t, res)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
 
@@ -193,7 +193,7 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 
 	for _, tc := range testCases {
 		get := http.MethodGet
-		res := utils.MakeRequest("", get, tc.url, views, nil)
+		res := utils.MakeRequest("", get, tc.url, router, nil)
 		ct := "text/html; charset=utf-8"
 		assert.Equal(t, ct, res.Header.Get("Content-Type"))
 		assert.Equal(t, http.StatusOK, res.StatusCode)

@@ -1,28 +1,20 @@
 package handlers
 
 import (
-	"database/sql"
 	"net/http"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/config"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
-	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
-	"github.com/redis/go-redis/v9"
 )
 
-type ApiRouter struct {
-	*sql.DB
-	daos.ShotsDao
-	Cache *redis.Client
-}
-
-type ViewsRouter struct {
-	daos.UserDao
-	daos.SessionStore
-}
-
-func (r ViewsRouter) Routes() http.Handler {
-	authz := authzHandler{r.UserDao, r.SessionStore}
+func NewRouter(config *config.Config) http.Handler {
+	authz := authzHandler{config.UserDao, config.SessionStore}
 	index := indexHandler{}
+	health := healthHandler{config.HealthDao}
+	shots := shotsHandler{
+		ShotsDao:  config.ShotsDao,
+		Validator: validators.ShotsRequestValidator{},
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", index.get)
@@ -31,24 +23,9 @@ func (r ViewsRouter) Routes() http.Handler {
 	mux.HandleFunc("POST /login", authz.postLogin)
 	mux.HandleFunc("POST /logout", authz.postLogout)
 	mux.HandleFunc("POST /signup", authz.postSignup)
-
-	return mux
-}
-
-func (r ApiRouter) Routes() http.Handler {
-	health := healthHandler{
-		DB:    r.DB,
-		Cache: r.Cache,
-	}
-	shots := shotsHandler{
-		ShotsDao:  r.ShotsDao,
-		Validator: validators.ShotsRequestValidator{},
-	}
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /health", health.get)
-	mux.HandleFunc("GET /target/{targetID}/shots", shots.get)
-	mux.HandleFunc("POST /target/{targetID}/shots", shots.post)
+	mux.HandleFunc("GET /api/health", health.get)
+	mux.HandleFunc("GET /api/target/{targetID}/shots", shots.get)
+	mux.HandleFunc("POST /api/target/{targetID}/shots", shots.post)
 
 	return mux
 }
