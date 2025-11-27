@@ -12,5 +12,5 @@ lint:
 .PHONY: test
 test:
 	for layer in $(LAYERS); do \
-		$(MAKE) -C $$layer test; \
+		ENVIRONMENT="development" $(MAKE) -C $$layer test; \
 	done

@@ -44,5 +44,5 @@ func init() {
 		log.Fatalf("failed to setup logger: %v", err)
 	}
 
-	log.Printf("using %s logger\n", environment)
+	Log.Info("logger is set up", zap.String("environment", environment))
 }

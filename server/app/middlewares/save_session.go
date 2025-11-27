@@ -3,11 +3,11 @@ package middlewares
 import (
 	"net/http"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
-	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 	"go.uber.org/zap"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	. "github.com/cornbuddy/reflectiveTarget/server/app/logger"
+	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
 func (mw Middleware) SaveSession(next http.Handler) http.Handler {
@@ -53,6 +53,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 
 		// session token was either found in the session store, or was
 		// set earlier, so let's process the request
+		log.Info("session is validated")
 		next.ServeHTTP(w, r)
 	})
 }
