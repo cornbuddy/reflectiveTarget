@@ -11,7 +11,6 @@ var Log *zap.Logger
 
 var devConfig = zap.Config{
 	Level:            zap.NewAtomicLevelAt(zap.DebugLevel),
-	Development:      true,
 	Encoding:         "console",
 	EncoderConfig:    zap.NewDevelopmentEncoderConfig(),
 	OutputPaths:      []string{"stdout"},

@@ -26,12 +26,18 @@ func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
 			return
 		}
 
-		key := constants.AuthenticatedCtx
-		ctx := context.WithValue(r.Context(), key, value)
-		Log.Info("context set up",
-			zap.String("token", token),
-			zap.Bool("is-authenticated", *value),
-		)
+		ctx := r.Context()
+		log := Log.With(zap.String("token", token))
+		if value == nil {
+			log.Warn("auth info not included in the context")
+		} else {
+			log.Info("adding auth info to context",
+				zap.Bool("is-authenticated", *value),
+			)
+			key := constants.AuthenticatedCtx
+			ctx = context.WithValue(r.Context(), key, value)
+		}
+
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
