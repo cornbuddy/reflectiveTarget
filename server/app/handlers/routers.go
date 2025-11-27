@@ -16,7 +16,7 @@ func NewRouter(config *config.Config) http.Handler {
 		config.ShotsDao,
 		validators.ShotsRequestValidator{},
 	}
-	mv := middlewares.Middleware{
+	mw := middlewares.Middleware{
 		SessionStore: config.SessionStore,
 	}
 
@@ -31,5 +31,9 @@ func NewRouter(config *config.Config) http.Handler {
 	mux.HandleFunc("GET /api/target/{targetID}/shots", shots.get)
 	mux.HandleFunc("POST /api/target/{targetID}/shots", shots.post)
 
-	return mv.SaveSession(mv.IsAuthenticated(mux))
+	return middlewares.Chain(mux,
+		mw.Log,
+		mw.SaveSession,
+		mw.IsAuthenticated,
+	)
 }
