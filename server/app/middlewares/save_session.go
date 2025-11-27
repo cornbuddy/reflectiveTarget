@@ -5,6 +5,9 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
+	"go.uber.org/zap"
+
+	. "github.com/cornbuddy/reflectiveTarget/server/app/logger"
 )
 
 func (mw Middleware) SaveSession(next http.Handler) http.Handler {
@@ -14,6 +17,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// not empty error means cookie doesn't exist, hence should be
 		// set
 		if err != nil {
+			Log.Info("registering new session...")
 			_, err := utils.SaveSession(mw.SessionStore, false, w)
 			if err != nil {
 				internalServerError(w, err.Error())
@@ -27,6 +31,8 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// empty error means cookie exists, hence session token should
 		// be validated
 		token := cookie.Value
+		log := Log.With(zap.String("token", token))
+		log.Info("validating session...")
 		auth, err := mw.SessionStore.IsAuthenitcated(token)
 		if err != nil {
 			internalServerError(w, err.Error())
@@ -37,6 +43,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// seems like cache key expired earlier than cookie. kinda
 		// suspicious, let's reset the session
 		if auth == nil {
+			log.Warn("session is not registered")
 			_, err := utils.SaveSession(mw.SessionStore, false, w)
 			if err != nil {
 				internalServerError(w, err.Error())
