@@ -4,13 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/caarlos0/env/v11"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 
+	. "github.com/cornbuddy/reflectiveTarget/server/app/logger"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 )
@@ -90,12 +91,15 @@ func retry(operation string, f func() error) error {
 
 	var err error
 	for attempt := range attempts {
-		log.Printf("%s, attempt #%d", operation, attempt)
+		Log.Info(operation, zap.Int("attempt", attempt))
 		if err = f(); err != nil {
-			log.Printf("%s failed, waiting %v...", operation, delay)
+			Log.Warn(operation,
+				zap.String("status", "failed"),
+				zap.Duration("delay", delay),
+			)
 			time.Sleep(delay)
 		} else {
-			log.Printf("%s is succeeded", operation)
+			Log.Info(operation, zap.String("status", "success"))
 			break
 		}
 	}
