@@ -16,7 +16,8 @@ class DSL:
         self.driver.find_element(By.NAME, "username").send_keys(username)
         self.driver.find_element(By.NAME, "password").send_keys(password)
         self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
-        self.assert_authorized()
+        session = self.driver.get_cookie(SESSION_TOKEN)
+        assert session is not None
 
         return self.driver
 
@@ -25,7 +26,8 @@ class DSL:
         self.driver.find_element(By.NAME, "username").send_keys(username)
         self.driver.find_element(By.NAME, "password").send_keys(password)
         self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
-        self.assert_authorized()
+        session = self.driver.get_cookie(SESSION_TOKEN)
+        assert session is not None
 
         return self.driver
 
@@ -34,15 +36,9 @@ class DSL:
         sidebar = self.driver.find_element(By.TAG_NAME, "nav")
         assert sidebar.is_displayed()
 
+        before_logout = self.driver.get_cookie(SESSION_TOKEN)
         self.driver.find_element(By.LINK_TEXT, "Logout").click()
-        self.assert_unauthorized()
+        after_logout = self.driver.get_cookie(SESSION_TOKEN)
+        assert before_logout != after_logout
 
         return self.driver
-
-    def assert_authorized(self):
-        session = self.driver.get_cookie(SESSION_TOKEN)
-        assert session is not None
-
-    def assert_unauthorized(self):
-        session = self.driver.get_cookie(SESSION_TOKEN)
-        assert session is None

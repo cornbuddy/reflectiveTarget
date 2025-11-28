@@ -18,12 +18,13 @@ tidy:
 
 COVERPROFILE = cover.out
 COVERREPORT = cover.html
+PACKAGES = ./...
 
 .PHONY: test
 test:
 	ENVIRONMENT=development \
 	GOTOOLCHAIN=go1.25.3+auto \
-		go test -coverprofile=$(COVERPROFILE) ./...
+		go test -coverprofile=$(COVERPROFILE) $(PACKAGES)
 	go tool cover -html $(COVERPROFILE) -o $(COVERREPORT)
 	- xdg-open $(COVERREPORT)
 

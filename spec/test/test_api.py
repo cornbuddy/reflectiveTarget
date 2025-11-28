@@ -8,5 +8,5 @@ def test_should_expose_health_endpoint():
     resp = requests.get(url, timeout=1)
     body = resp.json()
     assert resp.status_code == 200
-    assert body["db-connected"]
+    assert body["database-connected"]
     assert body["cache-connected"]

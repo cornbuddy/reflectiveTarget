@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"net/http"
+
+	"github.com/cornbuddy/reflectiveTarget/server/app/render"
 )
 
 type indexHandler struct{}
@@ -12,5 +14,5 @@ func (h indexHandler) get(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	layout.Render(resp, "views/index.tmpl", nil)
+	render.Layout.Index(req.Context(), resp, nil)
 }
