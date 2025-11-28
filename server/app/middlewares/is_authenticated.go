@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
-	. "github.com/cornbuddy/reflectiveTarget/server/app/logger"
+	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
 )
 
 func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {

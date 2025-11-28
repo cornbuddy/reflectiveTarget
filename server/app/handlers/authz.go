@@ -5,10 +5,10 @@ import (
 
 	"go.uber.org/zap"
 
-	. "github.com/cornbuddy/reflectiveTarget/server/app/logger"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
 )
 
 type authzHandler struct {

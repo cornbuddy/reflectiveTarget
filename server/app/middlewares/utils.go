@@ -5,7 +5,7 @@ import (
 
 	"go.uber.org/zap"
 
-	. "github.com/cornbuddy/reflectiveTarget/server/app/logger"
+	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
 )
 
 func internalServerError(w http.ResponseWriter, msg string) {

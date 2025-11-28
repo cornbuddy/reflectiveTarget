@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	. "github.com/cornbuddy/reflectiveTarget/server/app/logger"
+	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
 	"go.uber.org/zap"
 )
 

@@ -9,11 +9,11 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
-	. "github.com/cornbuddy/reflectiveTarget/server/app/logger"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
 )
 
 type ShotsRequest struct {
