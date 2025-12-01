@@ -6,15 +6,20 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
 )
 
-func TestLogMiddlewareShouldNotChangeRequest(t *testing.T) {
+func TestLoggerMiddlewareShouldAddLoggerToContext(t *testing.T) {
 	t.Parallel()
 
-	want := httptest.NewRequest(http.MethodGet, "/", nil)
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, want, r)
+		log := r.Context().Value(constants.LoggerCtx)
+		assert.NotNil(t, log)
+		assert.IsType(t, Log, log)
 	})
 
-	mw.Log(stub).ServeHTTP(httptest.NewRecorder(), want)
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
+	mw.Logger(stub).ServeHTTP(httptest.NewRecorder(), r)
 }

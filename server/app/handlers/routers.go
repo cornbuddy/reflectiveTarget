@@ -32,7 +32,7 @@ func NewRouter(config *config.Config) http.Handler {
 	mux.HandleFunc("POST /api/target/{targetID}/shots", shots.post)
 
 	return middlewares.Chain(mux,
-		mw.Log,
+		mw.Logger,
 		mw.SaveSession,
 		mw.IsAuthenticated,
 	)
