@@ -7,17 +7,17 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
-	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
 )
 
 func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log := utils.LoggerFromCtx(r.Context())
 		cookie, err := r.Cookie(constants.SessionCookieName)
 
 		// not empty error means cookie doesn't exist, hence should be
 		// set
 		if err != nil {
-			Log.Info("registering new session...")
+			log.Info("registering new session...")
 			_, err := utils.SaveSession(mw.SessionStore, false, w)
 			if err != nil {
 				internalServerError(w, err.Error())
@@ -31,7 +31,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// empty error means cookie exists, hence session token should
 		// be validated
 		token := cookie.Value
-		log := Log.With(zap.String("token", token))
+		log = log.With(zap.String("token", token))
 		log.Info("validating session...")
 		auth, err := mw.SessionStore.IsAuthenitcated(token)
 		if err != nil {

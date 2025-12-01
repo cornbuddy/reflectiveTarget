@@ -9,11 +9,11 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
-	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
 )
 
 type ShotsRequest struct {
@@ -30,14 +30,16 @@ type shotsHandler struct {
 }
 
 func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
+	log := utils.LoggerFromCtx(req.Context())
+
 	targetID, err := strconv.Atoi(req.PathValue("targetID"))
 	if err != nil {
-		Log.Error("failed to parse target id", zap.Error(err))
+		log.Error("failed to parse target id", zap.Error(err))
 		http.Error(resp, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	log := Log.With(zap.Int("target-id", targetID))
+	log = log.With(zap.Int("target-id", targetID))
 
 	shots, err := h.ShotsDao.List(targetID)
 	if stderr.Is(err, errors.ErrNotFound) {
@@ -63,14 +65,16 @@ func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (h shotsHandler) post(resp http.ResponseWriter, req *http.Request) {
+	log := utils.LoggerFromCtx(req.Context())
+
 	targetID, err := strconv.Atoi(req.PathValue("targetID"))
 	if err != nil {
-		Log.Error("failed to parse target id", zap.Error(err))
+		log.Error("failed to parse target id", zap.Error(err))
 		http.Error(resp, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	log := Log.With(zap.Int("target-id", targetID))
+	log = log.With(zap.Int("target-id", targetID))
 
 	var shots ShotsRequest
 	if err := json.NewDecoder(req.Body).Decode(&shots); err != nil {
