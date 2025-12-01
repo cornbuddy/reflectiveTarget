@@ -7,10 +7,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/render"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/app/render"
 )
 
 func TestLayoutRendererShouldContainFullPage(t *testing.T) {
@@ -64,7 +64,6 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 		require.NoError(t, err)
 
 		body := string(raw)
-
 		for _, token := range tc.contains {
 			assert.Contains(t, body, token)
 		}
