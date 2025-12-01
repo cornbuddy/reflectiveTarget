@@ -36,7 +36,7 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 	testCases := []testCase{{
 		"non authorized client should see correct navbar",
 		render.Layout.Index,
-		authorizedCtx,
+		emptyCtx,
 		httptest.NewRecorder(),
 		nil,
 		[]string{"Login", "Signup"},
@@ -48,12 +48,14 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 		nil,
 		[]string{"Logout"},
 	}, {
+		"signup page should contain form",
 		render.View.Signup,
 		emptyCtx,
 		httptest.NewRecorder(),
 		nil,
 		[]string{"Signup", "</form>"},
 	}, {
+		"login page should contain form",
 		render.View.Login,
 		emptyCtx,
 		httptest.NewRecorder(),

@@ -24,16 +24,17 @@ func NewRouter(config *config.Config) http.Handler {
 	mux.HandleFunc("GET /", index.get)
 	mux.HandleFunc("GET /login", authz.getLogin)
 	mux.HandleFunc("GET /signup", authz.getSignup)
+	mux.HandleFunc("GET /logout", authz.getLogout)
 	mux.HandleFunc("POST /login", authz.postLogin)
-	mux.HandleFunc("POST /logout", authz.postLogout)
 	mux.HandleFunc("POST /signup", authz.postSignup)
+
 	mux.HandleFunc("GET /api/health", health.get)
 	mux.HandleFunc("GET /api/target/{targetID}/shots", shots.get)
 	mux.HandleFunc("POST /api/target/{targetID}/shots", shots.post)
 
 	return middlewares.Chain(mux,
-		mw.Logger,
 		mw.SaveSession,
 		mw.IsAuthenticated,
+		mw.Logger,
 	)
 }

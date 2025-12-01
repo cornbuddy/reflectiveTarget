@@ -21,7 +21,7 @@ func TestLogoutShouldUpdateSessionCookie(t *testing.T) {
 	const url = "/logout"
 
 	ct := "application/x-www-form-urlencoded"
-	res := utils.MakeRequest(ct, http.MethodPost, url, router, nil)
+	res := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
 	require.NotNil(t, res)
 	assert.Equal(t, http.StatusSeeOther, res.StatusCode)
 	assert.Equal(t, "/", res.Header.Get("Location"))

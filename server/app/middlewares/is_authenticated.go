@@ -33,7 +33,7 @@ func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
 		if value == nil {
 			log.Warn("auth info not included in the context")
 		} else {
-			log.Info("adding auth info to context",
+			log.Debug("adding auth info to context",
 				zap.Bool("is-authenticated", *value),
 			)
 			key := constants.AuthenticatedCtx

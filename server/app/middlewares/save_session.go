@@ -32,7 +32,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// be validated
 		token := cookie.Value
 		log = log.With(zap.String("token", token))
-		log.Info("validating session...")
+		log.Debug("validating session...")
 		auth, err := mw.SessionStore.IsAuthenitcated(token)
 		if err != nil {
 			internalServerError(w, err.Error())
@@ -53,7 +53,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 
 		// session token was either found in the session store, or was
 		// set earlier, so let's process the request
-		log.Info("session is validated")
+		log.Debug("session is validated")
 		next.ServeHTTP(w, r)
 	})
 }

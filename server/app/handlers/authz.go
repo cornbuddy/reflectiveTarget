@@ -16,7 +16,7 @@ type authzHandler struct {
 	daos.SessionStore
 }
 
-func (h authzHandler) postLogout(w http.ResponseWriter, r *http.Request) {
+func (h authzHandler) getLogout(w http.ResponseWriter, r *http.Request) {
 	log := utils.LoggerFromCtx(r.Context())
 
 	if _, err := utils.SaveSession(h.SessionStore, false, w); err != nil {

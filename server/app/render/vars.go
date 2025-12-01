@@ -1,22 +1,14 @@
 package render
 
 import (
-	"context"
 	"embed"
-	"net/http"
 
 	"github.com/abiosoft/mold"
 )
 
-type RenderFunc func(context.Context, http.ResponseWriter, any)
-
 var Layout = engine{layoutEngine}
 
 var View = engine{viewsEngine}
-
-type engine struct {
-	Engine mold.Engine
-}
 
 //go:embed templates
 var dir embed.FS
