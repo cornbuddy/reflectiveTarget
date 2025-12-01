@@ -11,7 +11,7 @@ var Layout = engine{layoutEngine}
 var View = engine{viewsEngine}
 
 type engine struct {
-	mold.Engine
+	Engine mold.Engine
 }
 
 //go:embed templates

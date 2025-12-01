@@ -5,6 +5,7 @@ import (
 	"net/http"
 )
 
+// func (e engine) Index(ctx context.Context, w http.ResponseWriter, data any) {
 func (e engine) Index(ctx context.Context, w http.ResponseWriter, data any) {
-	e.Engine.Render(w, "views/index.tmpl", data)
+	e.Engine.Render(w, "views/index.tmpl", nil)
 }
