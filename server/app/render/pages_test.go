@@ -10,8 +10,68 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/render"
 )
+
+func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		description string
+		render      render.RenderFunc
+		ctx         context.Context
+		w           *httptest.ResponseRecorder
+		data        any
+		contains    []string
+	}
+
+	emptyCtx := context.TODO()
+	authorizedCtx := context.WithValue(
+		context.TODO(),
+		constants.AuthenticatedCtx,
+		toPtr(true),
+	)
+
+	testCases := []testCase{{
+		"non authorized client should see correct navbar",
+		render.Layout.Index,
+		authorizedCtx,
+		httptest.NewRecorder(),
+		nil,
+		[]string{"Login", "Signup"},
+	}, {
+		"authorized client should see correct navbar",
+		render.Layout.Index,
+		authorizedCtx,
+		httptest.NewRecorder(),
+		nil,
+		[]string{"Logout"},
+	}, {
+		render.View.Signup,
+		emptyCtx,
+		httptest.NewRecorder(),
+		nil,
+		[]string{"Signup", "</form>"},
+	}, {
+		render.View.Login,
+		emptyCtx,
+		httptest.NewRecorder(),
+		nil,
+		[]string{"Login", "</form>"},
+	}}
+
+	for _, tc := range testCases {
+		tc.render(tc.ctx, tc.w, tc.data)
+		raw, err := io.ReadAll(tc.w.Body)
+		require.NoError(t, err, tc.description)
+
+		body := string(raw)
+		for _, token := range tc.contains {
+			assert.Contains(t, body, token, tc.description)
+		}
+	}
+}
 
 func TestLayoutRendererShouldContainFullPage(t *testing.T) {
 	t.Parallel()
@@ -40,32 +100,6 @@ func TestLayoutRendererShouldContainFullPage(t *testing.T) {
 	}
 }
 
-func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
-	t.Parallel()
-
-	type testCase struct {
-		render   render.RenderFunc
-		contains []string
-	}
-
-	testCases := []testCase{{
-		render.View.Signup,
-		[]string{"Signup", "</form>"},
-	}, {
-		render.View.Login,
-		[]string{"Login", "</form>"},
-	}}
-
-	for _, tc := range testCases {
-		ctx := context.TODO()
-		w := httptest.NewRecorder()
-		tc.render(ctx, w, nil)
-		raw, err := io.ReadAll(w.Body)
-		require.NoError(t, err)
-
-		body := string(raw)
-		for _, token := range tc.contains {
-			assert.Contains(t, body, token)
-		}
-	}
+func toPtr[A any](obj A) *A {
+	return &obj
 }
