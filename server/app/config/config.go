@@ -11,8 +11,8 @@ import (
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 
-	. "github.com/cornbuddy/reflectiveTarget/server/app/logger"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 )
 

@@ -8,7 +8,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handlers"
-	. "github.com/cornbuddy/reflectiveTarget/server/app/logger"
+	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
 )
 
 func main() {

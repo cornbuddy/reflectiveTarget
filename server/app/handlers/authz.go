@@ -5,6 +5,7 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
@@ -124,9 +125,9 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h authzHandler) getSignup(w http.ResponseWriter, r *http.Request) {
-	layout.Render(w, "views/signup.tmpl", nil)
+	render.Layout.Signup(r.Context(), w, nil)
 }
 
 func (h authzHandler) getLogin(w http.ResponseWriter, r *http.Request) {
-	layout.Render(w, "views/login.tmpl", nil)
+	render.Layout.Login(r.Context(), w, nil)
 }

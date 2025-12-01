@@ -1,10 +1,14 @@
 package render
 
 import (
+	"context"
 	"embed"
+	"net/http"
 
 	"github.com/abiosoft/mold"
 )
+
+type RenderFunc func(context.Context, http.ResponseWriter, any)
 
 var Layout = engine{layoutEngine}
 

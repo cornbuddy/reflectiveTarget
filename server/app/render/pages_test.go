@@ -40,36 +40,33 @@ func TestLayoutRendererShouldContainFullPage(t *testing.T) {
 	}
 }
 
-// func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
-// 	t.Parallel()
-//
-// 	type testCase struct {
-// 		url      string
-// 		contains string
-// 	}
-//
-// 	testCases := []testCase{{
-// 		url:      "/signup",
-// 		contains: "Signup",
-// 	}, {
-// 		url:      "/login",
-// 		contains: "Login",
-// 	}}
-//
-// 	for _, tc := range testCases {
-// 		get := http.MethodGet
-// 		res := utils.MakeRequest("", get, tc.url, router, nil)
-// 		ct := "text/html; charset=utf-8"
-// 		assert.Equal(t, ct, res.Header.Get("Content-Type"))
-// 		assert.Equal(t, http.StatusOK, res.StatusCode)
-//
-// 		data, err := io.ReadAll(res.Body)
-// 		assert.NoError(t, err)
-//
-// 		t.Cleanup(func() { res.Body.Close() })
-//
-// 		body := string(data)
-// 		assert.Contains(t, body, tc.contains)
-// 		assert.Contains(t, body, "</form>")
-// 	}
-// }
+func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		render   render.RenderFunc
+		contains []string
+	}
+
+	testCases := []testCase{{
+		render.View.Signup,
+		[]string{"Signup", "</form>"},
+	}, {
+		render.View.Login,
+		[]string{"Login", "</form>"},
+	}}
+
+	for _, tc := range testCases {
+		ctx := context.TODO()
+		w := httptest.NewRecorder()
+		tc.render(ctx, w, nil)
+		raw, err := io.ReadAll(w.Body)
+		require.NoError(t, err)
+
+		body := string(raw)
+
+		for _, token := range tc.contains {
+			assert.Contains(t, body, token)
+		}
+	}
+}
