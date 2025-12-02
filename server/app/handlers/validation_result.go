@@ -1,4 +1,4 @@
-package validators
+package handlers
 
 type ValidationResult struct {
 	Errors []error

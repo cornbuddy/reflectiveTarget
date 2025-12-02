@@ -1,4 +1,4 @@
-package validators
+package handlers
 
 import (
 	"testing"
@@ -14,31 +14,41 @@ func TestShotsValidator(t *testing.T) {
 
 	type testCase struct {
 		description string
-		shots       valueobjects.Shots
+		shots       ShotsRequest
 		result      ValidationResult
 	}
 
 	testCases := []testCase{{
 		"should be valid if everything is 0",
-		[]valueobjects.Shot{{X: 0, Y: 0}},
+		ShotsRequest{
+			Shots: []valueobjects.Shot{{X: 0, Y: 0}},
+		},
 		ValidationResult{Errors: nil},
 	}, {
 		"should be valid if everything is on range (0; 100)",
-		[]valueobjects.Shot{{X: 69, Y: 69}},
+		ShotsRequest{
+			Shots: []valueobjects.Shot{{X: 69, Y: 69}},
+		},
 		ValidationResult{Errors: nil},
 	}, {
 		"should be valid if everything is 100",
-		[]valueobjects.Shot{{X: 100, Y: 100}},
+		ShotsRequest{
+			Shots: []valueobjects.Shot{{X: 100, Y: 100}},
+		},
 		ValidationResult{Errors: nil},
 	}, {
 		"should not be valid if coordinate is less than 0",
-		[]valueobjects.Shot{{X: -1, Y: 0}},
+		ShotsRequest{
+			Shots: []valueobjects.Shot{{X: -1, Y: 0}},
+		},
 		ValidationResult{
 			Errors: []error{errors.ErrShotBadCoordinate},
 		},
 	}, {
 		"should not be valid if both coordinates are less than 0",
-		[]valueobjects.Shot{{X: -1, Y: -1}},
+		ShotsRequest{
+			Shots: []valueobjects.Shot{{X: -1, Y: -1}},
+		},
 		ValidationResult{
 			Errors: []error{
 				errors.ErrShotBadCoordinate,
@@ -46,7 +56,9 @@ func TestShotsValidator(t *testing.T) {
 			}},
 	}, {
 		"should not be valid if x > 100 and y < 0",
-		[]valueobjects.Shot{{X: 101, Y: -1}},
+		ShotsRequest{
+			Shots: []valueobjects.Shot{{X: 101, Y: -1}},
+		},
 		ValidationResult{
 			Errors: []error{
 				errors.ErrShotBadCoordinate,
@@ -54,7 +66,9 @@ func TestShotsValidator(t *testing.T) {
 			}},
 	}, {
 		"should not be valid if x < 0 and y > 100",
-		[]valueobjects.Shot{{X: -1, Y: 101}},
+		ShotsRequest{
+			Shots: []valueobjects.Shot{{X: -1, Y: 101}},
+		},
 		ValidationResult{
 			Errors: []error{
 				errors.ErrShotBadCoordinate,
