@@ -16,3 +16,8 @@ type engine struct {
 type contextData struct {
 	IsAuthorized bool
 }
+
+type viewData struct {
+	contextData
+	any
+}

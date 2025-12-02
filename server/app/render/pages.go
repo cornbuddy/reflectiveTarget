@@ -22,11 +22,6 @@ func (e engine) Index(ctx context.Context, w http.ResponseWriter, data any) {
 func (e engine) render(
 	ctx context.Context, path string, w http.ResponseWriter, data any,
 ) {
-	type viewData struct {
-		contextData
-		any
-	}
-
 	ctxData := extractDataFromContext(ctx)
 	resultData := viewData{ctxData, data}
 	e.Engine.Render(w, path, resultData)
