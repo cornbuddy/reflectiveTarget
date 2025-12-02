@@ -4,51 +4,31 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-func TestUserFieldsShouldBePopulatedAccordingly(t *testing.T) {
+func TestNewUserShouldReturnErrorWhenFormMissingRequiredKeys(t *testing.T) {
 	t.Parallel()
 
-	type testCase struct {
-		form url.Values
-		user User
+	fields := []string{"username", "password"}
+	for _, field := range fields {
+		form := url.Values{}
+		form.Set(field, "kek")
+		user, err := NewUser(form)
+		assert.ErrorIs(t, err, ErrUserFormMissingKeys)
+		assert.Nil(t, user)
 	}
+}
 
-	testCases := []testCase{{
-		form: url.Values{},
-		user: User{},
-	}, {
-		form: url.Values{"username": []string{"kek"}},
-		user: User{Username: "kek"},
-	}, {
-		form: url.Values{"password": []string{"kek"}},
-		user: User{
-			Password: valueobjects.Password{
-				Hash:      "not kek",
-				Plaintext: "kek",
-			},
-		},
-	}, {
-		form: url.Values{
-			"password": []string{"kek"},
-			"username": []string{"kek"},
-		},
-		user: User{
-			Username: "kek",
-			Password: valueobjects.Password{
-				Hash:      "not kek",
-				Plaintext: "kek",
-			},
-		},
-	}}
+func TestNewUserShouldHashPassword(t *testing.T) {
+	t.Parallel()
 
-	for _, tc := range testCases {
-		user, err := NewUser(tc.form)
-		require.NoError(t, err)
-		assert.Equal(t, tc.user, user)
-	}
-
+	form := url.Values{}
+	form.Set("username", "username")
+	form.Set("password", "password")
+	user, err := NewUser(form)
+	assert.NoError(t, err)
+	assert.Equal(t, form.Get("username"), user.Username)
+	assert.NotEqual(t, form.Get("password"), user.Password.Hash)
+	assert.NotEmpty(t, user.Password)
 }
