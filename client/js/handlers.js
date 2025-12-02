@@ -7,10 +7,12 @@ export function toggleNavigation() {
     const toggler = document.querySelector("#sidebar-toggler");
     const isOpened = nav.style.width == NAVBAR_WIDTH;
     if (isOpened) {
+        nav.style.visibility = "hidden";
         nav.style.width = "0";
         main.style.marginLeft = "0";
         toggler.style.marginLeft = "0";
     } else {
+        nav.style.visibility = "visible";
         nav.style.width = NAVBAR_WIDTH;
         main.style.marginLeft = NAVBAR_WIDTH;
         toggler.style.marginLeft = NAVBAR_WIDTH;

@@ -4,6 +4,7 @@ main {
 }
 
 nav {
+    visibility: hidden;
     height: 100%;
     width: 0;
     margin-left: 0;
