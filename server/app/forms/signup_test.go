@@ -1,4 +1,4 @@
-package formdata_test
+package forms_test
 
 import (
 	"net/url"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/formdata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/forms"
 )
 
 func TestShouldCreateProperInstanceOfSignupForm(t *testing.T) {
@@ -14,36 +14,42 @@ func TestShouldCreateProperInstanceOfSignupForm(t *testing.T) {
 
 	type testCase struct {
 		httpForm url.Values
-		wantForm formdata.SignupForm
+		wantForm forms.SignupForm
 	}
 
 	testCases := []testCase{{
 		httpForm: url.Values{},
-		wantForm: formdata.SignupForm{},
+		wantForm: forms.SignupForm{},
 	}, {
 		httpForm: url.Values{"username": []string{"kek"}},
-		wantForm: formdata.SignupForm{Username: "kek"},
+		wantForm: forms.SignupForm{
+			Username: forms.Field{Value: "kek"},
+		},
 	}, {
 		httpForm: url.Values{"password": []string{"pass"}},
-		wantForm: formdata.SignupForm{Password: "pass"},
+		wantForm: forms.SignupForm{
+			Password: forms.Field{Value: "pass"},
+		},
 	}, {
 		httpForm: url.Values{"repeated-password": []string{"pass"}},
-		wantForm: formdata.SignupForm{RepeatedPassword: "pass"},
+		wantForm: forms.SignupForm{
+			ConfirmPassword: forms.Field{Value: "pass"},
+		},
 	}, {
 		httpForm: url.Values{
 			"username":          []string{"kek"},
 			"password":          []string{"pass"},
 			"repeated-password": []string{"pass"},
 		},
-		wantForm: formdata.SignupForm{
-			Username:         "kek",
-			Password:         "pass",
-			RepeatedPassword: "pass",
+		wantForm: forms.SignupForm{
+			Username:        forms.Field{Value: "kek"},
+			Password:        forms.Field{Value: "pass"},
+			ConfirmPassword: forms.Field{Value: "pass"},
 		},
 	}}
 
 	for _, tc := range testCases {
-		gotForm := formdata.NewSignupForm(tc.httpForm)
+		gotForm := forms.NewSignupForm(tc.httpForm)
 		assert.Equal(t, tc.wantForm, gotForm)
 	}
 }

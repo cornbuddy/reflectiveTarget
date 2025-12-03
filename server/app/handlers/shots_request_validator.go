@@ -14,7 +14,6 @@ const (
 type ShotsRequestValidator struct{}
 
 func (v ShotsRequestValidator) Validate(shots ShotsRequest) ValidationResult {
-
 	res := ValidationResult{}
 	for _, shot := range shots.Shots {
 		if shot.X > MaxCoordinate || shot.X < MinCoordinate {
