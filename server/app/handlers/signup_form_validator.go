@@ -18,7 +18,7 @@ func (v SignupFormValidator) Validate(form *forms.SignupForm) {
 		form.Password.AddError(ErrEmpty)
 	}
 
-	if len(form.ConfirmPassword.Value) == 0 {
-		form.ConfirmPassword.AddError(ErrEmpty)
+	if len(form.Confirmation.Value) == 0 {
+		form.Confirmation.AddError(ErrEmpty)
 	}
 }

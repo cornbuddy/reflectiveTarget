@@ -31,20 +31,20 @@ func TestShouldCreateProperInstanceOfSignupForm(t *testing.T) {
 			Password: forms.Field{Value: "pass"},
 		},
 	}, {
-		httpForm: url.Values{"repeated-password": []string{"pass"}},
+		httpForm: url.Values{"confirmation": []string{"pass"}},
 		wantForm: forms.SignupForm{
-			ConfirmPassword: forms.Field{Value: "pass"},
+			Confirmation: forms.Field{Value: "pass"},
 		},
 	}, {
 		httpForm: url.Values{
-			"username":          []string{"kek"},
-			"password":          []string{"pass"},
-			"repeated-password": []string{"pass"},
+			"username":     []string{"kek"},
+			"password":     []string{"pass"},
+			"confirmation": []string{"pass"},
 		},
 		wantForm: forms.SignupForm{
-			Username:        forms.Field{Value: "kek"},
-			Password:        forms.Field{Value: "pass"},
-			ConfirmPassword: forms.Field{Value: "pass"},
+			Username:     forms.Field{Value: "kek"},
+			Password:     forms.Field{Value: "pass"},
+			Confirmation: forms.Field{Value: "pass"},
 		},
 	}}
 

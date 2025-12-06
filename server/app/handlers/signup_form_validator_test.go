@@ -18,9 +18,9 @@ func TestSignupFormValidator(t *testing.T) {
 
 	testCases := []testCase{{
 		forms.SignupForm{
-			Username:        forms.Field{Value: ""},
-			Password:        forms.Field{Value: ""},
-			ConfirmPassword: forms.Field{Value: ""},
+			Username:     forms.Field{Value: ""},
+			Password:     forms.Field{Value: ""},
+			Confirmation: forms.Field{Value: ""},
 		},
 		forms.SignupForm{
 			Username: forms.Field{
@@ -31,7 +31,7 @@ func TestSignupFormValidator(t *testing.T) {
 				Value:  "",
 				Errors: forms.Errors{ErrEmpty},
 			},
-			ConfirmPassword: forms.Field{
+			Confirmation: forms.Field{
 				Value:  "",
 				Errors: forms.Errors{ErrEmpty},
 			},
