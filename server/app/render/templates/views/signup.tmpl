@@ -4,20 +4,26 @@ Signup
 
     <section>
         <label for="username">Username</label>
-        <input id="username"
+        <input
             name="username"
             type="text"
-            autocomplete="username"
             required>
+
+    {{- if .Username.Errors }}
+    <ul id="username-errors">
+        {{- with .Username.Errors }}
+        <li>{{ . }}</li>
+        {{- end }}
+    </ul>
+    {{- end }}
+
     </section>
 
     <section>
         <label for="password">Password</label>
         <input
-            id="password"
             name="password"
             type="password"
-            autocomplete="password"
             required>
     </section>
 

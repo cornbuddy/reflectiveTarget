@@ -5,3 +5,5 @@ import (
 )
 
 var ErrEmpty = errors.New("field cannot be empty")
+
+var noErrs Errors

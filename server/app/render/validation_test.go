@@ -23,6 +23,12 @@ func TestSignupFormValidationErrorsShouldBeRendered(t *testing.T) {
 
 	testCases := []testCase{{
 		selector: "form ul#username-errors",
+	}, {
+
+		selector: "form ul#password-errors",
+	}, {
+
+		selector: "form ul#confirmation-errors",
 	}}
 
 	ctx := context.TODO()
@@ -38,13 +44,17 @@ func TestSignupFormValidationErrorsShouldBeRendered(t *testing.T) {
 	doc, err := goquery.NewDocumentFromReader(w.Body)
 	require.NoError(t, err)
 
+	html, err := doc.Html()
+	require.NoError(t, err)
+	t.Logf("kekeke: %s", html)
+
 	for _, tc := range testCases {
 		ul := doc.Find(tc.selector)
-		require.NotEmpty(t, ul.Nodes)
+		assert.NotEmpty(t, ul.Nodes, tc.selector)
 
 		ul.Children().Each(func(_ int, li *goquery.Selection) {
 			err := errors.New(li.Text())
-			assert.Contains(t, errs, err)
+			assert.Contains(t, errs, err, tc.selector)
 		})
 	}
 

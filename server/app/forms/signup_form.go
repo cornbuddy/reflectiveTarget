@@ -17,5 +17,3 @@ func NewSignupForm(form url.Values) SignupForm {
 		Confirmation: Field{form.Get("confirmation"), noErrs},
 	}
 }
-
-var noErrs Errors

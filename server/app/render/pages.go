@@ -4,7 +4,10 @@ import (
 	"context"
 	"net/http"
 
+	"go.uber.org/zap"
+
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
 func (e engine) Signup(ctx context.Context, w http.ResponseWriter, data any) {
@@ -24,7 +27,13 @@ func (e engine) render(
 ) {
 	ctxData := extractDataFromContext(ctx)
 	resultData := viewData{ctxData, data}
-	e.Engine.Render(w, path, resultData)
+	if err := e.Engine.Render(w, path, resultData); err != nil {
+		log := utils.LoggerFromCtx(ctx)
+		log.Error("failed to render",
+			zap.Error(err),
+			zap.String("path", path),
+		)
+	}
 
 }
 
