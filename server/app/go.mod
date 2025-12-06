@@ -9,6 +9,7 @@ replace github.com/cornbuddy/reflectiveTarget/server/domain => ../domain
 replace github.com/cornbuddy/reflectiveTarget/server/test => ../test
 
 require (
+	github.com/PuerkitoBio/goquery v1.11.0
 	github.com/abiosoft/mold v0.0.0-20250328135240-0a4c28cb836a
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/cornbuddy/reflectiveTarget/server/domain v0.0.0-00010101000000-000000000000
@@ -30,6 +31,7 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/alexedwards/argon2id v1.0.0 // indirect
+	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
