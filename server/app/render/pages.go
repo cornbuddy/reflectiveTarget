@@ -32,6 +32,7 @@ func (e engine) render(
 		log.Error("failed to render",
 			zap.Error(err),
 			zap.String("path", path),
+			zap.Any("data", data),
 		)
 	}
 
