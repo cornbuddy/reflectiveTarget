@@ -22,18 +22,18 @@ func TestSignupFormValidationErrorsShouldBeRendered(t *testing.T) {
 	}
 
 	testCases := []testCase{{
-		selector: "form ul#username-errors",
+		selector: "section#username ul.errors",
 	}, {
 
-		selector: "form ul#password-errors",
+		selector: "section#password ul.errors",
 	}, {
 
-		selector: "form ul#confirmation-errors",
+		selector: "section#confirmation ul.errors",
 	}}
 
 	ctx := context.TODO()
 	w := httptest.NewRecorder()
-	errs := forms.Errors{errors.New("kek")}
+	errs := forms.Errors{errors.New("kek-1"), errors.New("kek-2")}
 	form := forms.SignupForm{
 		Username:     forms.Field{Errors: errs},
 		Password:     forms.Field{Errors: errs},
@@ -53,5 +53,4 @@ func TestSignupFormValidationErrorsShouldBeRendered(t *testing.T) {
 			assert.Contains(t, errs, err, tc.selector)
 		})
 	}
-
 }

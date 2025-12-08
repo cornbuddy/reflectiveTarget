@@ -2,29 +2,34 @@ Signup
 
 <form action="/signup" method="post">
 
-    <section>
+    <section id="username">
         <label for="username">Username</label>
         <input
             name="username"
             type="text"
             required>
 
-    {{- if .Username.Errors }}
-    <ul id="username-errors">
-        {{- with .Username.Errors }}
-        <li>{{ . }}</li>
-        {{- end }}
-    </ul>
-    {{- end }}
-
+    {{ partial "components/errors.tmpl" .Username.Errors }}
     </section>
 
-    <section>
+    <section id="password">
         <label for="password">Password</label>
         <input
             name="password"
             type="password"
             required>
+
+    {{ partial "components/errors.tmpl" .Password.Errors }}
+    </section>
+
+    <section id="confirmation">
+        <label for="confirmation">Password confirmation</label>
+        <input
+            name="confirmation"
+            type="password"
+            required>
+
+    {{ partial "components/errors.tmpl" .Confirmation.Errors }}
     </section>
 
     <button type="submit">Sign up</button>
