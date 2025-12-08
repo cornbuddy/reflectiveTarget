@@ -10,10 +10,11 @@ var ErrEmpty = errors.New("field cannot be empty")
 var ErrUserAlreadyExists = errors.New("user already exists")
 
 var ErrPasswordsShouldMatch = errors.New("passwords should match")
-var ErrPasswordDoesntContainSpecialChar = errors.New(
-	"password should contain at least one special character",
+var ErrPasswordDoesntContainSpecialChars = fmt.Errorf(
+	"password should contain at least one special character: %v",
+	SpecialChars,
 )
-var ErrPasswordDoesntContainDigit = errors.New(
+var ErrPasswordDoesntContainDigits = errors.New(
 	"password should contain at least one digit",
 )
 var ErrPasswordTooShort = fmt.Errorf(

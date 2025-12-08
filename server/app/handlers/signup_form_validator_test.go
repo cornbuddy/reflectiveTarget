@@ -35,8 +35,8 @@ func TestSignupFormValidator(t *testing.T) {
 				Value: "",
 				Errors: forms.Errors{
 					ErrPasswordTooShort,
-					ErrPasswordDoesntContainDigit,
-					ErrPasswordDoesntContainSpecialChar,
+					ErrPasswordDoesntContainDigits,
+					ErrPasswordDoesntContainSpecialChars,
 				},
 			},
 			Confirmation: forms.Field{
@@ -74,8 +74,8 @@ func TestSignupFormValidator(t *testing.T) {
 			Password: forms.Field{
 				Value: "kekekeke",
 				Errors: forms.Errors{
-					ErrPasswordDoesntContainDigit,
-					ErrPasswordDoesntContainSpecialChar,
+					ErrPasswordDoesntContainDigits,
+					ErrPasswordDoesntContainSpecialChars,
 				},
 			},
 			Confirmation: forms.Field{
@@ -87,7 +87,7 @@ func TestSignupFormValidator(t *testing.T) {
 		forms.SignupForm{
 			Username:     forms.Field{Value: "keker"},
 			Password:     forms.Field{Value: "kekeke1@"},
-			Confirmation: forms.Field{Value: "not kek"},
+			Confirmation: forms.Field{Value: "kekeke1@"},
 		},
 		forms.SignupForm{
 			Username: forms.Field{
