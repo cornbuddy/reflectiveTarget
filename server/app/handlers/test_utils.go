@@ -18,8 +18,6 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
-var defaultPassword = "default-password"
-
 func makeTestTarget(db *sql.DB, userID int) (int, error) {
 	var targetID int
 	q := "INSERT INTO targets (name, owner_id) VALUES($1, $2) " +
@@ -32,7 +30,7 @@ func makeTestTarget(db *sql.DB, userID int) (int, error) {
 }
 
 func makeTestUser(dao daos.UserDao) (*entities.User, error) {
-	pwd, err := valueobjects.NewPassword(defaultPassword)
+	pwd, err := valueobjects.NewPassword("default-password")
 	if err != nil {
 		return nil, err
 	}

@@ -8,7 +8,11 @@ import (
 )
 
 func NewRouter(config *config.Config) http.Handler {
-	authz := authzHandler{config.UserDao, config.SessionStore}
+	authz := authzHandler{
+		config.UserDao,
+		config.SessionStore,
+		SignupFormValidator{config.UserDao},
+	}
 	index := indexHandler{}
 	health := healthHandler{config.HealthDao}
 	shots := shotsHandler{

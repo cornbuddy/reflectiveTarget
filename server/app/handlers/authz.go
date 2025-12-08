@@ -14,6 +14,7 @@ import (
 type authzHandler struct {
 	daos.UserDao
 	daos.SessionStore
+	SignupFormValidator
 }
 
 func (h authzHandler) getLogout(w http.ResponseWriter, r *http.Request) {
@@ -119,8 +120,7 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 
 	if _, err := utils.SaveSession(h.SessionStore, true, w); err != nil {
 		log.Error("failed to save session", zap.Error(err))
-		msg := err.Error()
-		http.Error(w, msg, http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
