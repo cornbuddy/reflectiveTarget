@@ -22,7 +22,7 @@ var SpecialChars = []rune{
 
 var hasDigits = regexp.MustCompile(`^.+\d.+$`)
 
-func (v SignupFormValidator) Validate(form *forms.SignupForm) {
+func (v SignupFormValidator) Validate(form *forms.SignupForm) bool {
 	user, err := v.UserDao.Find(form.Username.Value)
 	if err != nil {
 		form.Username.AddError(err)
@@ -49,4 +49,13 @@ func (v SignupFormValidator) Validate(form *forms.SignupForm) {
 	if form.Password.Value != form.Confirmation.Value {
 		form.Confirmation.AddError(ErrPasswordsShouldMatch)
 	}
+
+	errs := append(
+		form.Username.Errors,
+		append(
+			form.Password.Errors,
+			form.Confirmation.Errors...,
+		)...,
+	)
+	return len(errs) == 0
 }

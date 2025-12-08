@@ -16,8 +16,9 @@ func TestSignupFormValidator(t *testing.T) {
 	require.NoError(t, err)
 
 	type testCase struct {
-		form forms.SignupForm
-		want forms.SignupForm
+		form  forms.SignupForm
+		want  forms.SignupForm
+		valid bool
 	}
 
 	testCases := []testCase{{
@@ -43,6 +44,7 @@ func TestSignupFormValidator(t *testing.T) {
 				Value: "",
 			},
 		},
+		false,
 	}, {
 		forms.SignupForm{
 			Username:     forms.Field{Value: user.Username},
@@ -61,6 +63,7 @@ func TestSignupFormValidator(t *testing.T) {
 				Value: user.Password.Hash,
 			},
 		},
+		false,
 	}, {
 		forms.SignupForm{
 			Username:     forms.Field{Value: "keker"},
@@ -83,6 +86,7 @@ func TestSignupFormValidator(t *testing.T) {
 				Errors: forms.Errors{ErrPasswordsShouldMatch},
 			},
 		},
+		false,
 	}, {
 		forms.SignupForm{
 			Username:     forms.Field{Value: "keker"},
@@ -100,11 +104,13 @@ func TestSignupFormValidator(t *testing.T) {
 				Value: "kekeke1@",
 			},
 		},
+		true,
 	}}
 
 	validator := SignupFormValidator{UserDao: userDao}
 	for _, tc := range testCases {
-		validator.Validate(&tc.form)
+		valid := validator.Validate(&tc.form)
 		assert.Equal(t, tc.want, tc.form)
+		assert.Equal(t, tc.valid, valid)
 	}
 }

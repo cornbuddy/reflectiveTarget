@@ -5,6 +5,7 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/forms"
 	"github.com/cornbuddy/reflectiveTarget/server/app/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
@@ -93,22 +94,16 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	form := forms.NewSignupForm(r.Form)
+	if valid := h.SignupFormValidator.Validate(&form); !valid {
+		render.View.Login(r.Context(), w, form)
+		return
+	}
+
 	newUser, err := entities.NewUser(r.Form)
 	if err != nil {
 		log.Error("failed to create user object", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	username := newUser.Username
-	user, err := h.UserDao.Find(newUser.Username)
-	if err != nil {
-		log.Error("could not fetch user object", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	} else if user != nil {
-		log.Warn("username is taken", zap.String("username", username))
-		http.Error(w, "User already exists", http.StatusConflict)
 		return
 	}
 
