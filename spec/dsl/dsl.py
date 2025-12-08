@@ -22,22 +22,26 @@ class DSL:
     def sidebar(self) -> WebElement:
         return self.driver.find_element(By.TAG_NAME, "nav")
 
-    def signup(self, username: str, password: str):
-        self.driver.get(f"{self._url}/signup")
-        self.driver.find_element(By.NAME, "username").send_keys(username)
-        self.driver.find_element(By.NAME, "password").send_keys(password)
-        self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
+    def signup(self, username: str, password: str, confirmation: str = None):
+        if confirmation is None:
+            confirmation = password
+
+        driver = self.driver
+        driver.get(f"{self._url}/signup")
+        driver.find_element(By.NAME, "username").send_keys(username)
+        driver.find_element(By.NAME, "password").send_keys(password)
+        driver.find_element(By.NAME, "confirmation").send_keys(confirmation)
+        driver.find_element(By.XPATH, "//button[@type='submit']").click()
 
     def login(self, username: str, password: str):
-        self.driver.get(f"{self._url}/login")
-        self.driver.find_element(By.NAME, "username").send_keys(username)
-        self.driver.find_element(By.NAME, "password").send_keys(password)
-        self.driver.find_element(By.XPATH, "//button[@type='submit']").click()
+        driver = self.driver
+        driver.get(f"{self._url}/login")
+        driver.find_element(By.NAME, "username").send_keys(username)
+        driver.find_element(By.NAME, "password").send_keys(password)
+        driver.find_element(By.XPATH, "//button[@type='submit']").click()
 
     def logout(self):
-        self.toggle_navigation()
-        assert self.sidebar.is_displayed()
-
+        self.ensure_navigation_opened()
         before_logout = self.driver.get_cookie(SESSION_TOKEN)
         self.driver.find_element(By.LINK_TEXT, "Logout").click()
         after_logout = self.driver.get_cookie(SESSION_TOKEN)
