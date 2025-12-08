@@ -100,7 +100,8 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newUser, err := entities.NewUser(r.Form)
+	username := form.Username.Value
+	newUser, err := entities.NewUser(username, form.Password.Value)
 	if err != nil {
 		log.Error("failed to create user object", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusBadRequest)

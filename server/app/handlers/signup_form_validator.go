@@ -50,12 +50,7 @@ func (v SignupFormValidator) Validate(form *forms.SignupForm) bool {
 		form.Confirmation.AddError(ErrPasswordsShouldMatch)
 	}
 
-	errs := append(
-		form.Username.Errors,
-		append(
-			form.Password.Errors,
-			form.Confirmation.Errors...,
-		)...,
-	)
-	return len(errs) == 0
+	return form.Username.IsValid() &&
+		form.Password.IsValid() &&
+		form.Confirmation.IsValid()
 }
