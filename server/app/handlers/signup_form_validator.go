@@ -9,6 +9,8 @@ type SignupFormValidator struct {
 	daos.UserDao
 }
 
+const MinPasswordLength = 8
+
 func (v SignupFormValidator) Validate(form *forms.SignupForm) {
 	if len(form.Username.Value) == 0 {
 		form.Username.AddError(ErrEmpty)
@@ -20,5 +22,12 @@ func (v SignupFormValidator) Validate(form *forms.SignupForm) {
 
 	if len(form.Confirmation.Value) == 0 {
 		form.Confirmation.AddError(ErrEmpty)
+	}
+
+	user, err := v.UserDao.Find(form.Username.Value)
+	if err != nil {
+		form.Username.AddError(err)
+	} else if user != nil {
+		form.Username.AddError(ErrUserAlreadyExists)
 	}
 }
