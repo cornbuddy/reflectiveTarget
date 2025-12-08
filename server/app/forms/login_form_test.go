@@ -9,47 +9,40 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/forms"
 )
 
-func TestSignupForm(t *testing.T) {
+func TestLoginForm(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
 		httpForm url.Values
-		wantForm forms.SignupForm
+		wantForm forms.LoginForm
 	}
 
 	testCases := []testCase{{
 		url.Values{},
-		forms.SignupForm{},
+		forms.LoginForm{},
 	}, {
 		url.Values{"username": []string{"kek"}},
-		forms.SignupForm{
+		forms.LoginForm{
 			Username: forms.Field{Value: "kek"},
 		},
 	}, {
 		url.Values{"password": []string{"pass"}},
-		forms.SignupForm{
+		forms.LoginForm{
 			Password: forms.Field{Value: "pass"},
 		},
 	}, {
-		url.Values{"confirmation": []string{"pass"}},
-		forms.SignupForm{
-			Confirmation: forms.Field{Value: "pass"},
-		},
-	}, {
 		url.Values{
-			"username":     []string{"kek"},
-			"password":     []string{"pass"},
-			"confirmation": []string{"pass"},
+			"username": []string{"kek"},
+			"password": []string{"pass"},
 		},
-		forms.SignupForm{
-			Username:     forms.Field{Value: "kek"},
-			Password:     forms.Field{Value: "pass"},
-			Confirmation: forms.Field{Value: "pass"},
+		forms.LoginForm{
+			Username: forms.Field{Value: "kek"},
+			Password: forms.Field{Value: "pass"},
 		},
 	}}
 
 	for _, tc := range testCases {
-		gotForm := forms.NewSignupForm(tc.httpForm)
+		gotForm := forms.NewLoginForm(tc.httpForm)
 		assert.Equal(t, tc.wantForm, gotForm)
 	}
 }

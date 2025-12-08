@@ -12,8 +12,8 @@ type SignupForm struct {
 
 func NewSignupForm(form url.Values) SignupForm {
 	return SignupForm{
-		Username:     Field{form.Get("username"), noErrs},
-		Password:     Field{form.Get("password"), noErrs},
-		Confirmation: Field{form.Get("confirmation"), noErrs},
+		Username:     Field{Value: form.Get("username")},
+		Password:     Field{Value: form.Get("password")},
+		Confirmation: Field{Value: form.Get("confirmation")},
 	}
 }

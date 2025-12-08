@@ -41,47 +41,26 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userObj, err := entities.NewUser(r.Form)
-	if err != nil {
-		log.Error("failed to create user object", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	form := forms.NewLoginForm(r.Form)
+	// TODO: ensure user exists and password matches during validation
+	if valid := h.LoginFormValidator.Validate(&form); !valid {
+		log.Debug("login failed", zap.Any("form", form))
+		w.WriteHeader(http.StatusBadRequest)
+		render.View.Login(r.Context(), w, form)
 		return
 	}
 
-	username := userObj.Username
-	user, err := h.UserDao.Find(username)
-	if err != nil {
-		log.Error("could not fetch user object", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	} else if user == nil {
-		log.Warn("requested user not found")
-		http.Error(w, "User does not exist", http.StatusUnauthorized)
-		return
-	}
-
-	authorized, err := user.Password.Verify(r.Form.Get("password"))
-	if err != nil {
-		log.Error("failed to verify password", zap.Error(err))
+	if _, err := utils.SaveSession(h.SessionStore, true, w); err != nil {
+		log.Error("failed to register session", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if authorized {
-		_, err := utils.SaveSession(h.SessionStore, true, w)
-		if err != nil {
-			log.Error("failed to register session", zap.Error(err))
-			msg := err.Error()
-			http.Error(w, msg, http.StatusInternalServerError)
-			return
-		}
-
-		log.Info("user is logged in", zap.String("username", username))
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		w.Write([]byte("Login succeeded"))
-	} else {
-		http.Error(w, "Password is wrong", http.StatusUnauthorized)
-	}
+	log.Info("user is logged in",
+		zap.String("username", form.Username.Value),
+	)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+	w.Write([]byte("Login succeeded"))
 
 }
 
@@ -96,7 +75,9 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 
 	form := forms.NewSignupForm(r.Form)
 	if valid := h.SignupFormValidator.Validate(&form); !valid {
-		render.View.Login(r.Context(), w, form)
+		log.Debug("signup failed", zap.Any("form", form))
+		w.WriteHeader(http.StatusBadRequest)
+		render.View.Signup(r.Context(), w, form)
 		return
 	}
 
