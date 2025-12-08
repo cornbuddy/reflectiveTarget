@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/go-viper/mapstructure/v2"
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
@@ -25,17 +26,32 @@ func (e engine) Index(ctx context.Context, w http.ResponseWriter, data any) {
 func (e engine) render(
 	ctx context.Context, path string, w http.ResponseWriter, data any,
 ) {
-	ctxData := extractDataFromContext(ctx)
-	resultData := viewData{ctxData, data}
-	if err := e.Engine.Render(w, path, resultData); err != nil {
-		log := utils.LoggerFromCtx(ctx)
-		log.Error("failed to render",
-			zap.Error(err),
-			zap.String("path", path),
-			zap.Any("data", data),
-		)
+	log := utils.LoggerFromCtx(ctx).With(
+		zap.Any("data", data),
+		zap.String("path", path),
+	)
+
+	viewData, err := makeViewData(ctx, data)
+	if err != nil {
+		log.Error("failed to make view data", zap.Error(err))
 	}
 
+	if err := e.Engine.Render(w, path, viewData); err != nil {
+		log.Error("failed to render", zap.Error(err))
+	}
+
+}
+
+func makeViewData(ctx context.Context, data any) (viewData, error) {
+	var result viewData
+	ctxData := extractDataFromContext(ctx)
+	for _, data := range []any{ctxData, data} {
+		if err := mapstructure.Decode(data, &result); err != nil {
+			return nil, err
+		}
+	}
+
+	return result, nil
 }
 
 func extractDataFromContext(ctx context.Context) contextData {

@@ -44,10 +44,6 @@ func TestSignupFormValidationErrorsShouldBeRendered(t *testing.T) {
 	doc, err := goquery.NewDocumentFromReader(w.Body)
 	require.NoError(t, err)
 
-	html, err := doc.Html()
-	require.NoError(t, err)
-	t.Logf("kekeke: %s", html)
-
 	for _, tc := range testCases {
 		ul := doc.Find(tc.selector)
 		assert.NotEmpty(t, ul.Nodes, tc.selector)

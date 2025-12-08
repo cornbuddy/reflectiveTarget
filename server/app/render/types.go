@@ -17,7 +17,4 @@ type contextData struct {
 	IsAuthorized bool
 }
 
-type viewData struct {
-	contextData
-	any
-}
+type viewData map[string]any
