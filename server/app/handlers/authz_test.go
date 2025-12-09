@@ -10,8 +10,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -51,13 +49,13 @@ func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
 	require.NotNil(t, wrongPasswordUser)
 
 	testCases := []testCase{{
-		message:    "User does not exist",
+		message:    "user does not exist",
 		statusCode: http.StatusUnauthorized,
 		body: strings.NewReader(
 			fmt.Sprintf("username=%s&password=%s", "absent", "kek"),
 		),
 	}, {
-		message:    "Password is wrong",
+		message:    "wrong password",
 		statusCode: http.StatusUnauthorized,
 		body: strings.NewReader(
 			fmt.Sprintf(
@@ -90,20 +88,15 @@ func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 
 	const url = "/login"
 
-	username := "test-login"
-	password := "kek"
-	pwd, err := valueobjects.NewPassword(password)
+	user, err := makeTestUser(userDao)
 	require.NoError(t, err)
-
-	user := entities.User{
-		Username: username,
-		Password: *pwd,
-	}
-	require.NoError(t, userDao.Save(&user))
 
 	ct := "application/x-www-form-urlencoded"
 	body := strings.NewReader(
-		fmt.Sprintf("username=%s&password=%s", username, password),
+		fmt.Sprintf(
+			"username=%s&password=%s",
+			user.Username, defaultPassword,
+		),
 	)
 	res := utils.MakeRequest(ct, http.MethodPost, url, router, body)
 	require.NotNil(t, res)
@@ -135,16 +128,22 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 		message:    "User successfully created",
 		statusCode: http.StatusSeeOther,
 		body: strings.NewReader(
-			fmt.Sprintf("username=%s&password=%s", "kek", "kek"),
+			fmt.Sprintf(
+				"username=%s&password=%s&confirmation=%s",
+				"kek", defaultPassword, defaultPassword,
+			),
 		),
 	}, {
-		message:    "User already exists",
-		statusCode: http.StatusConflict,
+		message:    "user already exists",
+		statusCode: http.StatusBadRequest,
 		body: strings.NewReader(
-			fmt.Sprintf("username=%s&password=%s", "kek", "kek"),
+			fmt.Sprintf(
+				"username=%s&password=%s&confirmation=%s",
+				"kek", defaultPassword, defaultPassword,
+			),
 		),
 	}, {
-		message:    "missing keys",
+		message:    "password should contain at least 8 characters",
 		statusCode: http.StatusBadRequest,
 		body: strings.NewReader(
 			fmt.Sprintf("username=%s", "kek"),

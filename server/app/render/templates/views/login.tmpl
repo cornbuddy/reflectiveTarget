@@ -2,23 +2,26 @@ Login
 
 <form action="/login" method="post">
 
-    <section>
+    <section id="username">
         <label for="username">Username</label>
-        <input id="username"
+        <input
             name="username"
             type="text"
             autocomplete="username"
             required>
+
+    {{ partial "components/errors.tmpl" .Username.Errors }}
     </section>
 
-    <section>
+    <section id="password">
         <label for="password">Password</label>
         <input
-            id="password"
             name="password"
             type="password"
             autocomplete="password"
             required>
+
+    {{ partial "components/errors.tmpl" .Password.Errors }}
     </section>
 
     <button type="submit">Login</button>

@@ -18,7 +18,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
-const defaultPassword = "default-password1"
+const defaultPassword = "default-password123@"
 
 func makeTestTarget(db *sql.DB, userID int) (int, error) {
 	var targetID int

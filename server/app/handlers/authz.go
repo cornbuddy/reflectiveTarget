@@ -45,7 +45,7 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 	form := forms.NewLoginForm(r.Form)
 	if valid := h.LoginFormValidator.Validate(&form); !valid {
 		log.Debug("login failed", zap.Any("form", form))
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusUnauthorized)
 		render.View.Login(r.Context(), w, form)
 		return
 	}

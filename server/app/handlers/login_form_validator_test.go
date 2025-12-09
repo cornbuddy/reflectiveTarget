@@ -13,15 +13,18 @@ func TestLoginFormValidation(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
+		msg    string
 		form   forms.LoginForm
 		want   forms.LoginForm
 		result bool
 	}
 
+	absentUsername := makeRandomString(10)
 	user, err := makeTestUser(userDao)
 	require.NoError(t, err)
 
 	testCases := []testCase{{
+		"empty fields",
 		forms.LoginForm{},
 		forms.LoginForm{
 			Username: forms.Field{Errors: forms.Errors{ErrEmpty}},
@@ -29,32 +32,53 @@ func TestLoginFormValidation(t *testing.T) {
 		},
 		false,
 	}, {
+		"absent user without password",
 		forms.LoginForm{
-			Username: forms.Field{Value: "kek"},
+			Username: forms.Field{Value: absentUsername},
+			Password: forms.Field{},
+		},
+		forms.LoginForm{
+			Username: forms.Field{
+				Value:  absentUsername,
+				Errors: forms.Errors{ErrUserDoesNotExists},
+			},
+			Password: forms.Field{
+				Errors: forms.Errors{ErrEmpty},
+			},
+		},
+		false,
+	}, {
+		"absent user with password",
+		forms.LoginForm{
+			Username: forms.Field{Value: absentUsername},
 			Password: forms.Field{Value: "kek"},
 		},
 		forms.LoginForm{
 			Username: forms.Field{
-				Value:  "kek",
+				Value:  absentUsername,
 				Errors: forms.Errors{ErrUserDoesNotExists},
 			},
 			Password: forms.Field{Value: "kek"},
 		},
 		false,
 	}, {
+		"user with bad password",
 		forms.LoginForm{
 			Username: forms.Field{Value: user.Username},
 			Password: forms.Field{Value: "kek"},
 		},
 		forms.LoginForm{
 			Username: forms.Field{
-				Value:  user.Username,
+				Value: user.Username,
+			},
+			Password: forms.Field{
+				Value:  "kek",
 				Errors: forms.Errors{ErrWrongPassword},
 			},
-			Password: forms.Field{Value: "kek"},
 		},
 		false,
 	}, {
+		"all good",
 		forms.LoginForm{
 			Username: forms.Field{Value: user.Username},
 			Password: forms.Field{Value: defaultPassword},
@@ -69,7 +93,7 @@ func TestLoginFormValidation(t *testing.T) {
 	validator := LoginFormValidator{userDao}
 	for _, tc := range testCases {
 		got := validator.Validate(&tc.form)
-		assert.Equal(t, tc.want, tc.form)
-		assert.Equal(t, tc.result, got)
+		assert.Equal(t, tc.want, tc.form, tc.msg)
+		assert.Equal(t, tc.result, got, tc.msg)
 	}
 }

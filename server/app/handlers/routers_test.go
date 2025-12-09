@@ -34,7 +34,7 @@ func TestMakeHttpHandler(t *testing.T) {
 	}, {
 		url:        "/login",
 		method:     http.MethodPost,
-		statusCode: http.StatusBadRequest,
+		statusCode: http.StatusUnauthorized,
 	}, {
 		url:        "/signup",
 		method:     http.MethodGet,
