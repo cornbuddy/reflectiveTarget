@@ -12,6 +12,7 @@ func NewRouter(config *config.Config) http.Handler {
 		config.UserDao,
 		config.SessionStore,
 		SignupFormValidator{config.UserDao},
+		LoginFormValidator{config.UserDao},
 	}
 	index := indexHandler{}
 	health := healthHandler{config.HealthDao}

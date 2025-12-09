@@ -16,6 +16,7 @@ type authzHandler struct {
 	daos.UserDao
 	daos.SessionStore
 	SignupFormValidator
+	LoginFormValidator
 }
 
 func (h authzHandler) getLogout(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +43,6 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.NewLoginForm(r.Form)
-	// TODO: ensure user exists and password matches during validation
 	if valid := h.LoginFormValidator.Validate(&form); !valid {
 		log.Debug("login failed", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)

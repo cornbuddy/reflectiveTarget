@@ -8,7 +8,9 @@ import (
 var ErrEmpty = errors.New("field cannot be empty")
 
 var ErrUserAlreadyExists = errors.New("user already exists")
+var ErrUserDoesNotExists = errors.New("user doesn't exist")
 
+var ErrWrongPassword = errors.New("wrong password")
 var ErrPasswordsShouldMatch = errors.New("passwords should match")
 var ErrPasswordDoesntContainSpecialChars = fmt.Errorf(
 	"password should contain at least one special character: %v",
