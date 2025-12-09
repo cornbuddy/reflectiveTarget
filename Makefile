@@ -21,6 +21,11 @@ lint:
 	@$(MAKE) -C server lint
 	@$(MAKE) -C spec lint
 
+.PHONY: deps
+deps:
+	@$(MAKE) -C client deps
+	@$(MAKE) -C server deps
+
 .PHONY: test
 test:
 	@$(MAKE) -C server test
