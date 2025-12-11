@@ -75,6 +75,33 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 	}
 }
 
+func TestViewRendererShouldNotContainFullPage(t *testing.T) {
+	t.Parallel()
+
+	type stub struct{}
+	anyType := reflect.TypeOf(stub{})
+
+	value := reflect.ValueOf(&render.View)
+	for i := 0; i < value.NumMethod(); i++ {
+		method := value.Method(i)
+		require.True(t, method.IsValid())
+
+		w := httptest.NewRecorder()
+		args := []reflect.Value{
+			reflect.ValueOf(context.TODO()),
+			reflect.ValueOf(w),
+			reflect.New(anyType).Elem(),
+		}
+		method.Call(args)
+		raw, err := io.ReadAll(w.Body)
+		require.NoError(t, err)
+
+		body := string(raw)
+		assert.NotContains(t, body, "<!DOCTYPE html>")
+		assert.NotContains(t, body, "</html>")
+	}
+}
+
 func TestLayoutRendererShouldContainFullPage(t *testing.T) {
 	t.Parallel()
 
