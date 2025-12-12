@@ -105,6 +105,24 @@ func TestSignupFormValidator(t *testing.T) {
 			},
 		},
 		true,
+	}, {
+		forms.SignupForm{
+			Username:     forms.Field{Value: "keker"},
+			Password:     forms.Field{Value: "kekeke@1"},
+			Confirmation: forms.Field{Value: "kekeke@1"},
+		},
+		forms.SignupForm{
+			Username: forms.Field{
+				Value: "keker",
+			},
+			Password: forms.Field{
+				Value: "kekeke@1",
+			},
+			Confirmation: forms.Field{
+				Value: "kekeke@1",
+			},
+		},
+		true,
 	}}
 
 	validator := SignupFormValidator{UserDao: userDao}

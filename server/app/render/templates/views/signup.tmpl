@@ -5,6 +5,7 @@ Signup
     <section id="username">
         <label for="username">Username</label>
         <input
+            value="{{ .Username.Value }}"
             name="username"
             type="text"
             required>
@@ -15,6 +16,7 @@ Signup
     <section id="password">
         <label for="password">Password</label>
         <input
+            value="{{ .Password.Value }}"
             name="password"
             type="password"
             required>
@@ -25,6 +27,7 @@ Signup
     <section id="confirmation">
         <label for="confirmation">Password confirmation</label>
         <input
+            value="{{ .Confirmation.Value }}"
             name="confirmation"
             type="password"
             required>

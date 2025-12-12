@@ -20,7 +20,7 @@ var SpecialChars = []rune{
 	'.', '<', '>',
 }
 
-var hasDigits = regexp.MustCompile(`^.+\d.+$`)
+var hasDigits = regexp.MustCompile(`\d`)
 
 func (v SignupFormValidator) Validate(form *forms.SignupForm) bool {
 	user, err := v.UserDao.Find(form.Username.Value)

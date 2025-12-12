@@ -20,4 +20,5 @@ var layoutEngine = mold.Must(mold.New(dir, mold.With(
 
 var viewsEngine = mold.Must(mold.New(dir, mold.With(
 	mold.WithRoot("templates"),
+	mold.WithLayout("empty-layout.tmpl"),
 )))
