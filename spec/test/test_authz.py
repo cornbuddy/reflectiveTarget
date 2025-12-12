@@ -27,7 +27,7 @@ def test_username_should_be_validated_upon_signup(
 @pytest.mark.parametrize("password,message", [
     ("", "password should be at least 8 characters long"),
     ("kek", "password should be at least 8 characters long"),
-    ("kek", "password should contain at least 1 digig"),
+    ("kek", "password should contain at least 1 digit"),
     ("kek", "password should contain at least 1 special character"),
 ])
 def test_password_should_be_validated_upon_signup(

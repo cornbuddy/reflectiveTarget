@@ -1,10 +1,13 @@
+.PHONY: all
+all: build test
+
 .PHONY: build
-build: clean
-	npx webpack
+build: deps lint clean
+	@npx webpack
 
 .PHONY: clean
 clean:
-	rm -rf dist
+	- rm -rf dist
 
 .PHONY: deps
 deps:
@@ -13,3 +16,7 @@ deps:
 .PHONY: lint
 lint: deps
 	@npx eslint js/**
+
+.PHONY: test
+test: deps lint
+	@npx jest --detectOpenHandles $(ARGS)

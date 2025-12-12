@@ -18,3 +18,15 @@ export function toggleNavigation() {
         toggler.style.marginLeft = NAVBAR_WIDTH;
     }
 }
+
+export function htmxBeforeSwap(event) {
+    throw Error("not implemented");
+
+    // TODO: do not handle 3xx codes
+    const status = event.detail.xhr.status;
+    if (status >= 200 && status < 500) {
+        // I want to process client errors as well
+        event.detail.shouldSwap = true;
+        event.detail.isError = false;
+    }
+};

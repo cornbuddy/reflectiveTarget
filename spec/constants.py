@@ -5,4 +5,4 @@ URL = f"http://localhost:{environ.get('PORT', 8080)}"
 SESSION_TOKEN = "session-token"
 
 USERNAME = "username"
-PASSWORD = "password"
+PASSWORD = "p@ssword1"
