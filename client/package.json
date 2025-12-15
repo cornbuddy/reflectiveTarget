@@ -3,6 +3,7 @@
     "version": "0.0.0",
     "description": "simple web applicaion than implements reflective target",
     "main": "js/main.js",
+    "type": "module",
     "scripts": {
         "build": "npx webpack"
     },

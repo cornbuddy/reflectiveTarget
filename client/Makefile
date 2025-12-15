@@ -19,4 +19,5 @@ lint: deps
 
 .PHONY: test
 test: deps lint
-	@npx jest --detectOpenHandles $(ARGS)
+	NODE_OPTIONS="--experimental-vm-modules" \
+		npx jest --detectOpenHandles $(ARGS)
