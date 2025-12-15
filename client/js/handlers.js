@@ -20,11 +20,18 @@ export function toggleNavigation() {
 }
 
 export function htmxBeforeSwap(event) {
-    // TODO: do not handle 3xx codes
     const status = event.detail.xhr.status;
-    if (status >= 200 && status < 500) {
-        // I want to process client errors as well
+    if (status >= 200 && status <= 299) {
         event.detail.shouldSwap = true;
         event.detail.isError = false;
+    } else if (status >= 300 && status <= 399) {
+        event.detail.shouldSwap = false;
+        event.detail.isError = false;
+    } else if (status >= 400 && status <= 499) {
+        event.detail.shouldSwap = true;
+        event.detail.isError = true;
+    } else {
+        event.detail.shouldSwap = false;
+        event.detail.isError = true;
     }
 };
