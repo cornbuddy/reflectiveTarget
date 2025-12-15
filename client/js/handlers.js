@@ -20,8 +20,6 @@ export function toggleNavigation() {
 }
 
 export function htmxBeforeSwap(event) {
-    throw Error("not implemented");
-
     // TODO: do not handle 3xx codes
     const status = event.detail.xhr.status;
     if (status >= 200 && status < 500) {
