@@ -29,8 +29,7 @@ func (h authzHandler) getLogout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Info("logout succeeded")
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-	w.Write([]byte("Logout succeeded"))
+	utils.Redirect(w, r, "/", "Logout succeeded")
 }
 
 func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
@@ -59,9 +58,7 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 	log.Info("user is logged in",
 		zap.String("username", form.Username.Value),
 	)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-	w.Write([]byte("Login succeeded"))
-
+	utils.Redirect(w, r, "/", "Login succeeded")
 }
 
 func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
@@ -102,8 +99,7 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Info("user object created", zap.String("username", username))
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-	w.Write([]byte("User successfully created"))
+	utils.Redirect(w, r, "/", "User successfully created")
 }
 
 func (h authzHandler) getSignup(w http.ResponseWriter, r *http.Request) {

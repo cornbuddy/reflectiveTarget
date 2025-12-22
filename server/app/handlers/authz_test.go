@@ -23,7 +23,7 @@ func TestLogoutShouldUpdateSessionCookie(t *testing.T) {
 	require.NotNil(t, res)
 	assert.Equal(t, http.StatusSeeOther, res.StatusCode)
 	assert.Equal(t, "/", res.Header.Get("Location"))
-	assertSessionCookieIsSet(t, res)
+	assertAuthenticationStatusIsChanged(t, res)
 
 	data, err := io.ReadAll(res.Body)
 	assert.NoError(t, err)
@@ -100,9 +100,7 @@ func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 	)
 	res := utils.MakeRequest(ct, http.MethodPost, url, router, body)
 	require.NotNil(t, res)
-	assert.Equal(t, http.StatusSeeOther, res.StatusCode)
-	assert.Equal(t, "/", res.Header.Get("Location"))
-	assertSessionCookieIsSet(t, res)
+	assertAuthenticationStatusIsChanged(t, res)
 
 	data, err := io.ReadAll(res.Body)
 	require.NoError(t, err)
@@ -159,9 +157,7 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 
 		isSucceed := res.StatusCode == http.StatusSeeOther
 		if isSucceed {
-			url := res.Header.Get("Location")
-			assert.Equal(t, "/", url)
-			assertSessionCookieIsSet(t, res)
+			assertAuthenticationStatusIsChanged(t, res)
 		}
 
 		data, err := io.ReadAll(res.Body)

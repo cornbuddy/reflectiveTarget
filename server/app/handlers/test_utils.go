@@ -78,3 +78,10 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response) {
 	assert.True(t, sessionCookie.Expires.After(month))
 	assert.NoError(t, uuid.Validate(sessionCookie.Value))
 }
+
+func assertAuthenticationStatusIsChanged(t *testing.T, resp *http.Response) {
+	assertSessionCookieIsSet(t, resp)
+
+	url := resp.Header.Get("Location")
+	assert.Equal(t, "/", url, "location should be set")
+}
