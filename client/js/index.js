@@ -2,7 +2,7 @@
 
 import htmx from "htmx.org";
 
-import { toggleNavigation, htmxBeforeSwap } from "./handlers";
+import { toggleNavigation, htmxBeforeSwap } from "./handlers.js";
 
 window.htmx = htmx;
 window.toggleNavigation = toggleNavigation;

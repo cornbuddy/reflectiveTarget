@@ -2,7 +2,7 @@
 
 import { test, expect } from "@jest/globals";
 
-import { htmxBeforeSwap } from "./handlers";
+import { htmxBeforeSwap } from "./handlers.js";
 
 test.each([
     { status: 101, shouldSwap: false, isError: true },
