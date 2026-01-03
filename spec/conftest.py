@@ -12,12 +12,12 @@ from constants import URL, USERNAME, PASSWORD
 
 
 @pytest.fixture(scope="session")
-def anonymous_user(driver):
+def anon(driver):
     return DSL(driver, URL)
 
 
 @pytest.fixture(scope="session")
-def authorized_user(driver):
+def user(driver):
     dsl = DSL(driver, URL)
     dsl.signup(USERNAME, PASSWORD)
     return dsl
