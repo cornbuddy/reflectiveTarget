@@ -37,7 +37,7 @@ func NewRouter(config *config.Config) http.Handler {
 
 	mux.HandleFunc("GET /targets", targets.list)
 	mux.HandleFunc("POST /targets", targets.new)
-	mux.HandleFunc("PUT /targets", targets.update)
+	mux.HandleFunc("PUT /targets/{targetID}", targets.update)
 
 	mux.HandleFunc("GET /api/health", health.get)
 	mux.HandleFunc("GET /api/target/{targetID}/shots", shots.get)

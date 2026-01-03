@@ -49,11 +49,11 @@ func TestMakeHttpHandler(t *testing.T) {
 		statusCode: http.StatusForbidden,
 	}, {
 		url:        "/targets",
-		method:     http.MethodPut,
+		method:     http.MethodPost,
 		statusCode: http.StatusForbidden,
 	}, {
-		url:        "/targets",
-		method:     http.MethodPost,
+		url:        "/targets/1",
+		method:     http.MethodPut,
 		statusCode: http.StatusForbidden,
 	}, {
 		url:        "/api/health",
