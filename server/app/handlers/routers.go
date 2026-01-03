@@ -20,17 +20,24 @@ func NewRouter(config *config.Config) http.Handler {
 		config.ShotsDao,
 		ShotsRequestValidator{},
 	}
+	targets := targetsHandler{}
 	mw := middlewares.Middleware{
 		SessionStore: config.SessionStore,
 	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", index.get)
-	mux.HandleFunc("GET /login", authz.getLogin)
-	mux.HandleFunc("GET /signup", authz.getSignup)
+
 	mux.HandleFunc("GET /logout", authz.getLogout)
+	mux.HandleFunc("GET /login", authz.getLogin)
 	mux.HandleFunc("POST /login", authz.postLogin)
+
+	mux.HandleFunc("GET /signup", authz.getSignup)
 	mux.HandleFunc("POST /signup", authz.postSignup)
+
+	mux.HandleFunc("GET /targets", targets.list)
+	mux.HandleFunc("POST /targets", targets.new)
+	mux.HandleFunc("PUT /targets", targets.update)
 
 	mux.HandleFunc("GET /api/health", health.get)
 	mux.HandleFunc("GET /api/target/{targetID}/shots", shots.get)

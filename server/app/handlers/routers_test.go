@@ -44,6 +44,18 @@ func TestMakeHttpHandler(t *testing.T) {
 		method:     http.MethodPost,
 		statusCode: http.StatusBadRequest,
 	}, {
+		url:        "/targets",
+		method:     http.MethodGet,
+		statusCode: http.StatusForbidden,
+	}, {
+		url:        "/targets",
+		method:     http.MethodPut,
+		statusCode: http.StatusForbidden,
+	}, {
+		url:        "/targets",
+		method:     http.MethodPost,
+		statusCode: http.StatusForbidden,
+	}, {
 		url:        "/api/health",
 		method:     http.MethodGet,
 		statusCode: http.StatusOK,

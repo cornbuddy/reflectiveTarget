@@ -5,7 +5,9 @@ from selenium.webdriver.common.by import By
 def test_user_should_be_able_to_create_target(user):
     user.ensure_navigation_opened()
     user.driver.find_element(By.LINK_TEXT, "Targets").click()
-    raise RuntimeError("not implemented")
+    user.driver.find_element(By.LINK_TEXT, "New").click()
+    target_form = user.driver.find_element(By.TAG_NAME, "form")
+    assert target_form is not None
 
 
 @pytest.mark.order(after=test_user_should_be_able_to_create_target.__name__)
