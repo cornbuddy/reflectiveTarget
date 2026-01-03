@@ -53,14 +53,18 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 		emptyCtx,
 		httptest.NewRecorder(),
 		nil,
-		[]string{"Signup", "</form>"},
+		[]string{
+			"Signup", "<form hx-post=\"/signup\"", "</form>",
+		},
 	}, {
 		"login page should contain form",
 		render.View.Login,
 		emptyCtx,
 		httptest.NewRecorder(),
 		nil,
-		[]string{"Login", "</form>"},
+		[]string{
+			"Login", "<form hx-post=\"/login\"", "</form>",
+		},
 	}}
 
 	for _, tc := range testCases {
