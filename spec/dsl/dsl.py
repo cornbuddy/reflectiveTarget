@@ -1,9 +1,12 @@
 from time import sleep
+import logging
 
 from selenium.webdriver.remote.webdriver import WebDriver, WebElement
 from selenium.webdriver.common.by import By
 
 from constants import SESSION_TOKEN
+
+log = logging.getLogger(__name__)
 
 
 class DSL:
@@ -32,6 +35,7 @@ class DSL:
         driver.find_element(By.NAME, "password").send_keys(password)
         driver.find_element(By.NAME, "confirmation").send_keys(confirmation)
         driver.find_element(By.XPATH, "//button[@type='submit']").click()
+        sleep(1)
 
     def login(self, username: str, password: str):
         driver = self.driver
@@ -39,18 +43,24 @@ class DSL:
         driver.find_element(By.NAME, "username").send_keys(username)
         driver.find_element(By.NAME, "password").send_keys(password)
         driver.find_element(By.XPATH, "//button[@type='submit']").click()
-
-    def logout(self):
-        self.ensure_navigation_opened()
-        before_logout = self.driver.get_cookie(SESSION_TOKEN)
-        self.driver.find_element(By.LINK_TEXT, "Logout").click()
-        after_logout = self.driver.get_cookie(SESSION_TOKEN)
-        assert before_logout != after_logout
-
-    def toggle_navigation(self):
-        self.sidebar_toggler.click()
         sleep(1)
 
+    def logout(self):
+        before_logout = self.driver.get_cookie(SESSION_TOKEN)
+        log.info("cookie before logout: %s", before_logout)
+        self.ensure_navigation_opened()
+        self.driver.find_element(By.LINK_TEXT, "Logout").click()
+        after_logout = self.driver.get_cookie(SESSION_TOKEN)
+        log.info("cookie after logout: %s", after_logout)
+        assert before_logout != after_logout
+
     def ensure_navigation_opened(self):
-        if not self.sidebar.is_displayed():
+        sidebar_hidden = not self.sidebar.is_displayed()
+        log.info("sidebar hidden: %s", sidebar_hidden)
+        if sidebar_hidden:
+            log.info("show sidebar")
             self.sidebar_toggler.click()
+            sleep(1)
+            # for some reason, it doesn't work nice after redirects, so doing
+            # a bit of recursion to 100% ensure sidebar is displayed
+            self.ensure_navigation_opened()

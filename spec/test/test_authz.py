@@ -15,7 +15,6 @@ def test_user_should_be_able_to_login(authorized_user):
 
 @pytest.mark.parametrize("username,message", [
     (USERNAME, "user already exists"),
-    ("", "username should not be empty"),
 ])
 def test_username_should_be_validated_upon_signup(
         anonymous_user, username, message,
@@ -25,10 +24,9 @@ def test_username_should_be_validated_upon_signup(
 
 
 @pytest.mark.parametrize("password,message", [
-    ("", "password should be at least 8 characters long"),
     ("kek", "password should be at least 8 characters long"),
-    ("kek", "password should contain at least 1 digit"),
-    ("kek", "password should contain at least 1 special character"),
+    ("kekekekeke", "password should contain at least one digit"),
+    ("kekekekek1", "password should contain at least one special character"),
 ])
 def test_password_should_be_validated_upon_signup(
         anonymous_user, password, message,

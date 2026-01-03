@@ -21,7 +21,7 @@ var ErrPasswordDoesntContainDigits = errors.New(
 	"password should contain at least one digit",
 )
 var ErrPasswordTooShort = fmt.Errorf(
-	"password should contain at least %d characters", MinPasswordLength,
+	"password should be at least %d characters long", MinPasswordLength,
 )
 
 func runesToString(runes []rune) string {
