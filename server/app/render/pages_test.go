@@ -46,7 +46,7 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 		authorizedCtx,
 		httptest.NewRecorder(),
 		nil,
-		[]string{"Logout"},
+		[]string{"Targets", "Logout"},
 	}, {
 		"signup page should contain form",
 		render.View.Signup,
@@ -106,7 +106,7 @@ func TestLayoutRendererShouldContainFullPage(t *testing.T) {
 	t.Parallel()
 
 	type stub struct{}
-	anyType := reflect.TypeOf(stub{})
+	anyType := reflect.TypeFor[stub]()
 
 	value := reflect.ValueOf(&render.Layout)
 	for i := 0; i < value.NumMethod(); i++ {
