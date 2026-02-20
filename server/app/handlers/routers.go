@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
 	"github.com/cornbuddy/reflectiveTarget/server/app/middlewares"
@@ -46,6 +47,8 @@ func NewRouter(config *config.Config) http.Handler {
 	return middlewares.Chain(mux,
 		mw.IsAuthenticated,
 		mw.SaveSession,
+		// TODO: move timeout to configuration block
+		mw.SetTimeout(30*time.Second),
 		mw.Logger,
 	)
 }
