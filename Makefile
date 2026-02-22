@@ -31,9 +31,8 @@ test:
 	@$(MAKE) -C server test
 
 .PHONY: spec
-spec:
-	$(MAKE) build \
-		&& $(MAKE) run & \
+spec: build
+	$(MAKE) run & \
 		sleep 10 \
 		&& $(MAKE) -C spec spec \
 		|| $(MAKE) stop

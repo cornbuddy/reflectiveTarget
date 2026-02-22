@@ -13,11 +13,13 @@ from constants import URL, USERNAME, PASSWORD
 
 @pytest.fixture(scope="session")
 def anon(driver):
+    """starts anonymous user session"""
     return DSL(driver, URL)
 
 
 @pytest.fixture(scope="session")
 def user(driver):
+    """starts authorized user session"""
     dsl = DSL(driver, URL)
     dsl.signup(USERNAME, PASSWORD)
     return dsl
@@ -25,6 +27,7 @@ def user(driver):
 
 @pytest.fixture(scope="session")
 def driver():
+    """configures and runs selenium driver"""
     debug = json.loads(environ.get("DEBUG", "false").lower())
     opts = list(filter(None, [
         "--disable-gpu",
@@ -47,6 +50,7 @@ def driver():
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item):
+    """makes screenshots for each test case"""
     outcome = yield
     test_report = outcome.get_result()
     driver = item.funcargs.get("driver", None)
