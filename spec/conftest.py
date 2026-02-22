@@ -6,46 +6,30 @@ import pytest
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.remote.webdriver import WebDriver
 
 from dsl.dsl import DSL
 from constants import URL, USERNAME, PASSWORD
 
 
 @pytest.fixture(scope="session")
-def anon(driver):
+def anon():
     """starts anonymous user session"""
-    return DSL(driver, URL)
+    browser = start_browser()
+    yield DSL(browser, URL)
+
+    browser.quit()
 
 
 @pytest.fixture(scope="session")
-def user(driver):
+def user():
     """starts authorized user session"""
-    dsl = DSL(driver, URL)
+    browser = start_browser()
+    dsl = DSL(browser, URL)
     dsl.signup(USERNAME, PASSWORD)
-    return dsl
+    yield dsl
 
-
-@pytest.fixture(scope="session")
-def driver():
-    """configures and runs selenium driver"""
-    debug = json.loads(environ.get("DEBUG", "false").lower())
-    opts = list(filter(None, [
-        "--disable-gpu",
-        "--no-sandbox",
-        "--disable-dev-shm-usage",
-        "--headless" if not debug else "",
-    ]))
-    options = Options()
-    for opt in opts:
-        options.add_argument(opt)
-    path = which("firefox.geckodriver")
-    service = Service(executable_path=path)
-    _driver = webdriver.Firefox(options=options, service=service)
-    _driver.set_window_size(1920, 1080)
-    _driver.implicitly_wait(10)
-    yield _driver
-
-    _driver.quit()
+    browser.quit()
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -60,3 +44,23 @@ def pytest_runtest_makereport(item):
         extras = getattr(test_report, "extra", [])
         extras.append(pytest_html.extras.image(screenshot))
         test_report.extras = extras
+
+
+def start_browser() -> WebDriver:
+    """configures and runs selenium driver"""
+    debug = json.loads(environ.get("DEBUG", "false").lower())
+    opts = list(filter(None, [
+        "--disable-gpu",
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+        "--headless" if not debug else "",
+    ]))
+    options = Options()
+    for opt in opts:
+        options.add_argument(opt)
+    path = which("firefox.geckodriver")
+    service = Service(executable_path=path)
+    browser = webdriver.Firefox(options=options, service=service)
+    browser.set_window_size(1920, 1080)
+    browser.implicitly_wait(10)
+    return browser
