@@ -7,13 +7,13 @@ import (
 type targetsHandler struct{}
 
 func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
-
+	http.Error(w, "kek", http.StatusForbidden)
 }
 
 func (h targetsHandler) new(w http.ResponseWriter, r *http.Request) {
-
+	http.Error(w, "kek", http.StatusForbidden)
 }
 
 func (h targetsHandler) update(w http.ResponseWriter, r *http.Request) {
-
+	http.Error(w, "kek", http.StatusForbidden)
 }

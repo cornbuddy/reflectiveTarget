@@ -15,7 +15,7 @@ func Redirect(w http.ResponseWriter, r *http.Request, url, body string) {
 	isHtmx := r.Header.Get(htmxRequestKey) == "true"
 	if isHtmx {
 		w.Header().Set("HX-Redirect", url)
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusOK)
 	} else {
 		http.Redirect(w, r, url, http.StatusSeeOther)
 	}

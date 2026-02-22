@@ -35,7 +35,7 @@ func TestRedirect(t *testing.T) {
 		"/",
 		"kek",
 		http.Header{"Hx-Redirect": []string{"/"}},
-		http.StatusNoContent,
+		http.StatusOK,
 	}, {
 		"should return http redirect on empty header",
 		http.Header{},
