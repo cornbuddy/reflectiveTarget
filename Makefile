@@ -32,10 +32,10 @@ test:
 
 .PHONY: spec
 spec: build
-	$(MAKE) run & \
-		sleep 10 \
-		&& $(MAKE) -C spec spec \
-		|| $(MAKE) stop
+	$(MAKE) run &
+	sleep 10
+	- $(MAKE) -C spec spec
+	$(MAKE) stop
 
 .PHONY: pre-commit
 pre-commit:

@@ -1,10 +1,13 @@
 import pytest
 
-from constants import PASSWORD, USERNAME, URL
+from constants import PASSWORD, USERNAME, URL, SESSION_TOKEN
 
 
 def test_user_should_be_able_to_logout(user):
+    before_logout = user.driver.get_cookie(SESSION_TOKEN)
     user.logout()
+    after_logout = user.driver.get_cookie(SESSION_TOKEN)
+    assert before_logout != after_logout
     assert user.driver.current_url == f"{URL}/"
 
 

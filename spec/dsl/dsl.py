@@ -4,7 +4,7 @@ import logging
 from selenium.webdriver.remote.webdriver import WebDriver, WebElement
 from selenium.webdriver.common.by import By
 
-from constants import SESSION_TOKEN, ANIMATION_DURATION_SECS
+from constants import ANIMATION_DURATION_SECS
 
 log = logging.getLogger(__name__)
 
@@ -46,13 +46,8 @@ class DSL:
         sleep(ANIMATION_DURATION_SECS)
 
     def logout(self):
-        before_logout = self.driver.get_cookie(SESSION_TOKEN)
-        log.info("cookie before logout: %s", before_logout)
         self.ensure_navigation_opened()
         self.driver.find_element(By.LINK_TEXT, "Logout").click()
-        after_logout = self.driver.get_cookie(SESSION_TOKEN)
-        log.info("cookie after logout: %s", after_logout)
-        assert before_logout != after_logout
 
     def ensure_navigation_opened(self):
         sidebar_hidden = not self.sidebar.is_displayed()
