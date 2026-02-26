@@ -5,9 +5,9 @@ import (
 )
 
 type User struct {
-	valueobjects.Password
-	ID       int
 	Username string
+	valueobjects.Password
+	valueobjects.ID
 }
 
 func NewUser(username, plaintext string) (*User, error) {
