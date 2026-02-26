@@ -6,10 +6,15 @@ import (
 	"errors"
 
 	aggr "github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
+	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
 type TargetRepo struct {
 	*sql.DB
+}
+
+func (r TargetRepo) Get(ctx context.Context, id vo.ID) (*aggr.Target, error) {
+	return nil, errors.New("not implemented")
 }
 
 func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
