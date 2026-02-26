@@ -5,8 +5,11 @@ import (
 )
 
 type Target struct {
-	Name string
+	Name  string
+	Owner string
 	valueobjects.ID
 	valueobjects.Shots
 	valueobjects.Questions
 }
+
+type Targets []Target
