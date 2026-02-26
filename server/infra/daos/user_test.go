@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
 func TestSaveShouldReturnErrorIfUsernameIsTaken(t *testing.T) {
@@ -25,7 +26,7 @@ func TestShouldSaveUser(t *testing.T) {
 	want := entities.User{Username: "kek2", Password: password}
 	assert.NoError(t, userDao.Save(ctx, &want))
 
-	var id int
+	var id valueobjects.ID
 	query := "SELECT id FROM users WHERE username = $1"
 	assert.NoError(t, db.QueryRow(query, want.Username).Scan(&id))
 	assert.GreaterOrEqual(t, id, 1)

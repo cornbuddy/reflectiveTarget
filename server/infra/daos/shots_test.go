@@ -14,7 +14,7 @@ import (
 func TestShotsDaoListShouldReturnEmptyListWhenNoShotsForTarget(t *testing.T) {
 	t.Parallel()
 
-	var targetID int
+	var targetID valueobjects.ID
 	q := "INSERT INTO targets (name, owner_id) VALUES ($1, $2) RETURNING id"
 	require.NoError(t, db.QueryRow(q, "kek?", user.ID).Scan(&targetID))
 

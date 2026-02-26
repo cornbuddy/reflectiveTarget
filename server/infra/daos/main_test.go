@@ -8,11 +8,13 @@ import (
 	"os"
 	"testing"
 
+	"github.com/redis/go-redis/v9"
+
+	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
-	"github.com/redis/go-redis/v9"
 )
 
 var (
@@ -25,7 +27,7 @@ var (
 	shotsDao ShotsDao
 	userDao  UserDao
 
-	target   entities.Target
+	target   aggregations.Target
 	user     entities.User
 	password valueobjects.Password
 	shots    valueobjects.Shots
@@ -75,7 +77,7 @@ func TestMain(m *testing.M) {
 		Password: password,
 		Username: "daos-user",
 	}
-	target = entities.Target{
+	target = aggregations.Target{
 		Name: "kek?",
 	}
 	shots = valueobjects.Shots{
@@ -91,7 +93,7 @@ func TestMain(m *testing.M) {
 }
 
 func fillDatabase(
-	db *sql.DB, user *entities.User, target *entities.Target,
+	db *sql.DB, user *entities.User, target *aggregations.Target,
 	shots valueobjects.Shots,
 ) error {
 
@@ -103,7 +105,7 @@ func fillDatabase(
 		return err
 	}
 
-	target.OwnerId = user.ID
+	target.Owner = user.Username
 
 	q = "INSERT INTO targets (name, owner_id) VALUES ($1, $2) RETURNING id"
 	err = db.QueryRow(q, "kek?", user.ID).Scan(&target.ID)

@@ -13,7 +13,7 @@ type ShotsDao struct {
 	*sql.DB
 }
 
-func (d ShotsDao) List(ctx context.Context, targetID int) (vo.Shots, error) {
+func (d ShotsDao) List(ctx context.Context, targetID vo.ID) (vo.Shots, error) {
 	q := "SELECT * FROM targets WHERE id = $1"
 	err := d.DB.QueryRowContext(ctx, q, targetID).Scan()
 	if errors.Is(err, sql.ErrNoRows) {
@@ -40,7 +40,7 @@ func (d ShotsDao) List(ctx context.Context, targetID int) (vo.Shots, error) {
 }
 
 func (d ShotsDao) Save(
-	ctx context.Context, shooter string, targetID int, shots vo.Shots,
+	ctx context.Context, shooter string, targetID vo.ID, shots vo.Shots,
 ) error {
 
 	q := "INSERT INTO shots (x, y, target_id, shooter) " +
