@@ -33,7 +33,7 @@ func TestHealthShouldReturnErrorWhenDependenciesDontWork(t *testing.T) {
 		DB:    db,
 		Cache: cache,
 	}
-	status := health.CheckHealth()
+	status := health.CheckHealth(ctx)
 	assert.False(t, status.CacheConnected)
 	assert.False(t, status.DbConnected)
 	assert.Equal(t, 0, status.CacheConnections)
@@ -43,7 +43,7 @@ func TestHealthShouldReturnErrorWhenDependenciesDontWork(t *testing.T) {
 func TestHealthShouldReturnNilWhenDependenciesWorksFine(t *testing.T) {
 	t.Parallel()
 
-	status := health.CheckHealth()
+	status := health.CheckHealth(ctx)
 	assert.True(t, status.CacheConnected)
 	assert.True(t, status.DbConnected)
 	assert.GreaterOrEqual(t, status.CacheConnections, 1)

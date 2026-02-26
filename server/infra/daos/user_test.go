@@ -13,9 +13,9 @@ func TestSaveShouldReturnErrorIfUsernameIsTaken(t *testing.T) {
 	t.Parallel()
 
 	user := entities.User{Username: "exists", Password: password}
-	require.NoError(t, userDao.Save(&user))
+	require.NoError(t, userDao.Save(ctx, &user))
 
-	err := userDao.Save(&user)
+	err := userDao.Save(ctx, &user)
 	require.ErrorContains(t, err, "violates unique constraint")
 }
 
@@ -23,7 +23,7 @@ func TestShouldSaveUser(t *testing.T) {
 	t.Parallel()
 
 	want := entities.User{Username: "kek2", Password: password}
-	assert.NoError(t, userDao.Save(&want))
+	assert.NoError(t, userDao.Save(ctx, &want))
 
 	var id int
 	query := "SELECT id FROM users WHERE username = $1"
@@ -40,7 +40,7 @@ func TestShouldFindUserIfExists(t *testing.T) {
 	_, err := db.Exec(query, username, "kek1")
 	assert.NoError(t, err)
 
-	user, err := userDao.Find(username)
+	user, err := userDao.Find(ctx, username)
 	assert.NoError(t, err)
 	assert.Equal(t, username, user.Username)
 	assert.NotEmpty(t, user.Password.Hash)
@@ -50,7 +50,7 @@ func TestShouldFindUserIfExists(t *testing.T) {
 func TestShouldReturnNilIfUserDoesNotExist(t *testing.T) {
 	t.Parallel()
 
-	user, err := userDao.Find("not-exists")
+	user, err := userDao.Find(ctx, "not-exists")
 	assert.NoError(t, err)
 	assert.Nil(t, user)
 }

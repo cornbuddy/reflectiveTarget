@@ -67,8 +67,8 @@ func TestMain(m *testing.M) {
 	db = testDb
 	userDao = UserDao{DB: db}
 	shotsDao = ShotsDao{DB: db}
-	store = SessionStore{Ctx: ctx, Cache: cache}
-	health = HealthDao{Ctx: ctx, Cache: cache, DB: db}
+	store = SessionStore{cache}
+	health = HealthDao{db, cache}
 
 	password = *pwd
 	user = entities.User{

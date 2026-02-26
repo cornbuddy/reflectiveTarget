@@ -12,12 +12,13 @@ import (
 )
 
 type SessionStore struct {
-	Ctx   context.Context
 	Cache *redis.Client
 }
 
-func (s SessionStore) IsAuthenitcated(token string) (*bool, error) {
-	ctx := s.Ctx
+func (s SessionStore) IsAuthenitcated(
+	ctx context.Context, token string,
+) (*bool, error) {
+
 	cache := s.Cache
 	key := s.isAuthenticatedKey(token)
 
@@ -36,8 +37,10 @@ func (s SessionStore) IsAuthenitcated(token string) (*bool, error) {
 	return &isAuthenticated, nil
 }
 
-func (s SessionStore) SaveSession(token string, isAuthenticated bool) error {
-	ctx := s.Ctx
+func (s SessionStore) SaveSession(
+	ctx context.Context, token string, isAuthenticated bool,
+) error {
+
 	cache := s.Cache
 	expiration := constants.SessionDuration
 	key := s.isAuthenticatedKey(token)

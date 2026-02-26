@@ -18,7 +18,7 @@ func TestShotsDaoListShouldReturnEmptyListWhenNoShotsForTarget(t *testing.T) {
 	q := "INSERT INTO targets (name, owner_id) VALUES ($1, $2) RETURNING id"
 	require.NoError(t, db.QueryRow(q, "kek?", user.ID).Scan(&targetID))
 
-	got, err := shotsDao.List(targetID)
+	got, err := shotsDao.List(ctx, targetID)
 	require.NoError(t, err)
 	assert.Empty(t, got)
 }
@@ -26,7 +26,7 @@ func TestShotsDaoListShouldReturnEmptyListWhenNoShotsForTarget(t *testing.T) {
 func TestShotsDaoListShouldReturnNotFoundErrorWhenNoSuchTarget(t *testing.T) {
 	t.Parallel()
 
-	got, err := shotsDao.List(69)
+	got, err := shotsDao.List(ctx, 69)
 	require.ErrorIs(t, err, errors.ErrNotFound)
 	assert.Nil(t, got)
 }
@@ -34,7 +34,7 @@ func TestShotsDaoListShouldReturnNotFoundErrorWhenNoSuchTarget(t *testing.T) {
 func TestShotsDaoShouldListShotsForTarget(t *testing.T) {
 	t.Parallel()
 
-	got, err := shotsDao.List(target.ID)
+	got, err := shotsDao.List(ctx, target.ID)
 	require.NoError(t, err)
 	assert.NotEmpty(t, got)
 }
@@ -48,7 +48,7 @@ func TestShotsDaoShouldSaveShots(t *testing.T) {
 		Y: rand.IntN(101),
 	}
 	shots := valueobjects.Shots{shot}
-	require.NoError(t, shotsDao.Save(shooter, target.ID, shots))
+	require.NoError(t, shotsDao.Save(ctx, shooter, target.ID, shots))
 
 	res, err := db.Query(
 		"SELECT * FROM shots WHERE x = $1 AND y = $2",

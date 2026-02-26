@@ -8,7 +8,6 @@ import (
 )
 
 type HealthDao struct {
-	Ctx context.Context
 	*sql.DB
 	Cache *redis.Client
 }
@@ -20,7 +19,7 @@ type HealthStatus struct {
 	CacheConnections int  `json:"cache-connections"`
 }
 
-func (dao HealthDao) CheckHealth() HealthStatus {
+func (dao HealthDao) CheckHealth(ctx context.Context) HealthStatus {
 	dbConnections := 0
 	dbConnected := dao.DB.Ping() == nil
 	if dbConnected {
@@ -28,7 +27,7 @@ func (dao HealthDao) CheckHealth() HealthStatus {
 	}
 
 	cacheConnections := 0
-	cacheConnected := dao.Cache.Ping(dao.Ctx).Err() == nil
+	cacheConnected := dao.Cache.Ping(ctx).Err() == nil
 	if cacheConnected {
 		cacheConnections = int(dao.Cache.PoolStats().TotalConns)
 	}
