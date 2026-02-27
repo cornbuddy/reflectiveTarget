@@ -97,27 +97,20 @@ func fillDatabase(
 	shots valueobjects.Shots,
 ) error {
 
-	q := "INSERT INTO users(username, hashed_password) " +
-		"VALUES($1, $2) " +
-		"RETURNING id"
-	err := db.QueryRow(q, user.Username, user.Password.Hash).Scan(&user.ID)
-	if err != nil {
+	if err := testutils.InsertUser(db, user); err != nil {
 		return err
 	}
 
-	target.Owner = user.Username
-
-	q = "INSERT INTO targets (name, owner_id) VALUES ($1, $2) RETURNING id"
-	err = db.QueryRow(q, "kek?", user.ID).Scan(&target.ID)
-	if err != nil {
+	target.Owner = *user
+	if err := testutils.InsertTarget(db, target); err != nil {
 		return err
 	}
 
-	q = "INSERT INTO shots (x, y, target_id, shooter) " +
+	q := "INSERT INTO shots (x, y, target_id, shooter) " +
 		"VALUES ($1, $2, $3, $4)"
 	shooter := "i'm-a-shooter"
 	for _, shot := range shots {
-		_, err = db.Query(q, shot.X, shot.Y, target.ID, shooter)
+		_, err := db.Query(q, shot.X, shot.Y, target.ID, shooter)
 		if err != nil {
 			return err
 		}

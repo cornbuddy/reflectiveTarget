@@ -2,6 +2,7 @@ package repositories_test
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"os"
 	"testing"
@@ -14,6 +15,7 @@ import (
 var (
 	ctx = context.TODO()
 
+	db         *sql.DB
 	targetRepo repositories.TargetRepo
 )
 
@@ -33,6 +35,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("failed to init db: %v", err)
 	}
 
+	db = testDb
 	targetRepo = repositories.TargetRepo{testDb}
 
 	os.Exit(m.Run())

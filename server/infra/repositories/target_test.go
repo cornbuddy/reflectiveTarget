@@ -4,7 +4,11 @@ import (
 	"testing"
 
 	"github.com/bloomberg/go-testgroup"
+
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
+	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 type TargetGetTests struct {
@@ -12,7 +16,20 @@ type TargetGetTests struct {
 }
 
 func (s *TargetGetTests) PreGroup(t *testgroup.T) {
-	s.Target = &aggregations.Target{}
+	owner, err := entities.NewUser("username", "password")
+	t.Require.NoError(err)
+	t.Require.NoError(testutils.InsertUser(db, owner))
+
+	s.Target = &aggregations.Target{
+		Name:  "test",
+		Owner: *owner,
+	}
+	t.Require.NoError(testutils.InsertTarget(db, s.Target))
+
+	question := &valueobjects.Question{Text: "kek?"}
+	t.Require.NoError(testutils.InsertQuestion(db, question, s.Target.ID))
+
+	s.Target.Questions = valueobjects.Questions{*question}
 }
 
 func (*TargetGetTests) ShouldReturnNilIfTargetDoesNotExist(t *testgroup.T) {
