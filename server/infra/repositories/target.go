@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strings"
 
 	aggr "github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
@@ -14,7 +15,67 @@ type TargetRepo struct {
 }
 
 func (r TargetRepo) Get(ctx context.Context, id vo.ID) (*aggr.Target, error) {
-	return nil, nil
+	res := &aggr.Target{}
+	q := strings.Join([]string{
+		"SELECT t.id, t.name, u.username, u.id, u.hashed_password",
+		"FROM targets AS t",
+		"JOIN users AS u ON t.owner_id = u.id",
+		"WHERE t.id = $1",
+	}, "\n")
+
+	if err := r.QueryRowContext(ctx, q, id).Scan(
+		&res.ID, &res.Name, &res.Owner.Username, &res.Owner.ID,
+		&res.Owner.Password.Hash,
+	); errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+
+	q = strings.Join([]string{
+		"SELECT q.id, q.text",
+		"FROM questions AS q",
+		"WHERE q.target_id = $1",
+	}, "\n")
+	rows, err := r.QueryContext(ctx, q, id)
+	if err != nil {
+		return nil, err
+	}
+
+	questions := vo.Questions{}
+	for rows.Next() {
+		q := vo.Question{}
+		if err := rows.Scan(&q.ID, &q.Text); err != nil {
+			return nil, err
+		}
+
+		questions = append(questions, q)
+	}
+
+	q = strings.Join([]string{
+		"SELECT s.x, s.y",
+		"FROM shots AS s",
+		"WHERE s.target_id = $1",
+	}, "\n")
+	rows, err = r.QueryContext(ctx, q, id)
+	if err != nil {
+		return nil, err
+	}
+
+	shots := vo.Shots{}
+	for rows.Next() {
+		s := vo.Shot{}
+		if err := rows.Scan(&s.X, &s.Y); err != nil {
+			return nil, err
+		}
+
+		shots = append(shots, s)
+	}
+
+	res.Questions = questions
+	res.Shots = shots
+
+	return res, nil
 }
 
 func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {

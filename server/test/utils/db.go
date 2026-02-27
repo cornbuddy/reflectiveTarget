@@ -16,6 +16,52 @@ import (
 
 const DbImage = "postgres:18-alpine"
 
+func InsertShots(
+	db *sql.DB, shots *vo.Shots, targetId vo.ID, shooter string,
+) error {
+
+	for i := range *shots {
+		s := (*shots)[i]
+		if err := InsertShot(db, &s, targetId, shooter); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func InsertShot(
+	db *sql.DB, shot *vo.Shot, targetId vo.ID, shooter string,
+) error {
+
+	q := "INSERT INTO shots (x, y, target_id, shooter) " +
+		"VALUES($1, $2, $3, $4) "
+	_, err := db.Query(q, shot.X, shot.Y, targetId, shooter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func InsertQuestions(
+	db *sql.DB, questions *vo.Questions, targetId vo.ID,
+) error {
+
+	for i := range *questions {
+		// because question is changed as a side effect of
+		// the function below, and because I need to update
+		// questions as a side effect of this function, I use this weird
+		// construction
+		q := &((*questions)[i])
+		if err := InsertQuestion(db, q, targetId); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func InsertQuestion(db *sql.DB, question *vo.Question, targetId vo.ID) error {
 	q := "INSERT INTO questions (text, target_id) VALUES($1, $2) " +
 		"RETURNING id"

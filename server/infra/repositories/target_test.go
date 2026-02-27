@@ -7,7 +7,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
+	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -15,21 +15,32 @@ type TargetGetTests struct {
 	*aggregations.Target
 }
 
-func (s *TargetGetTests) PreGroup(t *testgroup.T) {
+func (suite *TargetGetTests) PreGroup(t *testgroup.T) {
 	owner, err := entities.NewUser("username", "password")
 	t.Require.NoError(err)
 	t.Require.NoError(testutils.InsertUser(db, owner))
 
-	s.Target = &aggregations.Target{
+	suite.Target = &aggregations.Target{
 		Name:  "test",
 		Owner: *owner,
 	}
-	t.Require.NoError(testutils.InsertTarget(db, s.Target))
+	t.Require.NoError(testutils.InsertTarget(db, suite.Target))
 
-	question := &valueobjects.Question{Text: "kek?"}
-	t.Require.NoError(testutils.InsertQuestion(db, question, s.Target.ID))
+	targetId := suite.Target.ID
+	questions := vo.Questions{
+		{Text: "kek1?"},
+		{Text: "kek2?"},
+	}
+	t.Require.NoError(testutils.InsertQuestions(db, &questions, targetId))
 
-	s.Target.Questions = valueobjects.Questions{*question}
+	shots := vo.Shots{
+		{X: 1, Y: 100},
+		{X: 100, Y: 1},
+	}
+	t.Require.NoError(testutils.InsertShots(db, &shots, targetId, "kek"))
+
+	suite.Target.Questions = questions
+	suite.Target.Shots = shots
 }
 
 func (*TargetGetTests) ShouldReturnNilIfTargetDoesNotExist(t *testgroup.T) {
@@ -38,11 +49,11 @@ func (*TargetGetTests) ShouldReturnNilIfTargetDoesNotExist(t *testgroup.T) {
 	t.Nil(got)
 }
 
-func (s *TargetGetTests) ShouldReturnTargetIfExist(t *testgroup.T) {
-	got, err := targetRepo.Get(ctx, s.Target.ID)
+func (suite *TargetGetTests) ShouldReturnTargetIfExist(t *testgroup.T) {
+	got, err := targetRepo.Get(ctx, suite.Target.ID)
 	t.Require.NoError(err)
 	t.NotNil(got)
-	t.EqualValues(*s.Target, *got)
+	t.EqualValues(*suite.Target, *got)
 }
 
 type TargetSaveTests struct{}
