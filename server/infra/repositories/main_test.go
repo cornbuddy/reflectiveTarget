@@ -14,7 +14,7 @@ import (
 var (
 	ctx = context.TODO()
 
-	target repositories.TargetRepo
+	targetRepo repositories.TargetRepo
 )
 
 func TestMain(m *testing.M) {
@@ -33,7 +33,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("failed to init db: %v", err)
 	}
 
-	target = repositories.TargetRepo{testDb}
+	targetRepo = repositories.TargetRepo{testDb}
 
 	os.Exit(m.Run())
 }

@@ -3,28 +3,44 @@ package repositories_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
-	// consider using the module below; each repo method belongs to its
-	// own suite
-	// "github.com/stretchr/testify/suite"
+	"github.com/bloomberg/go-testgroup"
 )
 
-func TestTargetRepoShouldGetTargetById(t *testing.T) {
-	t.Parallel()
+type TargetGetTests struct{}
 
-	_, err := target.Get(ctx, 69)
-	require.NoError(t, err)
+func (s TargetGetTests) ShouldGetByIdIfExists(t *testgroup.T) {
+	_, err := targetRepo.Get(ctx, 69)
+	t.Require.NoError(err)
 }
 
-func TestTargetRepoShouldSaveTarget(t *testing.T) {
-	t.Parallel()
+type TargetSaveTests struct{}
 
-	require.NoError(t, target.Save(ctx, nil))
+func (s TargetSaveTests) ShouldSaveTarget(t *testgroup.T) {
+	t.Require.NoError(targetRepo.Save(ctx, nil))
 }
 
-func TestTargetRepoShouldListTargetNamesForUser(t *testing.T) {
+type TargetListTargetNames struct{}
+
+func (s TargetListTargetNames) ShouldListTargetNames(t *testgroup.T) {
+	targets, err := targetRepo.ListTargetNamesOfUser(ctx, "kek")
+	t.Require.NoError(err)
+	t.Empty(targets)
+}
+
+func TestTargetRepoListTargetNamesForUser(t *testing.T) {
 	t.Parallel()
 
-	_, err := target.ListTargetNamesOfUser(ctx, "kek")
-	require.NoError(t, err)
+	testgroup.RunInParallel(t, new(TargetListTargetNames))
+}
+
+func TestTargetRepoGetTargetById(t *testing.T) {
+	t.Parallel()
+
+	testgroup.RunInParallel(t, new(TargetGetTests))
+}
+
+func TestTargetRepoSaveTarget(t *testing.T) {
+	t.Parallel()
+
+	testgroup.RunInParallel(t, new(TargetSaveTests))
 }
