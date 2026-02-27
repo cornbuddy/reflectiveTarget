@@ -14,7 +14,7 @@ type TargetRepo struct {
 }
 
 func (r TargetRepo) Get(ctx context.Context, id vo.ID) (*aggr.Target, error) {
-	return nil, errors.New("not implemented")
+	return nil, nil
 }
 
 func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
