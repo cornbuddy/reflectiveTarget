@@ -31,7 +31,6 @@ func (*TargetListTargetNames) ShouldListTargetNames(t *testgroup.T) {
 
 func TestTargetRepoListTargetNamesForUser(t *testing.T) {
 	t.Parallel()
-	t.Skip()
 
 	testgroup.RunInParallel(t, new(TargetListTargetNames))
 }
