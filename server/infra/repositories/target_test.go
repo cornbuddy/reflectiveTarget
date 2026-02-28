@@ -13,7 +13,7 @@ func (s *TargetRepoTests) ShouldReturnNilIfTargetDoesNotExist(t *testgroup.T) {
 }
 
 func (s *TargetRepoTests) ShouldReturnTargetIfExist(t *testgroup.T) {
-	target := (*s.targets)[0]
+	target := s.targets[0]
 	got, err := s.repo.Get(ctx, target.ID)
 	t.Require.NoError(err)
 	t.NotNil(got)

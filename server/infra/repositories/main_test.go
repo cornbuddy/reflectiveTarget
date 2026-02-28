@@ -24,7 +24,7 @@ var (
 )
 
 type TargetRepoTests struct {
-	targets *aggregations.Targets
+	targets aggregations.Targets
 	repo    *repositories.TargetRepo
 	// owns 1 targets
 	owner1 *entities.User
@@ -42,8 +42,6 @@ func (s *TargetRepoTests) PreGroup(t *testgroup.T) {
 	users := entities.Users{*owner1, *owner2}
 	t.Require.NoError(testutils.InsertUsers(db, users))
 
-	t.Logf("users: %v", users)
-
 	questions := vo.Questions{
 		{Text: "kek1?"},
 		{Text: "kek2?"},
@@ -52,7 +50,7 @@ func (s *TargetRepoTests) PreGroup(t *testgroup.T) {
 		{X: 1, Y: 100},
 		{X: 100, Y: 1},
 	}
-	targets := &aggregations.Targets{aggregations.Target{
+	targets := aggregations.Targets{aggregations.Target{
 		Name:      "test1",
 		Owner:     users[0],
 		Questions: append(vo.Questions{}, questions...),

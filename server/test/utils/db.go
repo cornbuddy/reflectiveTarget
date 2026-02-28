@@ -17,12 +17,12 @@ import (
 const DbImage = "postgres:18-alpine"
 
 func InsertShots(
-	db *sql.DB, shots *vo.Shots, targetId vo.ID, shooter string,
+	db *sql.DB, shots vo.Shots, targetId vo.ID, shooter string,
 ) error {
 
-	for i := range *shots {
-		s := &((*shots)[i])
-		if err := InsertShot(db, s, targetId, shooter); err != nil {
+	for i := range shots {
+		err := InsertShot(db, &shots[i], targetId, shooter)
+		if err != nil {
 			return err
 		}
 	}
@@ -45,16 +45,12 @@ func InsertShot(
 }
 
 func InsertQuestions(
-	db *sql.DB, questions *vo.Questions, targetId vo.ID,
+	db *sql.DB, questions vo.Questions, targetId vo.ID,
 ) error {
 
-	for i := range *questions {
-		// because question is changed as a side effect of
-		// the function below, and because I need to update
-		// questions as a side effect of this function, I use this weird
-		// construction
-		q := &((*questions)[i])
-		if err := InsertQuestion(db, q, targetId); err != nil {
+	for i := range questions {
+		err := InsertQuestion(db, &questions[i], targetId)
+		if err != nil {
 			return err
 		}
 	}
@@ -75,7 +71,6 @@ func InsertQuestion(db *sql.DB, question *vo.Question, targetId vo.ID) error {
 
 func InsertUsers(db *sql.DB, users entities.Users) error {
 	for i := range users {
-		// see the comment at InsertQuestions
 		if err := InsertUser(db, &users[i]); err != nil {
 			return err
 		}
@@ -95,11 +90,9 @@ func InsertUser(db *sql.DB, user *entities.User) error {
 	return nil
 }
 
-func InsertTargets(db *sql.DB, targets *aggregations.Targets) error {
-	for i := range *targets {
-		// see the comment at InsertQuestions
-		t := &((*targets)[i])
-		if err := InsertTarget(db, t); err != nil {
+func InsertTargets(db *sql.DB, targets aggregations.Targets) error {
+	for i := range targets {
+		if err := InsertTarget(db, &targets[i]); err != nil {
 			return err
 		}
 	}
@@ -116,11 +109,11 @@ func InsertTarget(db *sql.DB, target *aggregations.Target) error {
 	}
 
 	id := target.ID
-	if err := InsertQuestions(db, &target.Questions, id); err != nil {
+	if err := InsertQuestions(db, target.Questions, id); err != nil {
 		return err
 	}
 
-	if err := InsertShots(db, &target.Shots, id, "kek"); err != nil {
+	if err := InsertShots(db, target.Shots, id, "kek"); err != nil {
 		return err
 	}
 
