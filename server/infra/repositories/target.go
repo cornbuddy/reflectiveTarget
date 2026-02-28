@@ -22,7 +22,28 @@ func (r TargetRepo) ListTargetNamesOfUser(
 	ctx context.Context, username string,
 ) ([]string, error) {
 
-	return nil, errors.New("not implemented")
+	q := strings.Join([]string{
+		"SELECT t.name",
+		"FROM targets AS t",
+		"JOIN users AS u ON t.owner_id = u.id",
+		"WHERE u.username = $1",
+	}, "\n")
+	rows, err := r.QueryContext(ctx, q, username)
+	if err != nil {
+		return nil, err
+	}
+
+	names := []string{}
+	for rows.Next() {
+		name := ""
+		if err := rows.Scan(&name); err != nil {
+			return nil, err
+		}
+
+		names = append(names, name)
+	}
+
+	return names, nil
 }
 
 func (r TargetRepo) Get(ctx context.Context, id vo.ID) (*aggr.Target, error) {

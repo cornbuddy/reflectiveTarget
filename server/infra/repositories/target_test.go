@@ -13,11 +13,11 @@ func (s *TargetRepoTests) ShouldReturnNilIfTargetDoesNotExist(t *testgroup.T) {
 }
 
 func (s *TargetRepoTests) ShouldReturnTargetIfExist(t *testgroup.T) {
-	target := s.targets[0]
-	got, err := s.repo.Get(ctx, target.ID)
+	want := s.targets[0]
+	got, err := s.repo.Get(ctx, want.ID)
 	t.Require.NoError(err)
 	t.NotNil(got)
-	t.EqualValues(target, *got)
+	t.EqualValues(want, *got)
 }
 
 func (s *TargetRepoTests) ShouldReturnEmptyListIfNoUser(t *testgroup.T) {
@@ -27,9 +27,13 @@ func (s *TargetRepoTests) ShouldReturnEmptyListIfNoUser(t *testgroup.T) {
 }
 
 func (s *TargetRepoTests) ShouldReturnNamesIfTargetsExist(t *testgroup.T) {
-	targets, err := s.repo.ListTargetNamesOfUser(ctx, "kek")
+	got, err := s.repo.ListTargetNamesOfUser(ctx, s.owner1.Username)
 	t.Require.NoError(err)
-	t.Empty(targets)
+	t.Len(got, 1)
+
+	got, err = s.repo.ListTargetNamesOfUser(ctx, s.owner2.Username)
+	t.Require.NoError(err)
+	t.Len(got, 2)
 }
 
 func (*TargetRepoTests) ShouldSaveTarget(t *testgroup.T) {
