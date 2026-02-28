@@ -20,20 +20,21 @@ import (
 var (
 	ctx = context.TODO()
 
-	db         *sql.DB
-	targetRepo repositories.TargetRepo
+	db *sql.DB
 )
 
-type TargetGetTests struct {
-	*aggregations.Target
+type TargetRepoTests struct {
+	targets *aggregations.Targets
+	repo    *repositories.TargetRepo
 }
 
-func (suite *TargetGetTests) PreGroup(t *testgroup.T) {
+func (s *TargetRepoTests) PreGroup(t *testgroup.T) {
 	owner, err := entities.NewUser("username", "password")
 	t.Require.NoError(err)
 	t.Require.NoError(testutils.InsertUser(db, owner))
 
-	suite.Target = &aggregations.Target{
+	s.repo = &repositories.TargetRepo{db}
+	s.targets = &aggregations.Targets{aggregations.Target{
 		Name:  "test",
 		Owner: *owner,
 		Questions: vo.Questions{
@@ -44,15 +45,9 @@ func (suite *TargetGetTests) PreGroup(t *testgroup.T) {
 			{X: 1, Y: 100},
 			{X: 100, Y: 1},
 		},
-	}
-	t.Require.NoError(testutils.InsertTarget(db, suite.Target))
+	}}
+	t.Require.NoError(testutils.InsertTargets(db, s.targets))
 }
-
-type TargetListTargetNames struct {
-	aggregations.Targets
-}
-
-type TargetSaveTests struct{}
 
 func TestMain(m *testing.M) {
 	cleanUpDb, testDb, err := testutils.SetupTestDb(ctx)
@@ -71,7 +66,6 @@ func TestMain(m *testing.M) {
 	}
 
 	db = testDb
-	targetRepo = repositories.TargetRepo{testDb}
 
 	os.Exit(m.Run())
 }
