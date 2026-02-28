@@ -14,7 +14,42 @@ type TargetRepo struct {
 	*sql.DB
 }
 
+func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
+	return errors.New("not implemented")
+}
+
+func (r TargetRepo) ListTargetNamesOfUser(
+	ctx context.Context, username string,
+) ([]string, error) {
+
+	return nil, errors.New("not implemented")
+}
+
 func (r TargetRepo) Get(ctx context.Context, id vo.ID) (*aggr.Target, error) {
+	target, err := r.getTarget(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	questions, err := r.getQuestions(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	shots, err := r.getShots(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	target.Questions = questions
+	target.Shots = shots
+
+	return target, nil
+}
+
+func (r TargetRepo) getTarget(
+	ctx context.Context, id vo.ID,
+) (*aggr.Target, error) {
 	res := &aggr.Target{}
 	q := strings.Join([]string{
 		"SELECT t.id, t.name, u.username, u.id, u.hashed_password",
@@ -32,12 +67,19 @@ func (r TargetRepo) Get(ctx context.Context, id vo.ID) (*aggr.Target, error) {
 		return nil, err
 	}
 
-	q = strings.Join([]string{
+	return res, nil
+}
+
+func (r TargetRepo) getQuestions(
+	ctx context.Context, targetId vo.ID,
+) (vo.Questions, error) {
+
+	q := strings.Join([]string{
 		"SELECT q.id, q.text",
 		"FROM questions AS q",
 		"WHERE q.target_id = $1",
 	}, "\n")
-	rows, err := r.QueryContext(ctx, q, id)
+	rows, err := r.QueryContext(ctx, q, targetId)
 	if err != nil {
 		return nil, err
 	}
@@ -52,12 +94,19 @@ func (r TargetRepo) Get(ctx context.Context, id vo.ID) (*aggr.Target, error) {
 		questions = append(questions, q)
 	}
 
-	q = strings.Join([]string{
+	return questions, nil
+}
+
+func (r TargetRepo) getShots(
+	ctx context.Context, targetId vo.ID,
+) (vo.Shots, error) {
+
+	q := strings.Join([]string{
 		"SELECT s.x, s.y",
 		"FROM shots AS s",
 		"WHERE s.target_id = $1",
 	}, "\n")
-	rows, err = r.QueryContext(ctx, q, id)
+	rows, err := r.QueryContext(ctx, q, targetId)
 	if err != nil {
 		return nil, err
 	}
@@ -72,19 +121,5 @@ func (r TargetRepo) Get(ctx context.Context, id vo.ID) (*aggr.Target, error) {
 		shots = append(shots, s)
 	}
 
-	res.Questions = questions
-	res.Shots = shots
-
-	return res, nil
-}
-
-func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
-	return errors.New("not implemented")
-}
-
-func (r TargetRepo) ListTargetNamesOfUser(
-	ctx context.Context, username string,
-) ([]string, error) {
-
-	return nil, errors.New("not implemented")
+	return shots, nil
 }

@@ -35,15 +35,15 @@ func TestTargetRepoListTargetNamesForUser(t *testing.T) {
 	testgroup.RunInParallel(t, new(TargetListTargetNames))
 }
 
-func TestTargetRepoGetTargetById(t *testing.T) {
-	t.Parallel()
-
-	testgroup.RunInParallel(t, new(TargetGetTests))
-}
-
 func TestTargetRepoSaveTarget(t *testing.T) {
 	t.Parallel()
 	t.Skip()
 
 	testgroup.RunInParallel(t, new(TargetSaveTests))
+}
+
+func TestTargetRepoGetTargetById(t *testing.T) {
+	t.Parallel()
+
+	testgroup.RunInParallel(t, new(TargetGetTests))
 }
