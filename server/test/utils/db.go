@@ -21,8 +21,8 @@ func InsertShots(
 ) error {
 
 	for i := range *shots {
-		s := (*shots)[i]
-		if err := InsertShot(db, &s, targetId, shooter); err != nil {
+		s := &((*shots)[i])
+		if err := InsertShot(db, s, targetId, shooter); err != nil {
 			return err
 		}
 	}
@@ -73,12 +73,36 @@ func InsertQuestion(db *sql.DB, question *vo.Question, targetId vo.ID) error {
 	return nil
 }
 
+func InsertUsers(db *sql.DB, users *entities.Users) error {
+	for i := range *users {
+		// see the comment at InsertQuestions
+		u := (*users)[i]
+		if err := InsertUser(db, &u); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func InsertUser(db *sql.DB, user *entities.User) error {
 	q := "INSERT INTO users (username, hashed_password) VALUES($1, $2) " +
 		"RETURNING id"
 	err := db.QueryRow(q, user.Username, user.Hash).Scan(&user.ID)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func InsertTargets(db *sql.DB, targets *aggregations.Targets) error {
+	for i := range *targets {
+		// see the comment at InsertQuestions
+		t := &((*targets)[i])
+		if err := InsertTarget(db, t); err != nil {
+			return err
+		}
 	}
 
 	return nil

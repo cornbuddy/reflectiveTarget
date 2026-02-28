@@ -26,27 +26,52 @@ var (
 type TargetRepoTests struct {
 	targets *aggregations.Targets
 	repo    *repositories.TargetRepo
+	// owns 1 targets
+	owner1 *entities.User
+	// owns 2 targets
+	owner2 *entities.User
 }
 
 func (s *TargetRepoTests) PreGroup(t *testgroup.T) {
-	owner, err := entities.NewUser("username", "password")
+	owner1, err := entities.NewUser("user1", "password")
 	t.Require.NoError(err)
-	t.Require.NoError(testutils.InsertUser(db, owner))
 
-	s.repo = &repositories.TargetRepo{db}
-	s.targets = &aggregations.Targets{aggregations.Target{
-		Name:  "test",
-		Owner: *owner,
-		Questions: vo.Questions{
-			{Text: "kek1?"},
-			{Text: "kek2?"},
-		},
-		Shots: vo.Shots{
-			{X: 1, Y: 100},
-			{X: 100, Y: 1},
-		},
+	owner2, err := entities.NewUser("user2", "password")
+	t.Require.NoError(err)
+
+	users := entities.Users{*owner1, *owner2}
+	t.Require.NoError(testutils.InsertUsers(db, &users))
+
+	questions := vo.Questions{
+		{Text: "kek1?"},
+		{Text: "kek2?"},
+	}
+	shots := vo.Shots{
+		{X: 1, Y: 100},
+		{X: 100, Y: 1},
+	}
+	targets := &aggregations.Targets{aggregations.Target{
+		Name:      "test1",
+		Owner:     users[0],
+		Questions: questions,
+		Shots:     shots,
+	}, {
+		Name:      "test2",
+		Owner:     users[1],
+		Questions: questions,
+		Shots:     shots,
+	}, {
+		Name:      "test3",
+		Owner:     users[1],
+		Questions: questions,
+		Shots:     shots,
 	}}
-	t.Require.NoError(testutils.InsertTargets(db, s.targets))
+	t.Require.NoError(testutils.InsertTargets(db, targets))
+
+	s.owner1 = owner1
+	s.owner2 = owner2
+	s.repo = &repositories.TargetRepo{db}
+	s.targets = targets
 }
 
 func TestMain(m *testing.M) {

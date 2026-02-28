@@ -10,6 +10,8 @@ type User struct {
 	valueobjects.ID
 }
 
+type Users []User
+
 func NewUser(username, plaintext string) (*User, error) {
 	password, err := valueobjects.NewPassword(plaintext)
 	if err != nil {
