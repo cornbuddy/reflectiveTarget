@@ -73,11 +73,10 @@ func InsertQuestion(db *sql.DB, question *vo.Question, targetId vo.ID) error {
 	return nil
 }
 
-func InsertUsers(db *sql.DB, users *entities.Users) error {
-	for i := range *users {
+func InsertUsers(db *sql.DB, users entities.Users) error {
+	for i := range users {
 		// see the comment at InsertQuestions
-		u := (*users)[i]
-		if err := InsertUser(db, &u); err != nil {
+		if err := InsertUser(db, &users[i]); err != nil {
 			return err
 		}
 	}

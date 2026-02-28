@@ -40,7 +40,9 @@ func (s *TargetRepoTests) PreGroup(t *testgroup.T) {
 	t.Require.NoError(err)
 
 	users := entities.Users{*owner1, *owner2}
-	t.Require.NoError(testutils.InsertUsers(db, &users))
+	t.Require.NoError(testutils.InsertUsers(db, users))
+
+	t.Logf("users: %v", users)
 
 	questions := vo.Questions{
 		{Text: "kek1?"},
@@ -53,23 +55,23 @@ func (s *TargetRepoTests) PreGroup(t *testgroup.T) {
 	targets := &aggregations.Targets{aggregations.Target{
 		Name:      "test1",
 		Owner:     users[0],
-		Questions: questions,
-		Shots:     shots,
+		Questions: append(vo.Questions{}, questions...),
+		Shots:     append(vo.Shots{}, shots...),
 	}, {
 		Name:      "test2",
 		Owner:     users[1],
-		Questions: questions,
-		Shots:     shots,
+		Questions: append(vo.Questions{}, questions...),
+		Shots:     append(vo.Shots{}, shots...),
 	}, {
 		Name:      "test3",
 		Owner:     users[1],
-		Questions: questions,
-		Shots:     shots,
+		Questions: append(vo.Questions{}, questions...),
+		Shots:     append(vo.Shots{}, shots...),
 	}}
 	t.Require.NoError(testutils.InsertTargets(db, targets))
 
-	s.owner1 = owner1
-	s.owner2 = owner2
+	s.owner1 = &users[0]
+	s.owner2 = &users[1]
 	s.repo = &repositories.TargetRepo{db}
 	s.targets = targets
 }
