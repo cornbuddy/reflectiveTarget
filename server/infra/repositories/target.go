@@ -29,6 +29,8 @@ func (r TargetRepo) Get(ctx context.Context, id vo.ID) (*aggr.Target, error) {
 	target, err := r.getTarget(ctx, id)
 	if err != nil {
 		return nil, err
+	} else if target == nil {
+		return nil, nil
 	}
 
 	questions, err := r.getQuestions(ctx, id)

@@ -92,6 +92,15 @@ func InsertTarget(db *sql.DB, target *aggregations.Target) error {
 		return err
 	}
 
+	id := target.ID
+	if err := InsertQuestions(db, &target.Questions, id); err != nil {
+		return err
+	}
+
+	if err := InsertShots(db, &target.Shots, id, "kek"); err != nil {
+		return err
+	}
+
 	return nil
 }
 

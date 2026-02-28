@@ -36,29 +36,23 @@ func (suite *TargetGetTests) PreGroup(t *testgroup.T) {
 	suite.Target = &aggregations.Target{
 		Name:  "test",
 		Owner: *owner,
+		Questions: vo.Questions{
+			{Text: "kek1?"},
+			{Text: "kek2?"},
+		},
+		Shots: vo.Shots{
+			{X: 1, Y: 100},
+			{X: 100, Y: 1},
+		},
 	}
 	t.Require.NoError(testutils.InsertTarget(db, suite.Target))
+}
 
-	targetId := suite.Target.ID
-	questions := vo.Questions{
-		{Text: "kek1?"},
-		{Text: "kek2?"},
-	}
-	t.Require.NoError(testutils.InsertQuestions(db, &questions, targetId))
-
-	shots := vo.Shots{
-		{X: 1, Y: 100},
-		{X: 100, Y: 1},
-	}
-	t.Require.NoError(testutils.InsertShots(db, &shots, targetId, "kek"))
-
-	suite.Target.Questions = questions
-	suite.Target.Shots = shots
+type TargetListTargetNames struct {
+	aggregations.Targets
 }
 
 type TargetSaveTests struct{}
-
-type TargetListTargetNames struct{}
 
 func TestMain(m *testing.M) {
 	cleanUpDb, testDb, err := testutils.SetupTestDb(ctx)
