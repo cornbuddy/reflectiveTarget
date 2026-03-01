@@ -14,7 +14,7 @@ services:
     build:
       context: ../server
     environment:
-      ENVIRONMENT: "development"
+      ENVIRONMENT: development
       CACHE_ADDRESS: cache:6379
       PGPASSWORD: *pgpassword
       PGUSER: *pguser

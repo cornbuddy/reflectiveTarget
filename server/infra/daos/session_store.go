@@ -19,10 +19,8 @@ func (s SessionStore) IsAuthenitcated(
 	ctx context.Context, token string,
 ) (*bool, error) {
 
-	cache := s.Cache
 	key := s.isAuthenticatedKey(token)
-
-	value, err := cache.Get(ctx, key).Result()
+	value, err := s.Cache.Get(ctx, key).Result()
 	if errors.Is(err, redis.Nil) {
 		return nil, nil
 	} else if err != nil {
@@ -41,12 +39,10 @@ func (s SessionStore) SaveSession(
 	ctx context.Context, token string, isAuthenticated bool,
 ) error {
 
-	cache := s.Cache
 	expiration := constants.SessionDuration
 	key := s.isAuthenticatedKey(token)
 	value := strconv.FormatBool(isAuthenticated)
-
-	_, err := cache.Set(ctx, key, value, expiration).Result()
+	_, err := s.Cache.Set(ctx, key, value, expiration).Result()
 	if err != nil {
 		return err
 	}
