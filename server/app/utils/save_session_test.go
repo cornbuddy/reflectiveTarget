@@ -23,7 +23,7 @@ func TestSaveSessionShouldUpdateSessionStore(t *testing.T) {
 	require.NotNil(t, cookie)
 	assert.Equal(t, token, cookie.Value)
 
-	auth, err := store.IsAuthenitcated(ctx, token)
+	auth, err := store.IsAuthenticated(ctx, token)
 	require.NoError(t, err)
 	assert.NotNil(t, auth)
 	assert.Equal(t, wantAuth, *auth, "should update session store")

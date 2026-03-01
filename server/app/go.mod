@@ -11,6 +11,7 @@ replace github.com/cornbuddy/reflectiveTarget/server/test => ../test
 require (
 	github.com/PuerkitoBio/goquery v1.11.0
 	github.com/abiosoft/mold v0.0.0-20250328135240-0a4c28cb836a
+	github.com/bloomberg/go-testgroup v1.1.1
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/cornbuddy/reflectiveTarget/server/domain v0.0.0-00010101000000-000000000000
 	github.com/cornbuddy/reflectiveTarget/server/infra v0.0.0-00010101000000-000000000000

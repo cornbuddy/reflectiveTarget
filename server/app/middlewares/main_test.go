@@ -3,19 +3,38 @@ package middlewares
 import (
 	"context"
 	"log"
+	"net/http"
 	"os"
 	"testing"
+
+	"github.com/bloomberg/go-testgroup"
 
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 var (
-	ctx = context.TODO()
+	ctx       = context.TODO()
+	emptyStub = http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {},
+	)
 
 	store daos.SessionStore
 	mw    Middleware
 )
+
+type IsAuthenticatedSuite struct {
+	authenticatedToken string
+	handler            http.HandlerFunc
+}
+
+func (s *IsAuthenticatedSuite) PreGroup(t *testgroup.T) {
+	token := "kekeke"
+	t.Require.NoError(store.SaveSession(ctx, token, true))
+
+	s.authenticatedToken = token
+	s.handler = mw.IsAuthenticated(emptyStub).ServeHTTP
+}
 
 func TestMain(m *testing.M) {
 	cleanup, cache, err := utils.SetupCache(ctx)
@@ -29,12 +48,8 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
-	store = daos.SessionStore{
-		Cache: cache,
-	}
-	mw = Middleware{
-		SessionStore: store,
-	}
+	store = daos.SessionStore{Cache: cache}
+	mw = Middleware{SessionStore: store}
 
 	os.Exit(m.Run())
 }

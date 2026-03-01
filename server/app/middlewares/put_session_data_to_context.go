@@ -25,7 +25,7 @@ func (mw Middleware) PutSessionDataToContext(next http.Handler) http.Handler {
 		}
 
 		token := cookie.Value
-		value, err := mw.SessionStore.IsAuthenitcated(ctx, token)
+		value, err := mw.SessionStore.IsAuthenticated(ctx, token)
 		if err != nil {
 			internalServerError(w, err.Error())
 			return
