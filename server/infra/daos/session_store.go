@@ -15,7 +15,7 @@ type SessionStore struct {
 	Cache *redis.Client
 }
 
-func (s SessionStore) IsAuthenitcated(
+func (s SessionStore) IsAuthenticated(
 	ctx context.Context, token string,
 ) (*bool, error) {
 

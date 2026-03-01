@@ -9,5 +9,5 @@ import (
 type MiddlewareFunc func(http.Handler) http.Handler
 
 type Middleware struct {
-	daos.SessionStore
+	SessionStore daos.SessionStore
 }

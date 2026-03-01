@@ -9,40 +9,44 @@ import (
 )
 
 func NewRouter(config *config.Config) http.Handler {
+	mux := http.NewServeMux()
+	mw := middlewares.Middleware{
+		SessionStore: config.SessionStore,
+	}
+
 	authz := authzHandler{
 		config.UserDao,
 		config.SessionStore,
 		SignupFormValidator{config.UserDao},
 		LoginFormValidator{config.UserDao},
 	}
-	index := indexHandler{}
+	mux.HandleFunc("GET /logout", authz.getLogout)
+	mux.HandleFunc("GET /login", authz.getLogin)
+	mux.HandleFunc("GET /signup", authz.getSignup)
+	mux.HandleFunc("POST /login", authz.postLogin)
+	mux.HandleFunc("POST /signup", authz.postSignup)
+
+	targets := targetsHandler{}
+	targetsMux := http.NewServeMux()
+	targetsMux.HandleFunc("GET /", targets.list)
+	targetsMux.HandleFunc("POST /", targets.new)
+	targetsMux.HandleFunc("PUT /{targetID}", targets.update)
+	mux.Handle(
+		"/targets/",
+		mw.IsAuthenticated(http.StripPrefix("/targets", targetsMux)),
+	)
+
 	health := healthHandler{config.HealthDao}
 	shots := shotsHandler{
 		config.ShotsDao,
 		ShotsRequestValidator{},
 	}
-	targets := targetsHandler{}
-	mw := middlewares.Middleware{
-		SessionStore: config.SessionStore,
-	}
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /", index.get)
-
-	mux.HandleFunc("GET /logout", authz.getLogout)
-	mux.HandleFunc("GET /login", authz.getLogin)
-	mux.HandleFunc("POST /login", authz.postLogin)
-
-	mux.HandleFunc("GET /signup", authz.getSignup)
-	mux.HandleFunc("POST /signup", authz.postSignup)
-
-	mux.HandleFunc("GET /targets", targets.list)
-	mux.HandleFunc("POST /targets", targets.new)
-	mux.HandleFunc("PUT /targets/{targetID}", targets.update)
-
 	mux.HandleFunc("GET /api/health", health.get)
 	mux.HandleFunc("GET /api/target/{targetID}/shots", shots.get)
 	mux.HandleFunc("POST /api/target/{targetID}/shots", shots.post)
+
+	index := indexHandler{}
+	mux.HandleFunc("GET /{$}", index.get)
 
 	return middlewares.Chain(mux,
 		mw.PutSessionDataToContext,

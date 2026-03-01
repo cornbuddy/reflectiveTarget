@@ -13,7 +13,7 @@ func TestSessionStoreShouldReturnNilWhenNoSessionFound(t *testing.T) {
 	t.Parallel()
 
 	token := "not-exists"
-	got, err := store.IsAuthenitcated(ctx, token)
+	got, err := store.IsAuthenticated(ctx, token)
 	require.NoError(t, err)
 	assert.Nil(t, got)
 }
@@ -41,7 +41,7 @@ func TestSessionStoreShouldSaveAndRestoreSession(t *testing.T) {
 		err := store.SaveSession(ctx, tc.token, tc.isAuthenticated)
 		require.NoError(t, err)
 
-		got, err := store.IsAuthenitcated(ctx, tc.token)
+		got, err := store.IsAuthenticated(ctx, tc.token)
 		require.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, tc.isAuthenticated, *got)
