@@ -33,7 +33,11 @@ func (s *IsAuthenticatedSuite) PreGroup(t *testgroup.T) {
 	t.Require.NoError(store.SaveSession(ctx, token, true))
 
 	s.authenticatedToken = token
-	s.handler = mw.IsAuthenticated(emptyStub).ServeHTTP
+	s.handler = Chain(
+		emptyStub,
+		mw.IsAuthenticated,
+		mw.PutSessionDataToContext,
+	).ServeHTTP
 }
 
 func TestMain(m *testing.M) {
