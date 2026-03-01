@@ -15,17 +15,17 @@ func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
 		auth, ok := ctx.Value(constants.AuthenticatedCtx).(*bool)
 
 		if !ok {
-			log.Warn("request is unauthenticated")
-			http.Error(w, "forbidden", http.StatusForbidden)
-			return
+			goto unauthenticated
 		}
 
 		if *auth {
 			log.Debug("request is authenticated")
 			next.ServeHTTP(w, r)
-		} else {
-			log.Warn("request is unauthenticated")
-			http.Error(w, "forbidden", http.StatusForbidden)
+			return
 		}
+
+	unauthenticated:
+		log.Warn("request is unauthenticated")
+		http.Error(w, "forbidden", http.StatusForbidden)
 	})
 }
