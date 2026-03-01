@@ -10,7 +10,9 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
-func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
+// this function reads session data from session store and writes this data to
+// request's context
+func (mw Middleware) PutSessionDataToContext(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		log := utils.LoggerFromCtx(ctx)
@@ -37,7 +39,7 @@ func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
 				zap.Bool("is-authenticated", *value),
 			)
 			key := constants.AuthenticatedCtx
-			ctx = context.WithValue(r.Context(), key, value)
+			ctx = context.WithValue(ctx, key, value)
 		}
 
 		next.ServeHTTP(w, r.WithContext(ctx))

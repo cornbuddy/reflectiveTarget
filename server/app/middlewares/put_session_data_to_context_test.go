@@ -27,7 +27,7 @@ func TestIsAuthorizedShouldAddToCtxIfCookieIsInTheSessionStore(t *testing.T) {
 		Name:  constants.SessionCookieName,
 		Value: token,
 	}}
-	handler := mw.IsAuthenticated(stub).ServeHTTP
+	handler := mw.PutSessionDataToContext(stub).ServeHTTP
 	utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/", handler, nil, cookies...,
 	)
@@ -40,6 +40,6 @@ func TestIsAuthorizedShouldAddNilToCtxIfNoCookieInRequest(t *testing.T) {
 		assert.Nil(t, r.Context().Value(constants.AuthenticatedCtx))
 	})
 
-	handler := mw.IsAuthenticated(stub).ServeHTTP
+	handler := mw.PutSessionDataToContext(stub).ServeHTTP
 	utils.MakeRequest("", http.MethodGet, "/", handler, nil)
 }

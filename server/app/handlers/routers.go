@@ -45,7 +45,7 @@ func NewRouter(config *config.Config) http.Handler {
 	mux.HandleFunc("POST /api/target/{targetID}/shots", shots.post)
 
 	return middlewares.Chain(mux,
-		mw.IsAuthenticated,
+		mw.PutSessionDataToContext,
 		mw.SaveSession,
 		// TODO: move timeout to configuration block
 		mw.SetTimeout(30*time.Second),
