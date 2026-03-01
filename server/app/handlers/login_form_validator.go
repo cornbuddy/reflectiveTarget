@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"context"
+
 	"github.com/cornbuddy/reflectiveTarget/server/app/forms"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
@@ -9,7 +11,10 @@ type LoginFormValidator struct {
 	daos.UserDao
 }
 
-func (v LoginFormValidator) Validate(form *forms.LoginForm) bool {
+func (v LoginFormValidator) Validate(
+	ctx context.Context, form *forms.LoginForm,
+) bool {
+
 	emptyUsername := len(form.Username.Value) == 0
 	if emptyUsername {
 		form.Username.AddError(ErrEmpty)
@@ -24,7 +29,7 @@ func (v LoginFormValidator) Validate(form *forms.LoginForm) bool {
 		return false
 	}
 
-	user, err := v.UserDao.Find(form.Username.Value)
+	user, err := v.UserDao.Find(ctx, form.Username.Value)
 	if err != nil {
 		form.Username.AddError(err)
 		return false

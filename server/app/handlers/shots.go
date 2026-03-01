@@ -28,57 +28,59 @@ type shotsHandler struct {
 	Validator ShotsRequestValidator
 }
 
-func (h shotsHandler) get(resp http.ResponseWriter, req *http.Request) {
-	log := utils.LoggerFromCtx(req.Context())
+func (h shotsHandler) get(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	log := utils.LoggerFromCtx(ctx)
 
-	targetID, err := strconv.Atoi(req.PathValue("targetID"))
+	id, err := strconv.Atoi(r.PathValue("targetID"))
 	if err != nil {
 		log.Error("failed to parse target id", zap.Error(err))
-		http.Error(resp, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	log = log.With(zap.Int("target-id", targetID))
+	log = log.With(zap.Int("target-id", id))
 
-	shots, err := h.ShotsDao.List(targetID)
+	shots, err := h.ShotsDao.List(ctx, valueobjects.ID(id))
 	if stderr.Is(err, errors.ErrNotFound) {
 		log.Warn("target not found")
-		http.Error(resp, err.Error(), http.StatusNotFound)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	} else if err != nil {
 		log.Error("cannot fetch shots", zap.Error(err))
-		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	data, err := json.Marshal(ShotsResponse{Shots: shots})
 	if err != nil {
 		log.Error("cannot marshal response", zap.Error(err))
-		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	resp.Header().Set("Content-Type", "application/json")
-	resp.WriteHeader(http.StatusOK)
-	resp.Write(data)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(data)
 }
 
-func (h shotsHandler) post(resp http.ResponseWriter, req *http.Request) {
-	log := utils.LoggerFromCtx(req.Context())
+func (h shotsHandler) post(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	log := utils.LoggerFromCtx(ctx)
 
-	targetID, err := strconv.Atoi(req.PathValue("targetID"))
+	targetID, err := strconv.Atoi(r.PathValue("targetID"))
 	if err != nil {
 		log.Error("failed to parse target id", zap.Error(err))
-		http.Error(resp, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	log = log.With(zap.Int("target-id", targetID))
 
 	var shots ShotsRequest
-	if err := json.NewDecoder(req.Body).Decode(&shots); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&shots); err != nil {
 		log.Error("failed to decode body", zap.Error(err))
-		http.Error(resp, "bad request", http.StatusBadRequest)
+		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
 
@@ -86,26 +88,27 @@ func (h shotsHandler) post(resp http.ResponseWriter, req *http.Request) {
 		log.Error("failed to decode body",
 			zap.Errors("errors", res.Errors),
 		)
-		http.Error(resp, "invalid payload", http.StatusBadRequest)
+		http.Error(w, "invalid payload", http.StatusBadRequest)
 		return
 	}
 
-	cookies := req.CookiesNamed(constants.SessionCookieName)
+	cookies := r.CookiesNamed(constants.SessionCookieName)
 	if len(cookies) != 1 {
 		log.Error("too much of cookies", zap.Any("cookies", cookies))
-		http.Error(resp, "bad cookies", http.StatusBadRequest)
+		http.Error(w, "bad cookies", http.StatusBadRequest)
 		return
 	}
 
 	shooter := cookies[0].Value
-	if err := h.ShotsDao.Save(shooter, targetID, shots.Shots); err != nil {
+	id := valueobjects.ID(targetID)
+	if err := h.ShotsDao.Save(ctx, shooter, id, shots.Shots); err != nil {
 		log.Error("cannot save shots", zap.Error(err))
-		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	log.Info("shots saved")
-	resp.Header().Set("Content-Type", "application/json")
-	resp.WriteHeader(http.StatusCreated)
-	resp.Write([]byte("ok"))
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte("ok"))
 }

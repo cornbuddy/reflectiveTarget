@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"regexp"
 	"strings"
 
@@ -22,8 +23,11 @@ var SpecialChars = []rune{
 
 var hasDigits = regexp.MustCompile(`\d`)
 
-func (v SignupFormValidator) Validate(form *forms.SignupForm) bool {
-	user, err := v.UserDao.Find(form.Username.Value)
+func (v SignupFormValidator) Validate(
+	ctx context.Context, form *forms.SignupForm,
+) bool {
+
+	user, err := v.UserDao.Find(ctx, form.Username.Value)
 	if err != nil {
 		form.Username.AddError(err)
 	} else if user != nil {

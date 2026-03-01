@@ -54,7 +54,7 @@ func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
 	t.Parallel()
 
 	token := uuid.NewString()
-	require.NoError(t, store.SaveSession(token, false))
+	require.NoError(t, store.SaveSession(ctx, token, false))
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := w.Header().Get("Set-Cookie")

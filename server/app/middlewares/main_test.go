@@ -11,13 +11,13 @@ import (
 )
 
 var (
+	ctx = context.TODO()
+
 	store daos.SessionStore
 	mw    Middleware
 )
 
 func TestMain(m *testing.M) {
-	ctx := context.TODO()
-
 	cleanup, cache, err := utils.SetupCache(ctx)
 	if err != nil {
 		log.Fatalf("failed to setup cache: %v", err)
@@ -30,7 +30,6 @@ func TestMain(m *testing.M) {
 	}()
 
 	store = daos.SessionStore{
-		Ctx:   ctx,
 		Cache: cache,
 	}
 	mw = Middleware{

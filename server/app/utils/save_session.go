@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -12,7 +13,8 @@ import (
 )
 
 func SaveSession(
-	store daos.SessionStore, isAuthenticated bool, w http.ResponseWriter,
+	ctx context.Context, store daos.SessionStore, isAuthenticated bool,
+	w http.ResponseWriter,
 ) (string, error) {
 
 	raw, err := uuid.NewRandom()
@@ -21,7 +23,7 @@ func SaveSession(
 	}
 
 	token := raw.String()
-	if err := store.SaveSession(token, isAuthenticated); err != nil {
+	if err := store.SaveSession(ctx, token, isAuthenticated); err != nil {
 		return "", err
 	}
 

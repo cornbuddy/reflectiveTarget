@@ -15,8 +15,8 @@ type healthHandler struct {
 	daos.HealthDao
 }
 
-func (h healthHandler) get(resp http.ResponseWriter, req *http.Request) {
-	status := h.HealthDao.CheckHealth()
+func (h healthHandler) get(w http.ResponseWriter, r *http.Request) {
+	status := h.HealthDao.CheckHealth(r.Context())
 	code := http.StatusInternalServerError
 	if status.CacheConnected && status.DbConnected {
 		code = http.StatusOK
@@ -25,6 +25,6 @@ func (h healthHandler) get(resp http.ResponseWriter, req *http.Request) {
 	hr, _ := json.Marshal(HealthResponse{
 		HealthStatus: status,
 	})
-	resp.WriteHeader(code)
-	resp.Write(hr)
+	w.WriteHeader(code)
+	w.Write(hr)
 }

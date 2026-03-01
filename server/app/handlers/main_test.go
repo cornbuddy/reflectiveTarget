@@ -63,13 +63,10 @@ func makeTestConfig(
 	ctx context.Context, db *sql.DB, cache *redis.Client,
 ) *config.Config {
 
-	health := daos.HealthDao{Ctx: ctx, DB: db, Cache: cache}
+	health := daos.HealthDao{DB: db, Cache: cache}
 	shots := daos.ShotsDao{DB: db}
 	userDao := daos.UserDao{DB: db}
-	sessionStore := daos.SessionStore{
-		Ctx:   ctx,
-		Cache: cache,
-	}
+	sessionStore := daos.SessionStore{Cache: cache}
 
 	return &config.Config{
 		HealthDao:    health,

@@ -14,7 +14,7 @@ func TestSaveSessionShouldUpdateSessionStore(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	wantAuth := false
-	token, err := SaveSession(store, wantAuth, w)
+	token, err := SaveSession(ctx, store, wantAuth, w)
 	require.NoError(t, err)
 
 	header := w.Header().Get("Set-Cookie")
@@ -23,7 +23,7 @@ func TestSaveSessionShouldUpdateSessionStore(t *testing.T) {
 	require.NotNil(t, cookie)
 	assert.Equal(t, token, cookie.Value)
 
-	auth, err := store.IsAuthenitcated(token)
+	auth, err := store.IsAuthenitcated(ctx, token)
 	require.NoError(t, err)
 	assert.NotNil(t, auth)
 	assert.Equal(t, wantAuth, *auth, "should update session store")

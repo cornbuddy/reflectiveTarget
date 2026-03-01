@@ -20,9 +20,11 @@ type authzHandler struct {
 }
 
 func (h authzHandler) getLogout(w http.ResponseWriter, r *http.Request) {
-	log := utils.LoggerFromCtx(r.Context())
+	ctx := r.Context()
+	log := utils.LoggerFromCtx(ctx)
 
-	if _, err := utils.SaveSession(h.SessionStore, false, w); err != nil {
+	store := h.SessionStore
+	if _, err := utils.SaveSession(ctx, store, false, w); err != nil {
 		log.Error("failed to save session", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -33,7 +35,8 @@ func (h authzHandler) getLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
-	log := utils.LoggerFromCtx(r.Context())
+	ctx := r.Context()
+	log := utils.LoggerFromCtx(ctx)
 
 	if err := r.ParseForm(); err != nil {
 		log.Error("failed to parse form", zap.Error(err))
@@ -42,14 +45,15 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.NewLoginForm(r.Form)
-	if valid := h.LoginFormValidator.Validate(&form); !valid {
+	if valid := h.LoginFormValidator.Validate(ctx, &form); !valid {
 		log.Debug("login failed", zap.Any("form", form))
 		w.WriteHeader(http.StatusUnauthorized)
-		render.View.Login(r.Context(), w, form)
+		render.View.Login(ctx, w, form)
 		return
 	}
 
-	if _, err := utils.SaveSession(h.SessionStore, true, w); err != nil {
+	store := h.SessionStore
+	if _, err := utils.SaveSession(ctx, store, true, w); err != nil {
 		log.Error("failed to register session", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -62,7 +66,8 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
-	log := utils.LoggerFromCtx(r.Context())
+	ctx := r.Context()
+	log := utils.LoggerFromCtx(ctx)
 
 	if err := r.ParseForm(); err != nil {
 		log.Error("failed to parse form", zap.Error(err))
@@ -71,10 +76,10 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := forms.NewSignupForm(r.Form)
-	if valid := h.SignupFormValidator.Validate(&form); !valid {
+	if valid := h.SignupFormValidator.Validate(ctx, &form); !valid {
 		log.Debug("signup failed", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)
-		render.View.Signup(r.Context(), w, form)
+		render.View.Signup(ctx, w, form)
 		return
 	}
 
@@ -86,13 +91,14 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.UserDao.Save(newUser); err != nil {
+	if err := h.UserDao.Save(ctx, newUser); err != nil {
 		log.Error("failed to save user object", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if _, err := utils.SaveSession(h.SessionStore, true, w); err != nil {
+	store := h.SessionStore
+	if _, err := utils.SaveSession(ctx, store, true, w); err != nil {
 		log.Error("failed to save session", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

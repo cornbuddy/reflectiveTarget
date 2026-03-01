@@ -16,7 +16,7 @@ func TestIsAuthorizedShouldAddToCtxIfCookieIsInTheSessionStore(t *testing.T) {
 
 	token := "cookie"
 	authenticated := false
-	require.NoError(t, store.SaveSession(token, authenticated))
+	require.NoError(t, store.SaveSession(ctx, token, authenticated))
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		got := r.Context().Value(constants.AuthenticatedCtx).(*bool)

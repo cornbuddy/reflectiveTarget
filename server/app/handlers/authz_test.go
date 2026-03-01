@@ -44,7 +44,7 @@ func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
 	}
 
 	const url = "/login"
-	wrongPasswordUser, err := makeTestUser(userDao)
+	wrongPasswordUser, err := makeTestUser(db)
 	require.NoError(t, err)
 	require.NotNil(t, wrongPasswordUser)
 
@@ -88,7 +88,7 @@ func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 
 	const url = "/login"
 
-	user, err := makeTestUser(userDao)
+	user, err := makeTestUser(db)
 	require.NoError(t, err)
 
 	ct := "application/x-www-form-urlencoded"

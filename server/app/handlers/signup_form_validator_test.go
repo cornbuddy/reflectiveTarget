@@ -12,7 +12,7 @@ import (
 func TestSignupFormValidator(t *testing.T) {
 	t.Parallel()
 
-	user, err := makeTestUser(userDao)
+	user, err := makeTestUser(db)
 	require.NoError(t, err)
 
 	type testCase struct {
@@ -127,7 +127,7 @@ func TestSignupFormValidator(t *testing.T) {
 
 	validator := SignupFormValidator{UserDao: userDao}
 	for _, tc := range testCases {
-		valid := validator.Validate(&tc.form)
+		valid := validator.Validate(ctx, &tc.form)
 		assert.Equal(t, tc.want, tc.form)
 		assert.Equal(t, tc.valid, valid)
 	}

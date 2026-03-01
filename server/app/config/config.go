@@ -78,8 +78,8 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 	}
 
 	return &Config{
-		HealthDao:    daos.HealthDao{Ctx: ctx, DB: db, Cache: cache},
-		SessionStore: daos.SessionStore{Ctx: ctx, Cache: cache},
+		HealthDao:    daos.HealthDao{DB: db, Cache: cache},
+		SessionStore: daos.SessionStore{Cache: cache},
 		ShotsDao:     daos.ShotsDao{DB: db},
 		UserDao:      daos.UserDao{DB: db},
 	}, nil

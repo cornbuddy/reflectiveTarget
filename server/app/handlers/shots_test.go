@@ -22,10 +22,10 @@ const shotsUrl = "/api/target/1/shots"
 func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 	t.Parallel()
 
-	user, err := makeTestUser(userDao)
+	user, err := makeTestUser(db)
 	require.NoError(t, err)
 
-	targetID, err := makeTestTarget(db, user.ID)
+	targetID, err := makeTestTarget(db, int(user.ID))
 	require.NoError(t, err)
 
 	ct := "application/json"
@@ -52,10 +52,10 @@ func TestShotsShould404TargetDoesNotExist(t *testing.T) {
 func TestShotsShouldBeSavedIfValid(t *testing.T) {
 	t.Parallel()
 
-	user, err := makeTestUser(userDao)
+	user, err := makeTestUser(db)
 	require.NoError(t, err)
 
-	targetID, err := makeTestTarget(db, user.ID)
+	targetID, err := makeTestTarget(db, int(user.ID))
 	require.NoError(t, err)
 
 	shot := valueobjects.Shot{

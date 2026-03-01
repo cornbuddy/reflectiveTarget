@@ -20,7 +20,7 @@ func TestLoginFormValidation(t *testing.T) {
 	}
 
 	absentUsername := makeRandomString(10)
-	user, err := makeTestUser(userDao)
+	user, err := makeTestUser(db)
 	require.NoError(t, err)
 
 	testCases := []testCase{{
@@ -92,7 +92,7 @@ func TestLoginFormValidation(t *testing.T) {
 
 	validator := LoginFormValidator{userDao}
 	for _, tc := range testCases {
-		got := validator.Validate(&tc.form)
+		got := validator.Validate(ctx, &tc.form)
 		assert.Equal(t, tc.want, tc.form, tc.msg)
 		assert.Equal(t, tc.result, got, tc.msg)
 	}

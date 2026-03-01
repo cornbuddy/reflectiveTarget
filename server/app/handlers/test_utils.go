@@ -14,8 +14,7 @@ import (
 	appconst "github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	domconst "github.com/cornbuddy/reflectiveTarget/server/domain/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
-	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 const defaultPassword = "default-password123@"
@@ -31,21 +30,18 @@ func makeTestTarget(db *sql.DB, userID int) (int, error) {
 	return targetID, nil
 }
 
-func makeTestUser(dao daos.UserDao) (*entities.User, error) {
-	pwd, err := valueobjects.NewPassword(defaultPassword)
+func makeTestUser(db *sql.DB) (*entities.User, error) {
+	username := makeRandomString(10)
+	user, err := entities.NewUser(username, defaultPassword)
 	if err != nil {
 		return nil, err
 	}
 
-	user := entities.User{
-		Username: makeRandomString(10),
-		Password: *pwd,
-	}
-	if err := dao.Save(&user); err != nil {
+	if err := utils.InsertUser(db, user); err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func makeRandomString(length int) string {
