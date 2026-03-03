@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
@@ -32,16 +33,17 @@ func (h shotsHandler) get(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := utils.LoggerFromCtx(ctx)
 
-	id, err := strconv.Atoi(r.PathValue("targetID"))
+	vars := mux.Vars(r)
+	targetID, err := strconv.Atoi(vars["targetID"])
 	if err != nil {
 		log.Error("failed to parse target id", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	log = log.With(zap.Int("target-id", id))
+	log = log.With(zap.Int("target-id", targetID))
 
-	shots, err := h.ShotsDao.List(ctx, valueobjects.ID(id))
+	shots, err := h.ShotsDao.List(ctx, valueobjects.ID(targetID))
 	if stderr.Is(err, errors.ErrNotFound) {
 		log.Warn("target not found")
 		http.Error(w, err.Error(), http.StatusNotFound)
@@ -68,7 +70,8 @@ func (h shotsHandler) post(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := utils.LoggerFromCtx(ctx)
 
-	targetID, err := strconv.Atoi(r.PathValue("targetID"))
+	vars := mux.Vars(r)
+	targetID, err := strconv.Atoi(vars["targetID"])
 	if err != nil {
 		log.Error("failed to parse target id", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusBadRequest)

@@ -5,10 +5,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
+
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
-func (mw Middleware) SetTimeout(timeout time.Duration) MiddlewareFunc {
+func (mw Middleware) SetTimeout(timeout time.Duration) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return setTimeout(timeout, next)
 	}

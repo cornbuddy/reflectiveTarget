@@ -4,18 +4,20 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
+
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
 	"github.com/cornbuddy/reflectiveTarget/server/app/middlewares"
 )
 
 func NewRouter(config *config.Config) http.Handler {
-	mux := http.NewServeMux()
+	r := mux.NewRouter()
 	mw := middlewares.Middleware{
 		SessionStore: config.SessionStore,
 	}
 
 	index := indexHandler{}
-	mux.HandleFunc("GET /{$}", index.get)
+	r.HandleFunc("/", index.get).Methods(http.MethodGet)
 
 	authz := authzHandler{
 		config.UserDao,
@@ -23,36 +25,39 @@ func NewRouter(config *config.Config) http.Handler {
 		SignupFormValidator{config.UserDao},
 		LoginFormValidator{config.UserDao},
 	}
-	mux.HandleFunc("GET /logout", authz.getLogout)
-	mux.HandleFunc("GET /login", authz.getLogin)
-	mux.HandleFunc("GET /signup", authz.getSignup)
-	mux.HandleFunc("POST /login", authz.postLogin)
-	mux.HandleFunc("POST /signup", authz.postSignup)
+	r.HandleFunc("/logout", authz.getLogout).Methods(http.MethodGet)
+	r.HandleFunc("/login", authz.getLogin).Methods(http.MethodGet)
+	r.HandleFunc("/login", authz.postLogin).Methods(http.MethodPost)
+	r.HandleFunc("/signup", authz.getSignup).Methods(http.MethodGet)
+	r.HandleFunc("/signup", authz.postSignup).Methods(http.MethodPost)
 
 	targets := targetsHandler{}
-	targetsMux := http.NewServeMux()
-	targetsMux.HandleFunc("GET /", targets.list)
-	targetsMux.HandleFunc("POST /", targets.new)
-	targetsMux.HandleFunc("PUT /{targetID}", targets.update)
-	mux.Handle(
-		"/targets/",
-		mw.IsAuthenticated(http.StripPrefix("/targets", targetsMux)),
-	)
+	child := r.PathPrefix("/targets").Subrouter()
+	child.Use(mw.IsAuthenticated)
+	child.HandleFunc("", targets.list).Methods(http.MethodGet)
+	child.HandleFunc("", targets.new).Methods(http.MethodPost)
+	child.HandleFunc("/{targetID}", targets.update).Methods(http.MethodPut)
 
 	health := healthHandler{config.HealthDao}
 	shots := shotsHandler{
 		config.ShotsDao,
 		ShotsRequestValidator{},
 	}
-	mux.HandleFunc("GET /api/health", health.get)
-	mux.HandleFunc("GET /api/target/{targetID}/shots", shots.get)
-	mux.HandleFunc("POST /api/target/{targetID}/shots", shots.post)
+	r.HandleFunc("/api/health", health.get).Methods(http.MethodGet)
+	r.HandleFunc("/api/target/{targetID}/shots", shots.get).
+		Methods(http.MethodGet)
+	r.HandleFunc("/api/target/{targetID}/shots", shots.post).
+		Methods(http.MethodPost)
 
-	return middlewares.Chain(mux,
-		mw.PutSessionDataToContext,
-		mw.SaveSession,
+	r.Use(
 		// TODO: move timeout to configuration block
 		mw.SetTimeout(30*time.Second),
 		mw.Logger,
+		mw.SaveSession,
+		mw.PutSessionDataToContext,
 	)
+	// https://stackoverflow.com/a/56937571
+	r.NotFoundHandler = r.NewRoute().HandlerFunc(http.NotFound).GetHandler()
+
+	return r
 }

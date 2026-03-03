@@ -71,9 +71,8 @@ func TestMakeHttpHandler(t *testing.T) {
 
 	for _, tc := range testCases {
 		resp := utils.MakeRequest("", tc.method, tc.url, router, nil)
-		assertSessionCookieIsSet(t, resp)
-
 		msg := fmt.Sprintf("%s %s", tc.method, tc.url)
+		assertSessionCookieIsSet(t, resp, msg)
 		assert.Equal(t, tc.statusCode, resp.StatusCode, msg)
 	}
 }

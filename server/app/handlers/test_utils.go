@@ -54,9 +54,9 @@ func makeRandomString(length int) string {
 	return string(result)
 }
 
-func assertSessionCookieIsSet(t *testing.T, resp *http.Response) {
+func assertSessionCookieIsSet(t *testing.T, resp *http.Response, msg string) {
 	cookies := resp.Cookies()
-	require.NotEmpty(t, cookies)
+	require.NotEmpty(t, cookies, msg)
 
 	var sessionCookie *http.Cookie
 	for _, cookie := range cookies {
@@ -66,17 +66,20 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response) {
 		}
 	}
 
-	require.NotNil(t, sessionCookie)
+	require.NotNil(t, sessionCookie, msg)
 
 	// substracting few seconds because actual tests can happen after
 	// time.Now()
 	month := time.Now().Add(domconst.SessionDuration).Add(-10 * time.Second)
-	assert.True(t, sessionCookie.Expires.After(month))
-	assert.NoError(t, uuid.Validate(sessionCookie.Value))
+	assert.True(t, sessionCookie.Expires.After(month), msg)
+	assert.NoError(t, uuid.Validate(sessionCookie.Value), msg)
 }
 
-func assertAuthenticationStatusIsChanged(t *testing.T, resp *http.Response) {
-	assertSessionCookieIsSet(t, resp)
+func assertAuthenticationStatusIsChanged(
+	t *testing.T, resp *http.Response, msg string,
+) {
+
+	assertSessionCookieIsSet(t, resp, msg)
 
 	url := resp.Header.Get("Location")
 	assert.Equal(t, "/", url, "location should be set")

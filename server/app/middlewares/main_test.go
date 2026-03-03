@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/bloomberg/go-testgroup"
+	"github.com/gorilla/mux"
 
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
@@ -33,7 +34,7 @@ func (s *IsAuthenticatedSuite) PreGroup(t *testgroup.T) {
 	t.Require.NoError(store.SaveSession(ctx, token, true))
 
 	s.authenticatedToken = token
-	s.handler = Chain(
+	s.handler = chain(
 		emptyStub,
 		mw.IsAuthenticated,
 		mw.PutSessionDataToContext,
@@ -56,4 +57,12 @@ func TestMain(m *testing.M) {
 	mw = Middleware{SessionStore: store}
 
 	os.Exit(m.Run())
+}
+
+func chain(mux http.Handler, mwf ...mux.MiddlewareFunc) http.Handler {
+	for _, mw := range mwf {
+		mux = mw(mux)
+	}
+
+	return mux
 }
