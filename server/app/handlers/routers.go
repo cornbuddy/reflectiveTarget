@@ -14,6 +14,9 @@ func NewRouter(config *config.Config) http.Handler {
 		SessionStore: config.SessionStore,
 	}
 
+	index := indexHandler{}
+	mux.HandleFunc("GET /{$}", index.get)
+
 	authz := authzHandler{
 		config.UserDao,
 		config.SessionStore,
@@ -44,9 +47,6 @@ func NewRouter(config *config.Config) http.Handler {
 	mux.HandleFunc("GET /api/health", health.get)
 	mux.HandleFunc("GET /api/target/{targetID}/shots", shots.get)
 	mux.HandleFunc("POST /api/target/{targetID}/shots", shots.post)
-
-	index := indexHandler{}
-	mux.HandleFunc("GET /{$}", index.get)
 
 	return middlewares.Chain(mux,
 		mw.PutSessionDataToContext,
