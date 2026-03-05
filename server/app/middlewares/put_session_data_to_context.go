@@ -7,12 +7,15 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
 // this function reads session data from session store and writes this data to
 // request's context
 func (mw Middleware) PutSessionDataToContext(next http.Handler) http.Handler {
+	panic("todo: put SessionData object into the context")
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		log := utils.LoggerFromCtx(ctx)
