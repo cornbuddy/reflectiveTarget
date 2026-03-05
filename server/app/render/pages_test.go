@@ -12,16 +12,16 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/render"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 )
 
-func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
+func TestPageShouldContainText(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
 		description string
 		render      render.RenderFunc
 		ctx         context.Context
-		w           *httptest.ResponseRecorder
 		data        any
 		contains    []string
 	}
@@ -37,35 +37,55 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 		"non authorized client should see correct navbar",
 		render.Layout.Index,
 		emptyCtx,
-		httptest.NewRecorder(),
 		nil,
 		[]string{"Login", "Signup"},
 	}, {
 		"authorized client should see correct navbar",
 		render.Layout.Index,
 		authorizedCtx,
-		httptest.NewRecorder(),
 		nil,
 		[]string{"Targets", "Logout"},
 	}, {
 		"signup page should contain form",
 		render.View.Signup,
 		emptyCtx,
-		httptest.NewRecorder(),
 		nil,
 		[]string{"Signup", "<form hx-post=\"/signup\"", "</form>"},
 	}, {
 		"login page should contain form",
 		render.View.Login,
 		emptyCtx,
-		httptest.NewRecorder(),
 		nil,
 		[]string{"Login", "<form hx-post=\"/login\"", "</form>"},
+	}, {
+		"targets page should allow to create new target",
+		render.View.Targets,
+		authorizedCtx,
+		nil,
+		[]string{"Targets", "New target", "href=\"/targets/new\""},
+	}, {
+		"targets page should have links to targets",
+		render.View.Targets,
+		authorizedCtx,
+		map[string]any{
+			"Targets": aggregations.Targets{{
+				ID:   1,
+				Name: "kek1?",
+			}, {
+				ID:   69,
+				Name: "kek69?",
+			}},
+		},
+		[]string{
+			"href=\"/targets/1\">kek1?<",
+			"href=\"/targets/69\">kek69?<",
+		},
 	}}
 
 	for _, tc := range testCases {
-		tc.render(tc.ctx, tc.w, tc.data)
-		raw, err := io.ReadAll(tc.w.Body)
+		w := httptest.NewRecorder()
+		tc.render(tc.ctx, w, tc.data)
+		raw, err := io.ReadAll(w.Body)
 		require.NoError(t, err, tc.description)
 
 		body := string(raw)
@@ -75,11 +95,12 @@ func TestAuthzHandlerShouldRenderFormsOnGet(t *testing.T) {
 	}
 }
 
+var (
+	anyType = reflect.TypeFor[struct{}]()
+)
+
 func TestViewRendererShouldNotContainFullPage(t *testing.T) {
 	t.Parallel()
-
-	type stub struct{}
-	anyType := reflect.TypeOf(stub{})
 
 	value := reflect.ValueOf(&render.View)
 	for i := 0; i < value.NumMethod(); i++ {
@@ -104,9 +125,6 @@ func TestViewRendererShouldNotContainFullPage(t *testing.T) {
 
 func TestLayoutRendererShouldContainFullPage(t *testing.T) {
 	t.Parallel()
-
-	type stub struct{}
-	anyType := reflect.TypeFor[stub]()
 
 	value := reflect.ValueOf(&render.Layout)
 	for i := 0; i < value.NumMethod(); i++ {

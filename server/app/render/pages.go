@@ -11,6 +11,10 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
+func (e engine) Targets(ctx context.Context, w http.ResponseWriter, data any) {
+	e.render(ctx, "views/targets.tmpl", w, data)
+}
+
 func (e engine) Signup(ctx context.Context, w http.ResponseWriter, data any) {
 	e.render(ctx, "views/signup.tmpl", w, data)
 }

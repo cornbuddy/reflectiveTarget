@@ -1,0 +1,9 @@
+<h2>Targets</h2>
+
+<a href="/targets/new">New target</a>
+
+{{- range .Targets }}
+<ul>
+    <li><a href="/targets/{{ .ID }}">{{ .Name }}</a></li>
+</ul>
+{{- end }}
