@@ -7,7 +7,7 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 	"go.uber.org/zap"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
@@ -59,11 +59,6 @@ func makeViewData(ctx context.Context, data any) (viewData, error) {
 }
 
 func extractDataFromContext(ctx context.Context) contextData {
-	isAuthorized := false
-	auth := ctx.Value(constants.AuthenticatedCtx)
-	if auth != nil {
-		isAuthorized = *auth.(*bool)
-	}
 
 	return contextData{
 		IsAuthorized: isAuthorized,

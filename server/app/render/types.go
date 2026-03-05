@@ -13,8 +13,4 @@ type engine struct {
 	Engine mold.Engine
 }
 
-type contextData struct {
-	IsAuthorized bool
-}
-
 type viewData map[string]any
