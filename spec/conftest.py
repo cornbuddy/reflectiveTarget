@@ -1,5 +1,3 @@
-import json
-from os import environ
 from shutil import which
 
 import pytest
@@ -9,7 +7,7 @@ from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.remote.webdriver import WebDriver
 
 from dsl.dsl import DSL
-from constants import URL, USERNAME, PASSWORD
+from constants import DEBUG, URL, USERNAME, PASSWORD
 
 
 @pytest.fixture(scope="session")
@@ -48,12 +46,11 @@ def pytest_runtest_makereport(item):
 
 def start_browser() -> WebDriver:
     """configures and runs selenium driver"""
-    debug = json.loads(environ.get("DEBUG", "false").lower())
     opts = list(filter(None, [
         "--disable-gpu",
         "--no-sandbox",
         "--disable-dev-shm-usage",
-        "--headless" if not debug else "",
+        "--headless" if not DEBUG else "",
     ]))
     options = Options()
     for opt in opts:
