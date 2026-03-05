@@ -8,6 +8,8 @@ import (
 	"github.com/bloomberg/go-testgroup"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -42,7 +44,49 @@ func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
 	}
 }
 
-func (*TargetsSuite) PreGroup(t *testgroup.T) {}
+func (s *TargetsSuite) PreGroup(t *testgroup.T) {
+	owner, err := entities.NewUser("user1", "password")
+	t.Require.NoError(err)
+
+	foreigner, err := entities.NewUser("user2", "password")
+	t.Require.NoError(err)
+
+	t.Require.NoError(utils.InsertUser(db, owner))
+	t.Require.NoError(utils.InsertUser(db, foreigner))
+
+	questions := vo.Questions{
+		{Text: "kek1?"},
+		{Text: "kek2?"},
+	}
+	shots := vo.Shots{
+		{X: 1, Y: 100},
+		{X: 100, Y: 1},
+	}
+	ownedTargets := aggregations.Targets{aggregations.Target{
+		Name:      "test1",
+		Owner:     *owner,
+		Questions: append(vo.Questions{}, questions...),
+		Shots:     append(vo.Shots{}, shots...),
+	}, {
+		Name:      "test2",
+		Owner:     *owner,
+		Questions: append(vo.Questions{}, questions...),
+		Shots:     append(vo.Shots{}, shots...),
+	}}
+	t.Require.NoError(utils.InsertTargets(db, ownedTargets))
+
+	foreignTargets := aggregations.Targets{aggregations.Target{
+		Name:      "test3",
+		Owner:     *foreigner,
+		Questions: append(vo.Questions{}, questions...),
+		Shots:     append(vo.Shots{}, shots...),
+	}}
+	t.Require.NoError(utils.InsertTargets(db, foreignTargets))
+
+	s.foreignTargets = foreignTargets
+	s.ownedTargets = ownedTargets
+	s.session = []*http.Cookie{}
+}
 
 func TestTargetsHandler(t *testing.T) {
 	t.Parallel()
