@@ -39,7 +39,7 @@ func TestHealthHandlerShouldFailWhenDbsDontWork(t *testing.T) {
 	db.Close()
 	cache.Close()
 
-	config := makeTestConfig(ctx, db, cache)
+	config := makeTestConfig(db, cache)
 	router := NewRouter(config).ServeHTTP
 	res := utils.MakeRequest("", http.MethodGet, healthUrl, router, nil)
 	assert.NotNil(t, res)

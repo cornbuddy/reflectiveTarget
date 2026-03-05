@@ -18,9 +18,10 @@ import (
 var (
 	ctx = context.TODO()
 
-	db      *sql.DB
-	userDao daos.UserDao
-	router  http.HandlerFunc
+	db           *sql.DB
+	router       http.HandlerFunc
+	sessionStore daos.SessionStore
+	userDao      daos.UserDao
 )
 
 func TestMain(m *testing.M) {
@@ -51,18 +52,14 @@ func TestMain(m *testing.M) {
 	}()
 
 	db = testDb
+	router = NewRouter(makeTestConfig(testDb, testCache)).ServeHTTP
+	sessionStore = daos.SessionStore{Cache: testCache}
 	userDao = daos.UserDao{DB: testDb}
-
-	config := makeTestConfig(ctx, testDb, testCache)
-	router = NewRouter(config).ServeHTTP
 
 	os.Exit(m.Run())
 }
 
-func makeTestConfig(
-	ctx context.Context, db *sql.DB, cache *redis.Client,
-) *config.Config {
-
+func makeTestConfig(db *sql.DB, cache *redis.Client) *config.Config {
 	health := daos.HealthDao{DB: db, Cache: cache}
 	shots := daos.ShotsDao{DB: db}
 	userDao := daos.UserDao{DB: db}
