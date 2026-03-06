@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	// "github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 

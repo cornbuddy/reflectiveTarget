@@ -16,7 +16,7 @@ type targetsHandler struct {
 
 func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	session := sessiondata.Make(ctx)
+	session := sessiondata.Read(ctx)
 	log := session.Logger
 
 	targets, err := h.repo.ListTargetNamesOfUser(ctx, session.Username)

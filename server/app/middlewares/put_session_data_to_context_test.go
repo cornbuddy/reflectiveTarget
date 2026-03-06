@@ -8,38 +8,47 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
-func TestIsAuthorizedShouldAddToCtxIfCookieIsInTheSessionStore(t *testing.T) {
+func TestPutSessionDataToCtx(t *testing.T) {
 	t.Parallel()
 
-	token := "cookie"
-	authenticated := false
-	require.NoError(t, store.SaveSession(ctx, token, authenticated))
+	type testCase struct {
+		desc      string
+		sessionId string
+		want      sessiondata.SessionData
+	}
 
-	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		got := r.Context().Value(constants.AuthenticatedCtx).(*bool)
-		require.NotNil(t, got)
-		assert.Equal(t, authenticated, *got)
-	})
-	cookies := []*http.Cookie{{
-		Name:  constants.SessionCookieName,
-		Value: token,
+	sessionId := "kekeke"
+	want := sessiondata.SessionData{
+		IsAuthetnicated: true,
+		UserID:          69,
+		Username:        "kek",
+	}
+	require.NoError(t, store.SaveSession(ctx, sessionId, want))
+
+	testCases := []testCase{{
+		"should put cached data to context if any",
+		sessionId,
+		want,
+	}, {
+		"should put zero object on cache miss",
+		"not found",
+		sessiondata.SessionData{},
 	}}
-	handler := mw.PutSessionDataToContext(stub).ServeHTTP
-	utils.MakeRequestWithCookies(
-		"", http.MethodGet, "/", handler, nil, cookies...,
-	)
-}
 
-func TestIsAuthorizedShouldAddNilToCtxIfNoCookieInRequest(t *testing.T) {
-	t.Parallel()
-
-	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Nil(t, r.Context().Value(constants.AuthenticatedCtx))
-	})
-
-	handler := mw.PutSessionDataToContext(stub).ServeHTTP
-	utils.MakeRequest("", http.MethodGet, "/", handler, nil)
+	handler := mw.PutSessionDataToContext(emptyStub).ServeHTTP
+	for _, tc := range testCases {
+		cookies := []*http.Cookie{{
+			Name:  constants.SessionCookieName,
+			Value: tc.sessionId,
+		}}
+		resp := utils.MakeRequestWithCookies(
+			"", http.MethodGet, "/", handler, nil, cookies...,
+		)
+		got := sessiondata.Read(resp.Request.Context())
+		assert.EqualExportedValues(t, tc.want, got, tc.desc)
+	}
 }

@@ -7,8 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	. "github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
-	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
 )
 
 var (
@@ -24,43 +22,19 @@ func TestMake(t *testing.T) {
 		want SessionData
 	}
 
-	testLog := Log.Named("test")
+	testData := SessionData{true, 69, "kek"}
 	testCases := []testCase{{
-		"should return default logger by default",
+		"should return zero value by default",
 		ctx,
-		SessionData{
-			Logger: *Log,
-		},
+		SessionData{},
 	}, {
 		"should return explicitly set logger",
-		context.WithValue(ctx, LoggerCtx, *testLog),
-		SessionData{
-			Logger: *testLog,
-		},
-	}, {
-		"should set authenticated flag",
-		context.WithValue(ctx, AuthenticatedCtx, toPtr(true)),
-		SessionData{
-			IsAuthetnicated: true,
-		},
-	}, {
-		"should set username",
-		context.WithValue(ctx, UsernameCtx, toPtr("kek")),
-		SessionData{
-			Username: "kek",
-		},
-	}, {
-		"should set user id",
-		context.WithValue(ctx, UserIDCtx, toPtr(valueobjects.ID(69))),
-		SessionData{
-			UserID: valueobjects.ID(69),
-		},
+		context.WithValue(ctx, SessionDataCtx, &testData),
+		testData,
 	}}
 
 	for _, tc := range testCases {
-		got := Make(tc.ctx)
+		got := Read(tc.ctx)
 		assert.EqualExportedValues(t, tc.want, got, tc.desc)
 	}
 }
-
-func toPtr[T any](v T) *T { return &v }

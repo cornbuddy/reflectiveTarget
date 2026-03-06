@@ -21,11 +21,11 @@ func (mw Middleware) Logger(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 
-		elapsedTime := time.Since(startTime)
+		duration := time.Since(startTime)
 		log.Info("done processing HTTP request",
 			zap.String("method", r.Method),
 			zap.String("url", r.URL.Path),
-			zap.Duration("duration", elapsedTime),
+			zap.Duration("duration", duration),
 		)
 	})
 }
