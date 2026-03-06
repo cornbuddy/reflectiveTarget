@@ -11,7 +11,7 @@ const (
 )
 
 type SessionData struct {
-	IsAuthetnicated bool
+	IsAuthenticated bool
 	UserID          valueobjects.ID
 	Username        string
 }

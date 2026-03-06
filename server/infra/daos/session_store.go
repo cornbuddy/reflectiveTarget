@@ -8,6 +8,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/constants"
 )
 
@@ -15,11 +16,11 @@ type SessionStore struct {
 	Cache *redis.Client
 }
 
-func (s SessionStore) IsAuthenticated(
-	ctx context.Context, token string,
-) (*bool, error) {
+func (s SessionStore) Get(
+	ctx context.Context, sessionId string,
+) (*sessiondata.SessionData, error) {
 
-	key := s.isAuthenticatedKey(token)
+	key := s.isAuthenticatedKey(sessionId)
 	value, err := s.Cache.Get(ctx, key).Result()
 	if errors.Is(err, redis.Nil) {
 		return nil, nil
@@ -32,16 +33,20 @@ func (s SessionStore) IsAuthenticated(
 		return nil, err
 	}
 
-	return &isAuthenticated, nil
+	data := sessiondata.SessionData{
+		IsAuthenticated: isAuthenticated,
+	}
+
+	return &data, nil
 }
 
-func (s SessionStore) SaveSession(
-	ctx context.Context, token string, isAuthenticated bool,
+func (s SessionStore) Update(
+	ctx context.Context, sessionId string, data sessiondata.SessionData,
 ) error {
 
 	expiration := constants.SessionDuration
-	key := s.isAuthenticatedKey(token)
-	value := strconv.FormatBool(isAuthenticated)
+	key := s.isAuthenticatedKey(sessionId)
+	value := strconv.FormatBool(data.IsAuthenticated)
 	_, err := s.Cache.Set(ctx, key, value, expiration).Result()
 	if err != nil {
 		return err
@@ -50,9 +55,9 @@ func (s SessionStore) SaveSession(
 	return nil
 }
 
-func (s SessionStore) isAuthenticatedKey(token string) string {
+func (s SessionStore) isAuthenticatedKey(sessionId string) string {
 	const prefix = "session"
 	const postfix = "isAuthenticated"
 
-	return fmt.Sprintf("%s:%s:%s", prefix, token, postfix)
+	return fmt.Sprintf("%s:%s:%s", prefix, sessionId, postfix)
 }
