@@ -7,6 +7,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
 )
 
@@ -17,7 +18,7 @@ type targetsHandler struct {
 func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	session := sessiondata.Read(ctx)
-	log := session.Logger
+	log := utils.LoggerFromCtx(ctx)
 
 	targets, err := h.repo.ListTargetNamesOfUser(ctx, session.Username)
 	if err != nil {

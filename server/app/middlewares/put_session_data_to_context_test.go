@@ -23,11 +23,11 @@ func TestPutSessionDataToCtx(t *testing.T) {
 
 	sessionId := "kekeke"
 	want := sessiondata.SessionData{
-		IsAuthetnicated: true,
+		IsAuthenticated: true,
 		UserID:          69,
 		Username:        "kek",
 	}
-	require.NoError(t, store.SaveSession(ctx, sessionId, want))
+	require.NoError(t, store.Update(ctx, sessionId, want))
 
 	testCases := []testCase{{
 		"should put cached data to context if any",

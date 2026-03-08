@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -54,7 +55,7 @@ func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
 	t.Parallel()
 
 	token := uuid.NewString()
-	require.NoError(t, store.SaveSession(ctx, token, false))
+	require.NoError(t, store.Update(ctx, token, sessiondata.SessionData{}))
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := w.Header().Get("Set-Cookie")

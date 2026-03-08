@@ -7,6 +7,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/forms"
 	"github.com/cornbuddy/reflectiveTarget/server/app/render"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
@@ -24,7 +25,8 @@ func (h authzHandler) getLogout(w http.ResponseWriter, r *http.Request) {
 	log := utils.LoggerFromCtx(ctx)
 
 	store := h.SessionStore
-	if _, err := utils.SaveSession(ctx, store, false, w); err != nil {
+	data := sessiondata.SessionData{}
+	if _, err := utils.SaveSession(ctx, store, data, w); err != nil {
 		log.Error("failed to save session", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -52,8 +54,20 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, err := h.UserDao.Find(ctx, form.Username.Value)
+	if err != nil {
+		log.Error("failed to fetch user", zap.Error(err))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := sessiondata.SessionData{
+		IsAuthenticated: true,
+		UserID:          user.ID,
+		Username:        user.Username,
+	}
 	store := h.SessionStore
-	if _, err := utils.SaveSession(ctx, store, true, w); err != nil {
+	if _, err := utils.SaveSession(ctx, store, data, w); err != nil {
 		log.Error("failed to register session", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -84,21 +98,26 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	username := form.Username.Value
-	newUser, err := entities.NewUser(username, form.Password.Value)
+	user, err := entities.NewUser(username, form.Password.Value)
 	if err != nil {
 		log.Error("failed to create user object", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if err := h.UserDao.Save(ctx, newUser); err != nil {
+	if err := h.UserDao.Save(ctx, user); err != nil {
 		log.Error("failed to save user object", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	data := sessiondata.SessionData{
+		IsAuthenticated: true,
+		UserID:          user.ID,
+		Username:        user.Username,
+	}
 	store := h.SessionStore
-	if _, err := utils.SaveSession(ctx, store, true, w); err != nil {
+	if _, err := utils.SaveSession(ctx, store, data, w); err != nil {
 		log.Error("failed to save session", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

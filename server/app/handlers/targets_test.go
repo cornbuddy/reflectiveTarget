@@ -8,6 +8,7 @@ import (
 	"github.com/bloomberg/go-testgroup"
 
 	appconst "github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
@@ -85,7 +86,12 @@ func (s *TargetsSuite) PreGroup(t *testgroup.T) {
 	t.Require.NoError(utils.InsertTargets(db, foreignTargets))
 
 	token := "kekeke"
-	t.Require.NoError(sessionStore.SaveSession(ctx, token, true))
+	session := sessiondata.SessionData{
+		IsAuthenticated: true,
+		UserID:          owner.ID,
+		Username:        owner.Username,
+	}
+	t.Require.NoError(sessionStore.Update(ctx, token, session))
 
 	s.foreignTargets = foreignTargets
 	s.ownedTargets = ownedTargets
