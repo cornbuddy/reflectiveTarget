@@ -2,14 +2,17 @@ package daos
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 
 	"github.com/redis/go-redis/v9"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/constants"
+)
+
+const (
+	prefix = "session"
 )
 
 type SessionStore struct {
@@ -20,21 +23,17 @@ func (s SessionStore) Get(
 	ctx context.Context, sessionId string,
 ) (*sessiondata.SessionData, error) {
 
-	key := s.isAuthenticatedKey(sessionId)
-	value, err := s.Cache.Get(ctx, key).Result()
+	key := s.key(sessionId)
+	jsonData, err := s.Cache.Get(ctx, key).Bytes()
 	if errors.Is(err, redis.Nil) {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
 	}
 
-	isAuthenticated, err := strconv.ParseBool(value)
-	if err != nil {
+	var data sessiondata.SessionData
+	if err := json.Unmarshal(jsonData, &data); err != nil {
 		return nil, err
-	}
-
-	data := sessiondata.SessionData{
-		IsAuthenticated: isAuthenticated,
 	}
 
 	return &data, nil
@@ -44,10 +43,13 @@ func (s SessionStore) Update(
 	ctx context.Context, sessionId string, data sessiondata.SessionData,
 ) error {
 
-	expiration := constants.SessionDuration
-	key := s.isAuthenticatedKey(sessionId)
-	value := strconv.FormatBool(data.IsAuthenticated)
-	_, err := s.Cache.Set(ctx, key, value, expiration).Result()
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	key := s.key(sessionId)
+	err = s.Cache.Set(ctx, key, jsonData, sessiondata.SessionDuration).Err()
 	if err != nil {
 		return err
 	}
@@ -55,9 +57,6 @@ func (s SessionStore) Update(
 	return nil
 }
 
-func (s SessionStore) isAuthenticatedKey(sessionId string) string {
-	const prefix = "session"
-	const postfix = "isAuthenticated"
-
-	return fmt.Sprintf("%s:%s:%s", prefix, sessionId, postfix)
+func (s SessionStore) key(sessionId string) string {
+	return fmt.Sprintf("%s:%s", prefix, sessionId)
 }
