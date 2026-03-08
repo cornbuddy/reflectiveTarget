@@ -2,18 +2,20 @@ package sessiondata
 
 import (
 	"context"
+	"time"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
 const (
-	SessionDataCtx = "session-data"
+	SessionDataCtx  = "session-data"
+	SessionDuration = 30 * 24 * time.Hour
 )
 
 type SessionData struct {
-	IsAuthenticated bool
-	UserID          valueobjects.ID
-	Username        string
+	IsAuthenticated bool            `json:"isAuthenticated"`
+	UserID          valueobjects.ID `json:"userID"`
+	Username        string          `json:"username"`
 }
 
 func Read(ctx context.Context) SessionData {

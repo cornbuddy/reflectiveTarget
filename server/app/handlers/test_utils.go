@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	appconst "github.com/cornbuddy/reflectiveTarget/server/app/constants"
-	domconst "github.com/cornbuddy/reflectiveTarget/server/domain/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -68,10 +68,12 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response, msg string) {
 
 	require.NotNil(t, sessionCookie, msg)
 
-	// substracting few seconds because actual tests can happen after
-	// time.Now()
-	month := time.Now().Add(domconst.SessionDuration).Add(-10 * time.Second)
-	assert.True(t, sessionCookie.Expires.After(month), msg)
+	duration := time.Now().
+		Add(sessiondata.SessionDuration).
+		// substracting few seconds because actual tests can happen
+		// after time.Now()
+		Add(-10 * time.Second)
+	assert.True(t, sessionCookie.Expires.After(duration), msg)
 	assert.NoError(t, uuid.Validate(sessionCookie.Value), msg)
 }
 

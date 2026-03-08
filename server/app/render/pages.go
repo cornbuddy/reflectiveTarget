@@ -7,7 +7,6 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 	"go.uber.org/zap"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
@@ -46,21 +45,13 @@ func (e engine) render(
 
 }
 
-func makeViewData(ctx context.Context, data any) (viewData, error) {
+func makeViewData(ctx context.Context, data ...any) (viewData, error) {
 	var result viewData
-	ctxData := extractDataFromContext(ctx)
-	for _, data := range []any{ctxData, data} {
+	for _, data := range data {
 		if err := mapstructure.Decode(data, &result); err != nil {
 			return nil, err
 		}
 	}
 
 	return result, nil
-}
-
-func extractDataFromContext(ctx context.Context) contextData {
-
-	return contextData{
-		IsAuthorized: isAuthorized,
-	}
 }

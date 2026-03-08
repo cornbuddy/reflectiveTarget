@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -13,8 +14,8 @@ func TestSaveSessionShouldUpdateSessionStore(t *testing.T) {
 	t.Parallel()
 
 	w := httptest.NewRecorder()
-	wantAuth := false
-	token, err := SaveSession(ctx, store, wantAuth, w)
+	wantSession := sessiondata.SessionData{Username: "kek"}
+	token, err := SaveSession(ctx, store, wantSession, w)
 	require.NoError(t, err)
 
 	header := w.Header().Get("Set-Cookie")
@@ -23,8 +24,8 @@ func TestSaveSessionShouldUpdateSessionStore(t *testing.T) {
 	require.NotNil(t, cookie)
 	assert.Equal(t, token, cookie.Value)
 
-	auth, err := store.IsAuthenticated(ctx, token)
+	gotSession, err := store.Get(ctx, token)
 	require.NoError(t, err)
-	assert.NotNil(t, auth)
-	assert.Equal(t, wantAuth, *auth, "should update session store")
+	assert.NotNil(t, gotSession)
+	assert.Equal(t, wantSession, *gotSession, "should update session store")
 }
