@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
-	// "github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
@@ -28,7 +28,7 @@ func (mw Middleware) PutSessionDataToContext(next http.Handler) http.Handler {
 		}
 
 		token := cookie.Value
-		value, err := mw.SessionStore.IsAuthenticated(ctx, token)
+		value, err := mw.SessionStore.Get(ctx, token)
 		if err != nil {
 			internalServerError(w, err.Error())
 			return
@@ -38,11 +38,12 @@ func (mw Middleware) PutSessionDataToContext(next http.Handler) http.Handler {
 		if value == nil {
 			log.Warn("auth info not included in the context")
 		} else {
+			session := *value
 			log.Debug("adding auth info to context",
-				zap.Bool("is-authenticated", *value),
+				zap.Any("session", session),
 			)
-			key := constants.AuthenticatedCtx
-			ctx = context.WithValue(ctx, key, value)
+			key := sessiondata.SessionDataCtx
+			ctx = context.WithValue(ctx, key, session)
 		}
 
 		next.ServeHTTP(w, r.WithContext(ctx))

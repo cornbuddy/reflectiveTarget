@@ -10,6 +10,7 @@ import (
 	"github.com/bloomberg/go-testgroup"
 	"github.com/gorilla/mux"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -31,7 +32,12 @@ type IsAuthenticatedSuite struct {
 
 func (s *IsAuthenticatedSuite) PreGroup(t *testgroup.T) {
 	token := "kekeke"
-	t.Require.NoError(store.SaveSession(ctx, token, true))
+	data := sessiondata.SessionData{
+		IsAuthenticated: true,
+		UserID:          69,
+		Username:        "kek",
+	}
+	t.Require.NoError(store.Update(ctx, token, data))
 
 	s.authenticatedToken = token
 	s.handler = chain(

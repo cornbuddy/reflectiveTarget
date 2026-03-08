@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
@@ -18,9 +19,10 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 
 		// not empty error means cookie doesn't exist, hence should be
 		// set
+		emptySession := sessiondata.SessionData{}
 		if err != nil {
 			log.Info("registering new session...")
-			_, err := utils.SaveSession(ctx, store, false, w)
+			_, err := utils.SaveSession(ctx, store, emptySession, w)
 			if err != nil {
 				internalServerError(w, err.Error())
 				return
@@ -30,12 +32,12 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 			return
 		}
 
-		// empty error means cookie exists, hence session token should
-		// be validated
-		token := cookie.Value
-		log = log.With(zap.String("token", token))
+		// empty error means cookie exists, hence session sessionId
+		// should be validated
+		sessionId := cookie.Value
+		log = log.With(zap.String("token", sessionId))
 		log.Debug("validating session...")
-		auth, err := store.IsAuthenticated(ctx, token)
+		session, err := store.Get(ctx, sessionId)
 		if err != nil {
 			internalServerError(w, err.Error())
 			return
@@ -44,9 +46,9 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// cookie is present, but not found in the session store.
 		// seems like cache key expired earlier than cookie. kinda
 		// suspicious, let's reset the session
-		if auth == nil {
+		if session == nil {
 			log.Warn("session is not registered")
-			_, err := utils.SaveSession(ctx, store, false, w)
+			_, err := utils.SaveSession(ctx, store, emptySession, w)
 			if err != nil {
 				internalServerError(w, err.Error())
 				return
