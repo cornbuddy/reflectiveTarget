@@ -5,7 +5,6 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
-	"go.uber.org/zap"
 )
 
 // checks if user is authenticated, otherwise throws 403
