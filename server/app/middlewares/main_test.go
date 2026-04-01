@@ -43,7 +43,6 @@ func (s *IsAuthenticatedSuite) PreGroup(t *testgroup.T) {
 	s.handler = chain(
 		emptyStub,
 		mw.IsAuthenticated,
-		mw.PutSessionDataToContext,
 	).ServeHTTP
 }
 

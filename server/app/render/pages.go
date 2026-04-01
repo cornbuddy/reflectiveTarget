@@ -7,6 +7,7 @@ import (
 	"github.com/go-viper/mapstructure/v2"
 	"go.uber.org/zap"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
@@ -34,7 +35,8 @@ func (e engine) render(
 		zap.String("path", path),
 	)
 
-	viewData, err := makeViewData(ctx, data)
+	session := sessiondata.Read(ctx)
+	viewData, err := makeViewData(session, data)
 	if err != nil {
 		log.Error("failed to make view data", zap.Error(err))
 	}
@@ -45,10 +47,10 @@ func (e engine) render(
 
 }
 
-func makeViewData(ctx context.Context, data ...any) (viewData, error) {
+func makeViewData(data ...any) (viewData, error) {
 	var result viewData
-	for _, data := range data {
-		if err := mapstructure.Decode(data, &result); err != nil {
+	for _, d := range data {
+		if err := mapstructure.Decode(d, &result); err != nil {
 			return nil, err
 		}
 	}

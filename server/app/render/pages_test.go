@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/render"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 )
 
@@ -29,8 +29,12 @@ func TestPageShouldContainText(t *testing.T) {
 	emptyCtx := context.TODO()
 	authorizedCtx := context.WithValue(
 		context.TODO(),
-		constants.AuthenticatedCtx,
-		toPtr(true),
+		sessiondata.SessionDataCtx,
+		&sessiondata.SessionData{
+			IsAuthenticated: true,
+			UserID:          12,
+			Username:        "kek",
+		},
 	)
 
 	testCases := []testCase{{

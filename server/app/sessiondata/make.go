@@ -18,6 +18,7 @@ type SessionData struct {
 	Username        string          `json:"username"`
 }
 
+// reads session data from context. returns zero object if not found
 func Read(ctx context.Context) SessionData {
 	return getData[SessionData](ctx, SessionDataCtx)
 }

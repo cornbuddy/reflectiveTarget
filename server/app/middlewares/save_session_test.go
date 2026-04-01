@@ -13,6 +13,52 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
+func TestSaveSessionShouldPutSessionDataToCtx(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		desc      string
+		sessionId string
+		want      sessiondata.SessionData
+	}
+
+	sessionId := "kekeke"
+	want := sessiondata.SessionData{
+		IsAuthenticated: true,
+		UserID:          69,
+		Username:        "kek",
+	}
+	require.NoError(t, store.Update(ctx, sessionId, want))
+
+	testCases := []testCase{{
+		"should put cached data to context if any",
+		sessionId,
+		want,
+	}, {
+		"should put zero object on cache miss",
+		"not found",
+		sessiondata.SessionData{},
+	}}
+
+	for _, tc := range testCases {
+		cookies := []*http.Cookie{{
+			Name:  constants.SessionCookieName,
+			Value: tc.sessionId,
+		}}
+		stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			require.NotNil(t, w)
+			require.NotNil(t, r)
+
+			got := sessiondata.Read(r.Context())
+			assert.EqualExportedValues(t, tc.want, got, tc.desc)
+		})
+		handler := mw.SaveSession(stub).ServeHTTP
+		utils.MakeRequestWithCookies(
+			"", http.MethodGet, "/", handler, nil, cookies...,
+		)
+	}
+}
+
 func TestSaveSessionShouldResetRequestCookieWhenItsNotInStore(t *testing.T) {
 	t.Parallel()
 

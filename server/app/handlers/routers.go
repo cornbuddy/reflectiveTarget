@@ -15,6 +15,12 @@ func NewRouter(config *config.Config) http.Handler {
 	mw := middlewares.Middleware{
 		SessionStore: config.SessionStore,
 	}
+	r.Use(
+		mw.Logger,
+		mw.SaveSession,
+		// TODO: move timeout to configuration block
+		mw.SetTimeout(30*time.Second),
+	)
 
 	index := indexHandler{}
 	r.HandleFunc("/", index.get).Methods(http.MethodGet)
@@ -49,13 +55,6 @@ func NewRouter(config *config.Config) http.Handler {
 	r.HandleFunc("/api/target/{targetID}/shots", shots.post).
 		Methods(http.MethodPost)
 
-	r.Use(
-		// TODO: move timeout to configuration block
-		mw.SetTimeout(30*time.Second),
-		mw.Logger,
-		mw.SaveSession,
-		mw.PutSessionDataToContext,
-	)
 	// https://stackoverflow.com/a/56937571
 	r.NotFoundHandler = r.NewRoute().HandlerFunc(http.NotFound).GetHandler()
 

@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"net/http"
 
 	"go.uber.org/zap"
@@ -10,6 +11,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
+// saves session into store. updates request contexts with session data
 func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -48,7 +50,8 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// suspicious, let's reset the session
 		if session == nil {
 			log.Warn("session is not registered")
-			_, err := utils.SaveSession(ctx, store, emptySession, w)
+			session = &emptySession
+			_, err := utils.SaveSession(ctx, store, *session, w)
 			if err != nil {
 				internalServerError(w, err.Error())
 				return
@@ -57,7 +60,8 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 
 		// session token was either found in the session store, or was
 		// set earlier, so let's process the request
-		log.Debug("session is validated")
-		next.ServeHTTP(w, r)
+		log.Debug("session is validated", zap.Any("session", *session))
+		newCtx := context.WithValue(ctx, sessiondata.SessionDataCtx, session)
+		next.ServeHTTP(w, r.WithContext(newCtx))
 	})
 }
