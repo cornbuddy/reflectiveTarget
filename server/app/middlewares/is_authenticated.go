@@ -19,7 +19,7 @@ func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
 			log.Debug("request is authenticated")
 			next.ServeHTTP(w, r)
 		} else {
-			log.Warn("request is unauthenticated", zap.Any("session", session))
+			log.Warn("request is unauthenticated")
 			http.Error(w, "forbidden", http.StatusForbidden)
 		}
 	})
