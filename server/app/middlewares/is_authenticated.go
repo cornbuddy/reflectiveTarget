@@ -5,6 +5,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
+	"go.uber.org/zap"
 )
 
 // checks if user is authenticated, otherwise throws 403
@@ -18,7 +19,7 @@ func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
 			log.Debug("request is authenticated")
 			next.ServeHTTP(w, r)
 		} else {
-			log.Warn("request is unauthenticated")
+			log.Warn("request is unauthenticated", zap.Any("session", session))
 			http.Error(w, "forbidden", http.StatusForbidden)
 		}
 	})
