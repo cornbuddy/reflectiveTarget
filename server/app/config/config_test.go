@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,6 +19,16 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 	config, err := MakeConfig(ctx)
 	require.NoError(t, err)
 	require.NotEmpty(t, config)
+
+	val := reflect.ValueOf(*config)
+	typ := reflect.TypeFor[Config]()
+	for i := 0; i < val.NumField(); i++ {
+		field := typ.Field(i)
+		if field.PkgPath == "" {
+			v := val.Field(i).Interface()
+			assert.NotEmpty(t, v, "field %s should not be empty", field.Name)
+		}
+	}
 
 	db := config.HealthDao.DB
 	cache := config.HealthDao.Cache

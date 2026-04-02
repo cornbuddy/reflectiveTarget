@@ -13,6 +13,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 )
 
@@ -21,6 +22,7 @@ type Config struct {
 	daos.SessionStore
 	daos.ShotsDao
 	daos.UserDao
+	repositories.TargetRepo
 }
 
 func MakeConfig(ctx context.Context) (*Config, error) {
@@ -82,6 +84,7 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 		SessionStore: daos.SessionStore{Cache: cache},
 		ShotsDao:     daos.ShotsDao{DB: db},
 		UserDao:      daos.UserDao{DB: db},
+		TargetRepo:   repositories.TargetRepo{DB: db},
 	}, nil
 }
 

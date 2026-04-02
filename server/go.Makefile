@@ -20,12 +20,16 @@ COVERPROFILE = cover.out
 COVERREPORT = cover.html
 PACKAGES = ./...
 TESTS = ^.+$
+GO_TEST_CMD = go test -vet=all -count=1 \
+-run $(TESTS) \
+-coverprofile=$(COVERPROFILE) \
+$(PACKAGES)
 
 .PHONY: test
 test:
 	ENVIRONMENT=development \
-	GOTOOLCHAIN=go1.25.3+auto \
-		go test -count=1 -run $(TESTS) -coverprofile=$(COVERPROFILE) $(PACKAGES)
+	GOTOOLCHAIN=$(shell go env GOVERSION)+auto \
+		$(GO_TEST_CMD)
 	go tool cover -html $(COVERPROFILE) -o $(COVERREPORT)
 	- xdg-open $(COVERREPORT)
 

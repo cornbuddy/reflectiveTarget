@@ -10,6 +10,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
 	"github.com/redis/go-redis/v9"
@@ -64,11 +65,13 @@ func makeTestConfig(db *sql.DB, cache *redis.Client) *config.Config {
 	shots := daos.ShotsDao{DB: db}
 	userDao := daos.UserDao{DB: db}
 	sessionStore := daos.SessionStore{Cache: cache}
+	targetRepo := repositories.TargetRepo{DB: db}
 
 	return &config.Config{
 		HealthDao:    health,
 		SessionStore: sessionStore,
 		ShotsDao:     shots,
 		UserDao:      userDao,
+		TargetRepo:   targetRepo,
 	}
 }
