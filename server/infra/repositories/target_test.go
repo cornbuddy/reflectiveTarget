@@ -4,6 +4,12 @@ import (
 	"testing"
 
 	"github.com/bloomberg/go-testgroup"
+
+	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
+	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 func (s *TargetRepoTests) ShouldReturnNilIfTargetDoesNotExist(t *testgroup.T) {
@@ -27,17 +33,76 @@ func (s *TargetRepoTests) ShouldReturnEmptyListIfNoUser(t *testgroup.T) {
 }
 
 func (s *TargetRepoTests) ShouldReturnNamesIfTargetsExist(t *testgroup.T) {
-	got, err := s.repo.ListTargetNamesOfUser(ctx, s.owner1.Username)
+	got1, err := s.repo.ListTargetNamesOfUser(ctx, s.owner1.Username)
 	t.Require.NoError(err)
-	t.Len(got, 1)
+	t.Len(got1, 1)
 
-	got, err = s.repo.ListTargetNamesOfUser(ctx, s.owner2.Username)
+	got2, err := s.repo.ListTargetNamesOfUser(ctx, s.owner2.Username)
 	t.Require.NoError(err)
-	t.Len(got, 2)
+	t.Len(got2, 2)
+
+	for i, got := range append(got1, got2...) {
+		want := s.targets[i]
+		t.Equal(want.Name, got.Name)
+		t.Equal(want.ID, got.ID)
+		t.Empty(got.Questions)
+		t.Empty(got.Shots)
+	}
 }
 
 func (*TargetRepoTests) ShouldSaveTarget(t *testgroup.T) {
 	t.Skip("not implemented")
+}
+
+type TargetRepoTests struct {
+	targets aggregations.Targets
+	repo    *repositories.TargetRepo
+	// owns 1 targets
+	owner1 *entities.User
+	// owns 2 targets
+	owner2 *entities.User
+}
+
+func (s *TargetRepoTests) PreGroup(t *testgroup.T) {
+	owner1, err := entities.NewUser("user1", "password")
+	t.Require.NoError(err)
+
+	owner2, err := entities.NewUser("user2", "password")
+	t.Require.NoError(err)
+
+	users := entities.Users{*owner1, *owner2}
+	t.Require.NoError(testutils.InsertUsers(db, users))
+
+	questions := vo.Questions{
+		{Text: "kek1?"},
+		{Text: "kek2?"},
+	}
+	shots := vo.Shots{
+		{X: 1, Y: 100},
+		{X: 100, Y: 1},
+	}
+	targets := aggregations.Targets{aggregations.Target{
+		Name:      "test1",
+		Owner:     users[0],
+		Questions: append(vo.Questions{}, questions...),
+		Shots:     append(vo.Shots{}, shots...),
+	}, {
+		Name:      "test2",
+		Owner:     users[1],
+		Questions: append(vo.Questions{}, questions...),
+		Shots:     append(vo.Shots{}, shots...),
+	}, {
+		Name:      "test3",
+		Owner:     users[1],
+		Questions: append(vo.Questions{}, questions...),
+		Shots:     append(vo.Shots{}, shots...),
+	}}
+	t.Require.NoError(testutils.InsertTargets(db, targets))
+
+	s.owner1 = &users[0]
+	s.owner2 = &users[1]
+	s.repo = &repositories.TargetRepo{db}
+	s.targets = targets
 }
 
 func TestTargetRepo(t *testing.T) {

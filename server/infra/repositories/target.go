@@ -18,12 +18,13 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 	return errors.New("not implemented")
 }
 
+// returns list of hollow (without nested fields) targets
 func (r TargetRepo) ListTargetNamesOfUser(
 	ctx context.Context, username string,
-) ([]string, error) {
+) (aggr.Targets, error) {
 
 	q := strings.Join([]string{
-		"SELECT t.name",
+		"SELECT t.name, t.id",
 		"FROM targets AS t",
 		"JOIN users AS u ON t.owner_id = u.id",
 		"WHERE u.username = $1",
@@ -33,17 +34,17 @@ func (r TargetRepo) ListTargetNamesOfUser(
 		return nil, err
 	}
 
-	names := []string{}
+	var res aggr.Targets
 	for rows.Next() {
-		name := ""
-		if err := rows.Scan(&name); err != nil {
+		t := aggr.Target{}
+		if err := rows.Scan(&t.Name, &t.ID); err != nil {
 			return nil, err
 		}
 
-		names = append(names, name)
+		res = append(res, t)
 	}
 
-	return names, nil
+	return res, nil
 }
 
 func (r TargetRepo) Get(ctx context.Context, id vo.ID) (*aggr.Target, error) {
