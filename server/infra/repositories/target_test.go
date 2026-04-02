@@ -47,6 +47,7 @@ func (s *TargetRepoTests) ShouldReturnNamesIfTargetsExist(t *testgroup.T) {
 		t.Equal(want.ID, got.ID)
 		t.Empty(got.Questions)
 		t.Empty(got.Shots)
+		t.Empty(got.Owner)
 	}
 }
 

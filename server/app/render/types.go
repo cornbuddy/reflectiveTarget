@@ -7,10 +7,10 @@ import (
 	"github.com/abiosoft/mold"
 )
 
-type RenderFunc func(context.Context, http.ResponseWriter, any)
+type RenderFunc func(context.Context, http.ResponseWriter, ViewData)
+
+type ViewData map[string]any
 
 type engine struct {
 	Engine mold.Engine
 }
-
-type viewData map[string]any
