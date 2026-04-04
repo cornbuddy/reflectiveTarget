@@ -81,8 +81,8 @@ func TestPageShouldContainText(t *testing.T) {
 			}},
 		},
 		[]string{
-			"href=\"/targets/1\">kek1?<",
-			"href=\"/targets/69\">kek69?<",
+			"<a href=\"/targets/1\">kek1?</a>",
+			"<a href=\"/targets/69\">kek69?</a>",
 		},
 	}}
 
@@ -149,8 +149,4 @@ func TestLayoutRendererShouldContainFullPage(t *testing.T) {
 		assert.Contains(t, body, "<!DOCTYPE html>")
 		assert.Contains(t, body, "</html>")
 	}
-}
-
-func toPtr[A any](obj A) *A {
-	return &obj
 }

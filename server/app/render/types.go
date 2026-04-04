@@ -1,16 +1,26 @@
 package render
 
 import (
-	"context"
-	"net/http"
-
 	"github.com/abiosoft/mold"
+
+	"github.com/cornbuddy/reflectiveTarget/server/app/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 )
 
-type RenderFunc func(context.Context, http.ResponseWriter, ViewData)
-
-type ViewData map[string]any
-
-type engine struct {
-	Engine mold.Engine
+type TargetsData struct {
+	aggregations.Targets
 }
+
+type SignupData struct {
+	forms.SignupForm
+}
+
+type LoginData struct {
+	forms.LoginForm
+}
+
+type Engine struct {
+	mold.Engine
+}
+
+type viewData map[string]any

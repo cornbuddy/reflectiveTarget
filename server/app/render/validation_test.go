@@ -40,7 +40,7 @@ func TestSignupFormValidationErrorsShouldBeRendered(t *testing.T) {
 		Confirmation: forms.Field{Errors: errs},
 	}
 
-	render.View.Signup(ctx, w, form)
+	render.View.Signup(ctx, w, render.SignupData{form})
 	doc, err := goquery.NewDocumentFromReader(w.Body)
 	require.NoError(t, err)
 

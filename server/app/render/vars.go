@@ -6,9 +6,9 @@ import (
 	"github.com/abiosoft/mold"
 )
 
-var Layout = engine{layoutEngine}
+var Layout = Engine{layoutEngine}
 
-var View = engine{viewsEngine}
+var View = Engine{viewsEngine}
 
 //go:embed templates
 var dir embed.FS
