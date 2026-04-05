@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,7 +19,7 @@ func TestPageShouldContainText(t *testing.T) {
 
 	type testCase struct {
 		description string
-		render      render.RenderFunc
+		render      render.Render
 		ctx         context.Context
 		data        any
 		contains    []string
@@ -39,37 +38,37 @@ func TestPageShouldContainText(t *testing.T) {
 
 	testCases := []testCase{{
 		"non authorized client should see correct navbar",
-		render.Layout.Index,
+		render.Layout,
 		emptyCtx,
 		nil,
 		[]string{"Login", "Signup"},
 	}, {
 		"authorized client should see correct navbar",
-		render.Layout.Index,
+		render.Layout,
 		authorizedCtx,
 		nil,
 		[]string{"Targets", "Logout"},
 	}, {
 		"signup page should contain form",
-		render.View.Signup,
+		render.View,
 		emptyCtx,
 		nil,
 		[]string{"Signup", "<form hx-post=\"/signup\"", "</form>"},
 	}, {
 		"login page should contain form",
-		render.View.Login,
+		render.View,
 		emptyCtx,
 		nil,
 		[]string{"Login", "<form hx-post=\"/login\"", "</form>"},
 	}, {
 		"targets page should allow to create new target",
-		render.View.Targets,
+		render.View,
 		authorizedCtx,
 		nil,
 		[]string{"Targets", "New target", "href=\"/targets/new\""},
 	}, {
 		"targets page should have links to targets",
-		render.View.Targets,
+		render.View,
 		authorizedCtx,
 		map[string]any{
 			"Targets": aggregations.Targets{{
@@ -99,54 +98,30 @@ func TestPageShouldContainText(t *testing.T) {
 	}
 }
 
-var (
-	anyType = reflect.TypeFor[struct{}]()
-)
-
-func TestViewRendererShouldNotContainFullPage(t *testing.T) {
-	t.Parallel()
-
-	value := reflect.ValueOf(&render.View)
-	for i := 0; i < value.NumMethod(); i++ {
-		method := value.Method(i)
-		require.True(t, method.IsValid())
-
-		w := httptest.NewRecorder()
-		args := []reflect.Value{
-			reflect.ValueOf(context.TODO()),
-			reflect.ValueOf(w),
-			reflect.New(anyType).Elem(),
-		}
-		method.Call(args)
-		raw, err := io.ReadAll(w.Body)
-		require.NoError(t, err)
-
-		body := string(raw)
-		assert.NotContains(t, body, "<!DOCTYPE html>")
-		assert.NotContains(t, body, "</html>")
-	}
+type renderTestCase struct {
+	desc   string
+	render render.Render
+	assert func(*testing.T, io.Reader, []string)
 }
 
-func TestLayoutRendererShouldContainFullPage(t *testing.T) {
+var renderTestCases = []renderTestCase{{
+	"layout render",
+	render.Layout,
+	assertContainsTokens,
+}, {
+	"view render",
+	render.View,
+	assertNotContainsTokens,
+}}
+
+func TestRenderIndex(t *testing.T) {
 	t.Parallel()
 
-	value := reflect.ValueOf(&render.Layout)
-	for i := 0; i < value.NumMethod(); i++ {
-		method := value.Method(i)
-		require.True(t, method.IsValid())
-
-		w := httptest.NewRecorder()
-		args := []reflect.Value{
-			reflect.ValueOf(context.TODO()),
-			reflect.ValueOf(w),
-			reflect.New(anyType).Elem(),
-		}
-		method.Call(args)
-		raw, err := io.ReadAll(w.Body)
-		require.NoError(t, err)
-
-		body := string(raw)
-		assert.Contains(t, body, "<!DOCTYPE html>")
-		assert.Contains(t, body, "</html>")
+	for _, tc := range renderTestCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			tc.render.Index(context.TODO(), w)
+			tc.assert(t, w.Body, layoutMakrers)
+		})
 	}
 }

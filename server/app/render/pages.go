@@ -11,29 +11,29 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
-func (e Engine) Targets(
+func (e engine) Targets(
 	ctx context.Context, w http.ResponseWriter, data TargetsData,
 ) {
 	e.render(ctx, "views/targets.tmpl", w, data)
 }
 
-func (e Engine) Signup(
+func (e engine) Signup(
 	ctx context.Context, w http.ResponseWriter, data SignupData,
 ) {
 	e.render(ctx, "views/signup.tmpl", w, data)
 }
 
-func (e Engine) Login(
+func (e engine) Login(
 	ctx context.Context, w http.ResponseWriter, data LoginData,
 ) {
 	e.render(ctx, "views/login.tmpl", w, data)
 }
 
-func (e Engine) Index(ctx context.Context, w http.ResponseWriter) {
+func (e engine) Index(ctx context.Context, w http.ResponseWriter) {
 	e.render(ctx, "views/index.tmpl", w, nil)
 }
 
-func (e Engine) render(
+func (e engine) render(
 	ctx context.Context, path string, w http.ResponseWriter, data any,
 ) {
 	log := utils.LoggerFromCtx(ctx).With(
