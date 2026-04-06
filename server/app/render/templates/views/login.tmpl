@@ -10,7 +10,7 @@ Login
             autocomplete="username"
             required>
 
-    {{ partial "components/errors.tmpl" .Username.Errors }}
+    {{ partial "components/errors.tmpl" .LoginData.Username.Errors }}
     </section>
 
     <section id="password">
@@ -21,7 +21,7 @@ Login
             autocomplete="password"
             required>
 
-    {{ partial "components/errors.tmpl" .Password.Errors }}
+    {{ partial "components/errors.tmpl" .LoginData.Password.Errors }}
     </section>
 
     <button type="submit">Login</button>

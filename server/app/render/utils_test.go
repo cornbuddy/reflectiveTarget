@@ -59,16 +59,22 @@ func (tcs *layoutMarkersTestCases) run(t *testing.T, rc renderClosure) {
 }
 
 func assertContainsTokens(t *testing.T, body io.Reader, tokens []string) {
+	t.Helper()
+
 	assertTokens(t, body, tokens, assert.Contains)
 }
 
 func assertNotContainsTokens(t *testing.T, body io.Reader, tokens []string) {
+	t.Helper()
+
 	assertTokens(t, body, tokens, assert.NotContains)
 }
 
 func assertTokens(
 	t *testing.T, body io.Reader, tokens []string, asrt assertFunc,
 ) {
+	t.Helper()
+
 	raw, err := io.ReadAll(body)
 	require.NoError(t, err)
 

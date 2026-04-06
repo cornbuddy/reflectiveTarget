@@ -8,6 +8,7 @@ import (
 	"github.com/abiosoft/mold"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 )
 
@@ -36,7 +37,12 @@ type LoginData struct {
 	forms.LoginForm
 }
 
-type viewData map[string]any
+type viewData struct {
+	SessionData sessiondata.SessionData
+	TargetsData TargetsData
+	SignupData  SignupData
+	LoginData   LoginData
+}
 
 type engine struct {
 	mold.Engine

@@ -14,7 +14,7 @@ type RenderIndexTest struct{}
 
 func (r *RenderIndexTest) UserSeesButtons(t *testgroup.T) {
 	w := httptest.NewRecorder()
-	render.Layout.Index(anonCtx, w)
+	render.Layout.Index(userCtx, w)
 	tokens := []string{"Targets", "Logout"}
 	assertContainsTokens(t.T, w.Body, tokens)
 }

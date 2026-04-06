@@ -13,9 +13,9 @@ const (
 )
 
 type SessionData struct {
-	IsAuthenticated bool            `json:"isAuthenticated"`
-	UserID          valueobjects.ID `json:"userID"`
-	Username        string          `json:"username"`
+	IsAuthenticated bool
+	UserID          valueobjects.ID
+	Username        string
 }
 
 // reads session data from context. returns zero object if not found

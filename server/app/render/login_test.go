@@ -12,9 +12,9 @@ import (
 
 type RenderLoginTest struct{}
 
-func (r *RenderLoginTest) HasSignupForm(t *testgroup.T) {
+func (r *RenderLoginTest) HasLoginForm(t *testgroup.T) {
 	w := httptest.NewRecorder()
-	render.View.Signup(anonCtx, w, render.SignupData{})
+	render.View.Login(anonCtx, w, render.LoginData{})
 	tokens := []string{"Login", "<form hx-post=\"/login\"", "</form>"}
 	assertContainsTokens(t.T, w.Body, tokens)
 }

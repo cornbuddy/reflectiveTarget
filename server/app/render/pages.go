@@ -2,9 +2,9 @@ package render
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
-	"github.com/go-viper/mapstructure/v2"
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
@@ -42,24 +42,37 @@ func (e engine) render(
 	)
 
 	session := sessiondata.Read(ctx)
-	viewData, err := makeViewData(session, data)
+	viewData, err := makeViewData(data, session)
+	log = log.With(zap.Any("view-data", viewData))
+	log.Debug("view data")
 	if err != nil {
 		log.Error("failed to make view data", zap.Error(err))
 	}
 
-	if err := e.Render(w, path, viewData); err != nil {
+	if err := e.Render(w, path, *viewData); err != nil {
 		log.Error("failed to render", zap.Error(err))
 	}
 
 }
 
-func makeViewData(data ...any) (viewData, error) {
+func makeViewData(datas ...any) (*viewData, error) {
 	var result viewData
-	for _, d := range data {
-		if err := mapstructure.Decode(d, &result); err != nil {
-			return nil, err
+	for _, data := range datas {
+		switch v := data.(type) {
+		case sessiondata.SessionData:
+			result.SessionData = v
+		case TargetsData:
+			result.TargetsData = v
+		case SignupData:
+			result.SignupData = v
+		case LoginData:
+			result.LoginData = v
+		case nil:
+			// do nothing, this is expected
+		default:
+			return nil, fmt.Errorf("unknown data %v", data)
 		}
 	}
 
-	return result, nil
+	return &result, nil
 }
