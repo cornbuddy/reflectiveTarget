@@ -34,8 +34,9 @@ test:
 spec: build
 	$(MAKE) run &
 	sleep 10
-	- $(MAKE) -C spec spec
-	$(MAKE) stop
+	$(MAKE) -C spec spec; ret=$$?; \
+		$(MAKE) stop; \
+		exit $$ret
 
 .PHONY: pre-commit
 pre-commit:
