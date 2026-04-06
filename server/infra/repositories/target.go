@@ -19,7 +19,7 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 }
 
 // returns list of hollow (without nested fields) targets
-func (r TargetRepo) ListTargetNamesOfUser(
+func (r TargetRepo) ListTargetsOfUser(
 	ctx context.Context, username string,
 ) (aggr.Targets, error) {
 

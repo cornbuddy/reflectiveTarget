@@ -3,6 +3,7 @@ package handlers
 import (
 	"io"
 	"net/http"
+	"strconv"
 	"testing"
 
 	"github.com/bloomberg/go-testgroup"
@@ -36,12 +37,12 @@ func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
 
 	body := string(data)
 	for _, ot := range s.ownedTargets {
-		t.Contains(body, ot.ID)
+		t.Contains(body, strconv.Itoa(int(ot.ID)))
 		t.Contains(body, ot.Name)
 	}
 
 	for _, ft := range s.foreignTargets {
-		t.NotContains(body, ft.ID)
+		t.NotContains(body, strconv.Itoa(int(ft.ID)))
 		t.NotContains(body, ft.Name)
 	}
 }

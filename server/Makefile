@@ -5,19 +5,24 @@ MODULES = app domain infra test
 all: lint test
 
 .PHONY: lint
+.ONESHELL:
 lint:
-	for module in $(MODULES); do \
-		$(MAKE) -C $$module lint; \
+	set -e
+	for module in $(MODULES); do
+		$(MAKE) -C $$module lint
 	done
 
 .PHONY: test
+.ONESHELL:
 test:
-	for layer in $(LAYERS); do \
-		ENVIRONMENT="development" $(MAKE) -C $$layer test; \
+	set -e
+	for layer in $(LAYERS); do
+		ENVIRONMENT="development" $(MAKE) -C $$layer test
 	done
 
 .PHONY: deps
+.ONESHELL:
 deps:
-	for module in $(MODULES); do \
-		$(MAKE) -C $$module deps; \
+	for module in $(MODULES); do
+		$(MAKE) -C $$module deps
 	done

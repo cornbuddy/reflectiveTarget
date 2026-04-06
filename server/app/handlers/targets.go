@@ -20,7 +20,7 @@ func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 	session := sessiondata.Read(ctx)
 	log := utils.LoggerFromCtx(ctx)
 
-	targets, err := h.repo.ListTargetNamesOfUser(ctx, session.Username)
+	targets, err := h.repo.ListTargetsOfUser(ctx, session.Username)
 	if err != nil {
 		msg := "failed to fetch list of targets"
 		log.Error(msg, zap.Error(err))
@@ -28,7 +28,7 @@ func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.Layout.Targets(ctx, w, targets)
+	render.Layout.Targets(ctx, w, render.TargetsData{Targets: targets})
 }
 
 func (h targetsHandler) new(w http.ResponseWriter, r *http.Request) {}

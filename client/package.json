@@ -19,7 +19,7 @@
     "homepage": "https://github.com/cornbuddy/reflectiveTarget#readme",
     "devDependencies": {
         "css-loader": "^7.1.2",
-        "css-minimizer-webpack-plugin": "^7.0.2",
+        "css-minimizer-webpack-plugin": "^8.0.0",
         "eslint": "^9.34.0",
         "jest": "^30.2.0",
         "mini-css-extract-plugin": "^2.9.4",

@@ -27,17 +27,17 @@ func (s *TargetRepoTests) ShouldReturnTargetIfExist(t *testgroup.T) {
 }
 
 func (s *TargetRepoTests) ShouldReturnEmptyListIfNoUser(t *testgroup.T) {
-	targets, err := s.repo.ListTargetNamesOfUser(ctx, "kek")
+	targets, err := s.repo.ListTargetsOfUser(ctx, "kek")
 	t.Require.NoError(err)
 	t.Empty(targets)
 }
 
 func (s *TargetRepoTests) ShouldReturnNamesIfTargetsExist(t *testgroup.T) {
-	got1, err := s.repo.ListTargetNamesOfUser(ctx, s.owner1.Username)
+	got1, err := s.repo.ListTargetsOfUser(ctx, s.owner1.Username)
 	t.Require.NoError(err)
 	t.Len(got1, 1)
 
-	got2, err := s.repo.ListTargetNamesOfUser(ctx, s.owner2.Username)
+	got2, err := s.repo.ListTargetsOfUser(ctx, s.owner2.Username)
 	t.Require.NoError(err)
 	t.Len(got2, 2)
 

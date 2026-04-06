@@ -14,5 +14,5 @@ func (h indexHandler) get(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	render.Layout.Index(req.Context(), resp, nil)
+	render.Layout.Index(req.Context(), resp)
 }

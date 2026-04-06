@@ -50,7 +50,7 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 	if valid := h.LoginFormValidator.Validate(ctx, &form); !valid {
 		log.Debug("login failed", zap.Any("form", form))
 		w.WriteHeader(http.StatusUnauthorized)
-		render.View.Login(ctx, w, form)
+		render.View.Login(ctx, w, render.LoginData{LoginForm: form})
 		return
 	}
 
@@ -93,7 +93,7 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 	if valid := h.SignupFormValidator.Validate(ctx, &form); !valid {
 		log.Debug("signup failed", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)
-		render.View.Signup(ctx, w, form)
+		render.View.Signup(ctx, w, render.SignupData{SignupForm: form})
 		return
 	}
 
@@ -128,9 +128,9 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h authzHandler) getSignup(w http.ResponseWriter, r *http.Request) {
-	render.Layout.Signup(r.Context(), w, nil)
+	render.Layout.Signup(r.Context(), w, render.SignupData{})
 }
 
 func (h authzHandler) getLogin(w http.ResponseWriter, r *http.Request) {
-	render.Layout.Login(r.Context(), w, nil)
+	render.Layout.Login(r.Context(), w, render.LoginData{})
 }
