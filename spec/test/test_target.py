@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 def test_user_should_be_able_to_create_target(user):
     user.ensure_navigation_opened()
     user.driver.find_element(By.LINK_TEXT, "Targets").click()
-    user.driver.find_element(By.LINK_TEXT, "New").click()
+    user.driver.find_element(By.LINK_TEXT, "New target").click()
     target_form = user.driver.find_element(By.TAG_NAME, "form")
     assert target_form is not None
 
