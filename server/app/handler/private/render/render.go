@@ -17,6 +17,7 @@ type Render interface {
 	Login(context.Context, http.ResponseWriter, LoginData)
 	Signup(context.Context, http.ResponseWriter, SignupData)
 	Targets(context.Context, http.ResponseWriter, TargetsData)
+	UpdateTarget(context.Context, http.ResponseWriter, TargetData)
 }
 
 // renders view with layout (eg navbar, head, header, footer, etc)
@@ -24,6 +25,10 @@ var Layout = makeRender("layout.tmpl")
 
 // renders view only
 var View = makeRender("empty-layout.tmpl")
+
+type TargetData struct {
+	aggregations.Target
+}
 
 type TargetsData struct {
 	aggregations.Targets
@@ -40,6 +45,7 @@ type LoginData struct {
 type viewData struct {
 	SessionData sessiondata.SessionData
 	TargetsData TargetsData
+	TargetData  TargetData
 	SignupData  SignupData
 	LoginData   LoginData
 }

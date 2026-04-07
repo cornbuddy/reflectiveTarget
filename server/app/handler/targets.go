@@ -31,7 +31,9 @@ func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 	render.Layout.Targets(ctx, w, render.TargetsData{Targets: targets})
 }
 
-func (h targetsHandler) makeNew(w http.ResponseWriter, r *http.Request) {}
+func (h targetsHandler) makeNew(w http.ResponseWriter, r *http.Request) {
+	render.Layout.UpdateTarget(r.Context(), w, render.TargetData{})
+}
 
 func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {}
 

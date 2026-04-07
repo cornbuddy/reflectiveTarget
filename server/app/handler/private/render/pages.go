@@ -11,6 +11,12 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
+func (e engine) UpdateTarget(
+	ctx context.Context, w http.ResponseWriter, data TargetData,
+) {
+	e.render(ctx, "views/targets.tmpl", w, data)
+}
+
 func (e engine) Targets(
 	ctx context.Context, w http.ResponseWriter, data TargetsData,
 ) {
@@ -63,6 +69,8 @@ func makeViewData(datas ...any) (*viewData, error) {
 			result.SessionData = v
 		case TargetsData:
 			result.TargetsData = v
+		case TargetData:
+			result.TargetData = v
 		case SignupData:
 			result.SignupData = v
 		case LoginData:
