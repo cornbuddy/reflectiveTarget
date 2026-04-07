@@ -7,15 +7,12 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
 	"github.com/cornbuddy/reflectiveTarget/server/app/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 type (
-	assertFunc             func(assert.TestingT, any, any, ...any) bool
 	renderClosure          func(render.Render) func(http.ResponseWriter)
 	layoutMarkersTestCases []layoutMarkersTestCase
 	layoutMarkersTestCase  struct {
@@ -31,11 +28,11 @@ var (
 	testCases     = layoutMarkersTestCases{{
 		"layout render",
 		render.Layout,
-		assertContainsTokens,
+		utils.AssertContainsTokens,
 	}, {
 		"view render",
 		render.View,
-		assertNotContainsTokens,
+		utils.AssertNotContainsTokens,
 	}}
 	userCtx = context.WithValue(
 		context.TODO(),
@@ -55,31 +52,5 @@ func (tcs *layoutMarkersTestCases) run(t *testing.T, rc renderClosure) {
 			rc(tc.render)(w)
 			tc.assert(t, w.Body, layoutMakrers)
 		})
-	}
-}
-
-func assertContainsTokens(t *testing.T, body io.Reader, tokens []string) {
-	t.Helper()
-
-	assertTokens(t, body, tokens, assert.Contains)
-}
-
-func assertNotContainsTokens(t *testing.T, body io.Reader, tokens []string) {
-	t.Helper()
-
-	assertTokens(t, body, tokens, assert.NotContains)
-}
-
-func assertTokens(
-	t *testing.T, body io.Reader, tokens []string, asrt assertFunc,
-) {
-	t.Helper()
-
-	raw, err := io.ReadAll(body)
-	require.NoError(t, err)
-
-	strBody := string(raw)
-	for _, token := range tokens {
-		asrt(t, strBody, token)
 	}
 }

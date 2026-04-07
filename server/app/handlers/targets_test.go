@@ -22,6 +22,13 @@ type TargetsSuite struct {
 	foreignTargets aggregations.Targets
 }
 
+func (s *TargetsSuite) ShouldContainHtmlForm(t *testgroup.T) {
+	r := utils.MakeRequestWithCookies(
+		"", http.MethodGet, "/targets/new", router, nil, s.session...,
+	)
+	t.Equal(http.StatusOK, r.StatusCode)
+}
+
 func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
 	r := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/targets", router, nil, s.session...,

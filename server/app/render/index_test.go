@@ -8,6 +8,7 @@ import (
 	"github.com/bloomberg/go-testgroup"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/render"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 type RenderIndexTest struct{}
@@ -16,14 +17,14 @@ func (r *RenderIndexTest) UserSeesButtons(t *testgroup.T) {
 	w := httptest.NewRecorder()
 	render.Layout.Index(userCtx, w)
 	tokens := []string{"Targets", "Logout"}
-	assertContainsTokens(t.T, w.Body, tokens)
+	utils.AssertContainsTokens(t.T, w.Body, tokens)
 }
 
 func (r *RenderIndexTest) AnonSeesButtons(t *testgroup.T) {
 	w := httptest.NewRecorder()
 	render.Layout.Index(anonCtx, w)
 	tokens := []string{"Login", "Signup"}
-	assertContainsTokens(t.T, w.Body, tokens)
+	utils.AssertContainsTokens(t.T, w.Body, tokens)
 }
 
 func (r *RenderIndexTest) HasProperLayoutMarkers(t *testgroup.T) {

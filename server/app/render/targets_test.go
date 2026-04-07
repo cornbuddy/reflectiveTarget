@@ -10,6 +10,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/render"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 type RenderTargetsTest struct{}
@@ -30,14 +31,14 @@ func (r *RenderTargetsTest) RendersTargetLinksProperly(t *testgroup.T) {
 
 	w := httptest.NewRecorder()
 	render.View.Targets(anonCtx, w, data)
-	assertContainsTokens(t.T, w.Body, tokens)
+	utils.AssertContainsTokens(t.T, w.Body, tokens)
 }
 
 func (r *RenderTargetsTest) AllowsToCreateNewTarget(t *testgroup.T) {
 	w := httptest.NewRecorder()
 	render.View.Targets(anonCtx, w, render.TargetsData{})
 	tokens := []string{"Targets", "New target", "href=\"/targets/new\""}
-	assertContainsTokens(t.T, w.Body, tokens)
+	utils.AssertContainsTokens(t.T, w.Body, tokens)
 }
 
 func (r *RenderTargetsTest) HasProperLayoutMarkers(t *testgroup.T) {

@@ -11,6 +11,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/forms"
 	"github.com/cornbuddy/reflectiveTarget/server/app/render"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 type RenderSignupTest struct {
@@ -53,7 +54,7 @@ func (r *RenderSignupTest) HasSignupForm(t *testgroup.T) {
 	w := httptest.NewRecorder()
 	render.View.Signup(anonCtx, w, render.SignupData{})
 	tokens := []string{"Signup", "<form hx-post=\"/signup\"", "</form>"}
-	assertContainsTokens(t.T, w.Body, tokens)
+	utils.AssertContainsTokens(t.T, w.Body, tokens)
 }
 
 func (r *RenderSignupTest) HasProperLayoutMarkers(t *testgroup.T) {

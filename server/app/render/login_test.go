@@ -8,6 +8,7 @@ import (
 	"github.com/bloomberg/go-testgroup"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/render"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 type RenderLoginTest struct{}
@@ -16,7 +17,7 @@ func (r *RenderLoginTest) HasLoginForm(t *testgroup.T) {
 	w := httptest.NewRecorder()
 	render.View.Login(anonCtx, w, render.LoginData{})
 	tokens := []string{"Login", "<form hx-post=\"/login\"", "</form>"}
-	assertContainsTokens(t.T, w.Body, tokens)
+	utils.AssertContainsTokens(t.T, w.Body, tokens)
 }
 
 func (r *RenderLoginTest) HasProperLayoutMarkers(t *testgroup.T) {
