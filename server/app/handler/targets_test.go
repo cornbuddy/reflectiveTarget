@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"io"
@@ -27,6 +27,9 @@ func (s *TargetsSuite) ShouldContainHtmlForm(t *testgroup.T) {
 		"", http.MethodGet, "/targets/new", router, nil, s.session...,
 	)
 	t.Equal(http.StatusOK, r.StatusCode)
+
+	tokens := []string{"<form>", "</form>"}
+	utils.AssertContainsTokens(t.T, r.Body, tokens)
 }
 
 func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
