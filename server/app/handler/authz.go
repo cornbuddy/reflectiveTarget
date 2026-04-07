@@ -7,6 +7,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
@@ -16,8 +17,8 @@ import (
 type authzHandler struct {
 	daos.UserDao
 	daos.SessionStore
-	SignupFormValidator
-	LoginFormValidator
+	validators.SignupFormValidator
+	validators.LoginFormValidator
 }
 
 func (h authzHandler) getLogout(w http.ResponseWriter, r *http.Request) {

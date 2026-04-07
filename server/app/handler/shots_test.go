@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -33,7 +34,7 @@ func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 	resp := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-	var shots ShotsResponse
+	var shots contracts.ShotsResponse
 	require.NoError(t, json.NewDecoder(resp.Body).Decode(&shots))
 	assert.Len(t, shots.Shots, 0)
 
@@ -65,7 +66,7 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 
 	var body bytes.Buffer
 	require.NoError(t, json.NewEncoder(&body).Encode(
-		ShotsRequest{Shots: []valueobjects.Shot{shot}},
+		contracts.ShotsRequest{Shots: []valueobjects.Shot{shot}},
 	))
 
 	url := fmt.Sprintf("/api/target/%v/shots", targetID)
@@ -96,15 +97,19 @@ func TestShotsShouldBeValidated(t *testing.T) {
 
 	type testCase struct {
 		desc string
-		body ShotsRequest
+		body contracts.ShotsRequest
 	}
 
 	testCases := []testCase{{
 		desc: "should fail when coordinates are greater than 100",
-		body: ShotsRequest{[]valueobjects.Shot{{X: 101, Y: 101}}},
+		body: contracts.ShotsRequest{
+			Shots: []valueobjects.Shot{{X: 101, Y: 101}},
+		},
 	}, {
 		desc: "should fail when coordinates are less than 0",
-		body: ShotsRequest{[]valueobjects.Shot{{X: -1, Y: -1}}},
+		body: contracts.ShotsRequest{
+			Shots: []valueobjects.Shot{{X: -1, Y: -1}},
+		},
 	}}
 
 	for _, tc := range testCases {

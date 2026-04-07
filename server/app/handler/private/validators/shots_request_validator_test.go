@@ -1,10 +1,11 @@
-package handler
+package validators
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
@@ -14,31 +15,31 @@ func TestShotsValidator(t *testing.T) {
 
 	type testCase struct {
 		description string
-		shots       ShotsRequest
+		shots       contracts.ShotsRequest
 		result      ValidationResult
 	}
 
 	testCases := []testCase{{
 		"should be valid if everything is 0",
-		ShotsRequest{
+		contracts.ShotsRequest{
 			Shots: []valueobjects.Shot{{X: 0, Y: 0}},
 		},
 		ValidationResult{Errors: nil},
 	}, {
 		"should be valid if everything is on range (0; 100)",
-		ShotsRequest{
+		contracts.ShotsRequest{
 			Shots: []valueobjects.Shot{{X: 69, Y: 69}},
 		},
 		ValidationResult{Errors: nil},
 	}, {
 		"should be valid if everything is 100",
-		ShotsRequest{
+		contracts.ShotsRequest{
 			Shots: []valueobjects.Shot{{X: 100, Y: 100}},
 		},
 		ValidationResult{Errors: nil},
 	}, {
 		"should not be valid if coordinate is less than 0",
-		ShotsRequest{
+		contracts.ShotsRequest{
 			Shots: []valueobjects.Shot{{X: -1, Y: 0}},
 		},
 		ValidationResult{
@@ -46,7 +47,7 @@ func TestShotsValidator(t *testing.T) {
 		},
 	}, {
 		"should not be valid if both coordinates are less than 0",
-		ShotsRequest{
+		contracts.ShotsRequest{
 			Shots: []valueobjects.Shot{{X: -1, Y: -1}},
 		},
 		ValidationResult{
@@ -56,7 +57,7 @@ func TestShotsValidator(t *testing.T) {
 			}},
 	}, {
 		"should not be valid if x > 100 and y < 0",
-		ShotsRequest{
+		contracts.ShotsRequest{
 			Shots: []valueobjects.Shot{{X: 101, Y: -1}},
 		},
 		ValidationResult{
@@ -66,7 +67,7 @@ func TestShotsValidator(t *testing.T) {
 			}},
 	}, {
 		"should not be valid if x < 0 and y > 100",
-		ShotsRequest{
+		contracts.ShotsRequest{
 			Shots: []valueobjects.Shot{{X: -1, Y: 101}},
 		},
 		ValidationResult{

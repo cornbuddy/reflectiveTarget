@@ -1,4 +1,4 @@
-package handler
+package validators
 
 import (
 	"testing"
@@ -7,13 +7,18 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 func TestSignupFormValidator(t *testing.T) {
 	t.Parallel()
 
-	user, err := makeTestUser(db)
+	username := "yet another username"
+	password := "default-password123@"
+	user, err := entities.NewUser(username, password)
 	require.NoError(t, err)
+	require.NoError(t, utils.InsertUser(db, user))
 
 	type testCase struct {
 		form  forms.SignupForm

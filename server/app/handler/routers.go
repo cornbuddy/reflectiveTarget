@@ -8,6 +8,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/middlewares"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 )
 
 func NewRouter(config *config.Config) http.Handler {
@@ -28,8 +29,8 @@ func NewRouter(config *config.Config) http.Handler {
 	authz := authzHandler{
 		config.UserDao,
 		config.SessionStore,
-		SignupFormValidator{config.UserDao},
-		LoginFormValidator{config.UserDao},
+		validators.SignupFormValidator{UserDao: config.UserDao},
+		validators.LoginFormValidator{UserDao: config.UserDao},
 	}
 	r.HandleFunc("/logout", authz.getLogout).Methods(http.MethodGet)
 	r.HandleFunc("/login", authz.getLogin).Methods(http.MethodGet)
@@ -48,12 +49,12 @@ func NewRouter(config *config.Config) http.Handler {
 	health := healthHandler{config.HealthDao}
 	shots := shotsHandler{
 		config.ShotsDao,
-		ShotsRequestValidator{},
+		validators.ShotsRequestValidator{},
 	}
 	r.HandleFunc("/api/health", health.get).Methods(http.MethodGet)
-	r.HandleFunc("/api/target/{targetID}/shots", shots.get).
+	r.HandleFunc("/api/target/{targetID:[0-9]+}/shots", shots.get).
 		Methods(http.MethodGet)
-	r.HandleFunc("/api/target/{targetID}/shots", shots.post).
+	r.HandleFunc("/api/target/{targetID:[0-9]+}/shots", shots.post).
 		Methods(http.MethodPost)
 
 	// https://stackoverflow.com/a/56937571

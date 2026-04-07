@@ -1,8 +1,9 @@
-package handler
+package validators
 
 import (
 	"fmt"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 )
 
@@ -13,7 +14,10 @@ const (
 
 type ShotsRequestValidator struct{}
 
-func (v ShotsRequestValidator) Validate(shots ShotsRequest) ValidationResult {
+func (v ShotsRequestValidator) Validate(
+	shots contracts.ShotsRequest,
+) ValidationResult {
+
 	res := ValidationResult{}
 	for _, shot := range shots.Shots {
 		if shot.X > MaxCoordinate || shot.X < MinCoordinate {

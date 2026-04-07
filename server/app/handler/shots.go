@@ -10,23 +10,17 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
-type ShotsRequest struct {
-	valueobjects.Shots `json:"shots"`
-}
-
-type ShotsResponse struct {
-	valueobjects.Shots `json:"shots"`
-}
-
 type shotsHandler struct {
 	daos.ShotsDao
-	Validator ShotsRequestValidator
+	Validator validators.ShotsRequestValidator
 }
 
 func (h shotsHandler) get(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +48,7 @@ func (h shotsHandler) get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := json.Marshal(ShotsResponse{Shots: shots})
+	data, err := json.Marshal(contracts.ShotsResponse{Shots: shots})
 	if err != nil {
 		log.Error("cannot marshal response", zap.Error(err))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -80,7 +74,7 @@ func (h shotsHandler) post(w http.ResponseWriter, r *http.Request) {
 
 	log = log.With(zap.Int("target-id", targetID))
 
-	var shots ShotsRequest
+	var shots contracts.ShotsRequest
 	if err := json.NewDecoder(r.Body).Decode(&shots); err != nil {
 		log.Error("failed to decode body", zap.Error(err))
 		http.Error(w, "bad request", http.StatusBadRequest)

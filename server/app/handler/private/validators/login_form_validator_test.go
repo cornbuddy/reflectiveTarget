@@ -1,4 +1,4 @@
-package handler
+package validators
 
 import (
 	"testing"
@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 func TestLoginFormValidation(t *testing.T) {
@@ -19,9 +21,12 @@ func TestLoginFormValidation(t *testing.T) {
 		result bool
 	}
 
-	absentUsername := makeRandomString(10)
-	user, err := makeTestUser(db)
+	absentUsername := "do not exist"
+	username := "completely random username"
+	password := "default-password123@"
+	user, err := entities.NewUser(username, password)
 	require.NoError(t, err)
+	require.NoError(t, utils.InsertUser(db, user))
 
 	testCases := []testCase{{
 		"empty fields",
@@ -81,11 +86,11 @@ func TestLoginFormValidation(t *testing.T) {
 		"all good",
 		forms.LoginForm{
 			Username: forms.Field{Value: user.Username},
-			Password: forms.Field{Value: defaultPassword},
+			Password: forms.Field{Value: password},
 		},
 		forms.LoginForm{
 			Username: forms.Field{Value: user.Username},
-			Password: forms.Field{Value: defaultPassword},
+			Password: forms.Field{Value: password},
 		},
 		true,
 	}}
