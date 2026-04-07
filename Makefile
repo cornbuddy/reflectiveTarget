@@ -11,6 +11,10 @@ run: stop
 stop:
 	- docker compose -f $(COMPOSE) down
 
+.PHONY: clean
+clean: stop
+	docker compose -f $(COMPOSE) down --rmi all
+
 .PHONY: build
 build:
 	docker compose -f $(COMPOSE) build --pull
