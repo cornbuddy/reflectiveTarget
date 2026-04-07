@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/abiosoft/mold"
+	"github.com/go-task/slim-sprig/v3"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
@@ -60,6 +61,7 @@ var templates embed.FS
 func makeRender(layout string) Render {
 	return engine{mold.Must(mold.New(templates, mold.With(
 		mold.WithRoot("templates"),
+		mold.WithFuncMap(sprig.FuncMap()),
 		mold.WithLayout(layout),
 	)))}
 }

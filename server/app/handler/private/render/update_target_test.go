@@ -1,6 +1,7 @@
 package render_test
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,9 +17,15 @@ type UpdateTargetTest struct{}
 
 func (u *UpdateTargetTest) ContainsTargetNameIfData(t *testgroup.T) {
 	w := httptest.NewRecorder()
-	target := aggregations.Target{Name: "kek"}
-	render.View.UpdateTarget(anonCtx, w, render.TargetData{target})
-	utils.AssertContainsTokens(t.T, w.Body, []string{target.Name})
+	tar := aggregations.Target{Name: "kek", ID: 69}
+	render.View.UpdateTarget(anonCtx, w, render.TargetData{tar})
+	utils.AssertContainsTokens(t.T, w.Body, []string{
+		fmt.Sprintf("<h2>%s</h2>", tar.Name),
+		fmt.Sprintf("<form hx-put=\"/target/%d\"", tar.ID),
+		"hx-trigger=\"submit\"",
+		"hx-target=\"main\"",
+		"</form>",
+	})
 }
 
 func (u *UpdateTargetTest) RendersProperViewForNewTarget(t *testgroup.T) {
@@ -26,7 +33,9 @@ func (u *UpdateTargetTest) RendersProperViewForNewTarget(t *testgroup.T) {
 	render.View.UpdateTarget(anonCtx, w, render.TargetData{})
 	utils.AssertContainsTokens(t.T, w.Body, []string{
 		"New target",
-		"<form hx-post=\"/target/new\" hx-trigger=\"submit\"",
+		"<form hx-post=\"/target/new\"",
+		"hx-trigger=\"submit\"",
+		"hx-target=\"main\"",
 		"</form>",
 	})
 }

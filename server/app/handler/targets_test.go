@@ -27,9 +27,7 @@ func (s *TargetsSuite) ShouldContainHtmlForm(t *testgroup.T) {
 		"", http.MethodGet, "/targets/new", router, nil, s.session...,
 	)
 	t.Equal(http.StatusOK, r.StatusCode)
-
-	tokens := []string{"<form>", "</form>"}
-	utils.AssertContainsTokens(t.T, r.Body, tokens)
+	utils.AssertContainsTokens(t.T, r.Body, []string{"<form", "</form>"})
 }
 
 func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
