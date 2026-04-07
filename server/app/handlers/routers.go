@@ -41,8 +41,9 @@ func NewRouter(config *config.Config) http.Handler {
 	child := r.PathPrefix("/targets").Subrouter()
 	child.Use(mw.IsAuthenticated)
 	child.HandleFunc("", targets.list).Methods(http.MethodGet)
-	child.HandleFunc("", targets.new).Methods(http.MethodPost)
-	child.HandleFunc("/{targetID}", targets.update).Methods(http.MethodPut)
+	child.HandleFunc("/new", targets.makeNew).Methods(http.MethodGet)
+	child.HandleFunc("/new", targets.saveNew).Methods(http.MethodPost)
+	child.HandleFunc("/{id:[0-9]+}", targets.update).Methods(http.MethodPut)
 
 	health := healthHandler{config.HealthDao}
 	shots := shotsHandler{
