@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
-	"github.com/cornbuddy/reflectiveTarget/server/app/middlewares"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/middlewares"
 )
 
 func NewRouter(config *config.Config) http.Handler {

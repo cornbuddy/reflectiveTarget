@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/render"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 )
 
 type indexHandler struct{}

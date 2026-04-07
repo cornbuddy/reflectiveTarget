@@ -10,7 +10,7 @@ import (
 	"github.com/bloomberg/go-testgroup"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/forms"
-	"github.com/cornbuddy/reflectiveTarget/server/app/render"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
