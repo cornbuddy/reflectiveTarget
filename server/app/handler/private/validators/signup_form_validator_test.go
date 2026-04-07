@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -21,109 +21,109 @@ func TestSignupFormValidator(t *testing.T) {
 	require.NoError(t, utils.InsertUser(db, user))
 
 	type testCase struct {
-		form  forms.SignupForm
-		want  forms.SignupForm
+		form  contracts.SignupForm
+		want  contracts.SignupForm
 		valid bool
 	}
 
 	testCases := []testCase{{
-		forms.SignupForm{
-			Username:     forms.Field{Value: ""},
-			Password:     forms.Field{Value: ""},
-			Confirmation: forms.Field{Value: ""},
+		contracts.SignupForm{
+			Username:     contracts.Field{Value: ""},
+			Password:     contracts.Field{Value: ""},
+			Confirmation: contracts.Field{Value: ""},
 		},
-		forms.SignupForm{
-			Username: forms.Field{
+		contracts.SignupForm{
+			Username: contracts.Field{
 				Value:  "",
-				Errors: forms.Errors{ErrEmpty},
+				Errors: contracts.Errors{ErrEmpty},
 			},
-			Password: forms.Field{
+			Password: contracts.Field{
 				Value: "",
-				Errors: forms.Errors{
+				Errors: contracts.Errors{
 					ErrPasswordTooShort,
 					ErrPasswordDoesntContainDigits,
 					ErrPasswordDoesntContainSpecialChars,
 				},
 			},
-			Confirmation: forms.Field{
+			Confirmation: contracts.Field{
 				Value: "",
 			},
 		},
 		false,
 	}, {
-		forms.SignupForm{
-			Username:     forms.Field{Value: user.Username},
-			Password:     forms.Field{Value: user.Password.Hash},
-			Confirmation: forms.Field{Value: user.Password.Hash},
+		contracts.SignupForm{
+			Username:     contracts.Field{Value: user.Username},
+			Password:     contracts.Field{Value: user.Password.Hash},
+			Confirmation: contracts.Field{Value: user.Password.Hash},
 		},
-		forms.SignupForm{
-			Username: forms.Field{
+		contracts.SignupForm{
+			Username: contracts.Field{
 				Value:  user.Username,
-				Errors: forms.Errors{ErrUserAlreadyExists},
+				Errors: contracts.Errors{ErrUserAlreadyExists},
 			},
-			Password: forms.Field{
+			Password: contracts.Field{
 				Value: user.Password.Hash,
 			},
-			Confirmation: forms.Field{
+			Confirmation: contracts.Field{
 				Value: user.Password.Hash,
 			},
 		},
 		false,
 	}, {
-		forms.SignupForm{
-			Username:     forms.Field{Value: "keker"},
-			Password:     forms.Field{Value: "kekekeke"},
-			Confirmation: forms.Field{Value: "not kek"},
+		contracts.SignupForm{
+			Username:     contracts.Field{Value: "keker"},
+			Password:     contracts.Field{Value: "kekekeke"},
+			Confirmation: contracts.Field{Value: "not kek"},
 		},
-		forms.SignupForm{
-			Username: forms.Field{
+		contracts.SignupForm{
+			Username: contracts.Field{
 				Value: "keker",
 			},
-			Password: forms.Field{
+			Password: contracts.Field{
 				Value: "kekekeke",
-				Errors: forms.Errors{
+				Errors: contracts.Errors{
 					ErrPasswordDoesntContainDigits,
 					ErrPasswordDoesntContainSpecialChars,
 				},
 			},
-			Confirmation: forms.Field{
+			Confirmation: contracts.Field{
 				Value:  "not kek",
-				Errors: forms.Errors{ErrPasswordsShouldMatch},
+				Errors: contracts.Errors{ErrPasswordsShouldMatch},
 			},
 		},
 		false,
 	}, {
-		forms.SignupForm{
-			Username:     forms.Field{Value: "keker"},
-			Password:     forms.Field{Value: "kekeke1@"},
-			Confirmation: forms.Field{Value: "kekeke1@"},
+		contracts.SignupForm{
+			Username:     contracts.Field{Value: "keker"},
+			Password:     contracts.Field{Value: "kekeke1@"},
+			Confirmation: contracts.Field{Value: "kekeke1@"},
 		},
-		forms.SignupForm{
-			Username: forms.Field{
+		contracts.SignupForm{
+			Username: contracts.Field{
 				Value: "keker",
 			},
-			Password: forms.Field{
+			Password: contracts.Field{
 				Value: "kekeke1@",
 			},
-			Confirmation: forms.Field{
+			Confirmation: contracts.Field{
 				Value: "kekeke1@",
 			},
 		},
 		true,
 	}, {
-		forms.SignupForm{
-			Username:     forms.Field{Value: "keker"},
-			Password:     forms.Field{Value: "kekeke@1"},
-			Confirmation: forms.Field{Value: "kekeke@1"},
+		contracts.SignupForm{
+			Username:     contracts.Field{Value: "keker"},
+			Password:     contracts.Field{Value: "kekeke@1"},
+			Confirmation: contracts.Field{Value: "kekeke@1"},
 		},
-		forms.SignupForm{
-			Username: forms.Field{
+		contracts.SignupForm{
+			Username: contracts.Field{
 				Value: "keker",
 			},
-			Password: forms.Field{
+			Password: contracts.Field{
 				Value: "kekeke@1",
 			},
-			Confirmation: forms.Field{
+			Confirmation: contracts.Field{
 				Value: "kekeke@1",
 			},
 		},

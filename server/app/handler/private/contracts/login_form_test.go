@@ -1,4 +1,4 @@
-package forms_test
+package contracts_test
 
 import (
 	"net/url"
@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 )
 
 func TestLoginForm(t *testing.T) {
@@ -14,35 +14,35 @@ func TestLoginForm(t *testing.T) {
 
 	type testCase struct {
 		httpForm url.Values
-		wantForm forms.LoginForm
+		wantForm contracts.LoginForm
 	}
 
 	testCases := []testCase{{
 		url.Values{},
-		forms.LoginForm{},
+		contracts.LoginForm{},
 	}, {
 		url.Values{"username": []string{"kek"}},
-		forms.LoginForm{
-			Username: forms.Field{Value: "kek"},
+		contracts.LoginForm{
+			Username: contracts.Field{Value: "kek"},
 		},
 	}, {
 		url.Values{"password": []string{"pass"}},
-		forms.LoginForm{
-			Password: forms.Field{Value: "pass"},
+		contracts.LoginForm{
+			Password: contracts.Field{Value: "pass"},
 		},
 	}, {
 		url.Values{
 			"username": []string{"kek"},
 			"password": []string{"pass"},
 		},
-		forms.LoginForm{
-			Username: forms.Field{Value: "kek"},
-			Password: forms.Field{Value: "pass"},
+		contracts.LoginForm{
+			Username: contracts.Field{Value: "kek"},
+			Password: contracts.Field{Value: "pass"},
 		},
 	}}
 
 	for _, tc := range testCases {
-		gotForm := forms.NewLoginForm(tc.httpForm)
+		gotForm := contracts.NewLoginForm(tc.httpForm)
 		assert.Equal(t, tc.wantForm, gotForm)
 	}
 }

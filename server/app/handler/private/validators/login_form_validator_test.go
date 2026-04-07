@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -16,8 +16,8 @@ func TestLoginFormValidation(t *testing.T) {
 
 	type testCase struct {
 		msg    string
-		form   forms.LoginForm
-		want   forms.LoginForm
+		form   contracts.LoginForm
+		want   contracts.LoginForm
 		result bool
 	}
 
@@ -30,67 +30,67 @@ func TestLoginFormValidation(t *testing.T) {
 
 	testCases := []testCase{{
 		"empty fields",
-		forms.LoginForm{},
-		forms.LoginForm{
-			Username: forms.Field{Errors: forms.Errors{ErrEmpty}},
-			Password: forms.Field{Errors: forms.Errors{ErrEmpty}},
+		contracts.LoginForm{},
+		contracts.LoginForm{
+			Username: contracts.Field{Errors: contracts.Errors{ErrEmpty}},
+			Password: contracts.Field{Errors: contracts.Errors{ErrEmpty}},
 		},
 		false,
 	}, {
 		"absent user without password",
-		forms.LoginForm{
-			Username: forms.Field{Value: absentUsername},
-			Password: forms.Field{},
+		contracts.LoginForm{
+			Username: contracts.Field{Value: absentUsername},
+			Password: contracts.Field{},
 		},
-		forms.LoginForm{
-			Username: forms.Field{
+		contracts.LoginForm{
+			Username: contracts.Field{
 				Value:  absentUsername,
-				Errors: forms.Errors{ErrUserDoesNotExists},
+				Errors: contracts.Errors{ErrUserDoesNotExists},
 			},
-			Password: forms.Field{
-				Errors: forms.Errors{ErrEmpty},
+			Password: contracts.Field{
+				Errors: contracts.Errors{ErrEmpty},
 			},
 		},
 		false,
 	}, {
 		"absent user with password",
-		forms.LoginForm{
-			Username: forms.Field{Value: absentUsername},
-			Password: forms.Field{Value: "kek"},
+		contracts.LoginForm{
+			Username: contracts.Field{Value: absentUsername},
+			Password: contracts.Field{Value: "kek"},
 		},
-		forms.LoginForm{
-			Username: forms.Field{
+		contracts.LoginForm{
+			Username: contracts.Field{
 				Value:  absentUsername,
-				Errors: forms.Errors{ErrUserDoesNotExists},
+				Errors: contracts.Errors{ErrUserDoesNotExists},
 			},
-			Password: forms.Field{Value: "kek"},
+			Password: contracts.Field{Value: "kek"},
 		},
 		false,
 	}, {
 		"user with bad password",
-		forms.LoginForm{
-			Username: forms.Field{Value: user.Username},
-			Password: forms.Field{Value: "kek"},
+		contracts.LoginForm{
+			Username: contracts.Field{Value: user.Username},
+			Password: contracts.Field{Value: "kek"},
 		},
-		forms.LoginForm{
-			Username: forms.Field{
+		contracts.LoginForm{
+			Username: contracts.Field{
 				Value: user.Username,
 			},
-			Password: forms.Field{
+			Password: contracts.Field{
 				Value:  "kek",
-				Errors: forms.Errors{ErrWrongPassword},
+				Errors: contracts.Errors{ErrWrongPassword},
 			},
 		},
 		false,
 	}, {
 		"all good",
-		forms.LoginForm{
-			Username: forms.Field{Value: user.Username},
-			Password: forms.Field{Value: password},
+		contracts.LoginForm{
+			Username: contracts.Field{Value: user.Username},
+			Password: contracts.Field{Value: password},
 		},
-		forms.LoginForm{
-			Username: forms.Field{Value: user.Username},
-			Password: forms.Field{Value: password},
+		contracts.LoginForm{
+			Username: contracts.Field{Value: user.Username},
+			Password: contracts.Field{Value: password},
 		},
 		true,
 	}}

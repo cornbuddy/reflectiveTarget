@@ -5,7 +5,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
@@ -47,7 +47,7 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form := forms.NewLoginForm(r.Form)
+	form := contracts.NewLoginForm(r.Form)
 	if valid := h.LoginFormValidator.Validate(ctx, &form); !valid {
 		log.Debug("login failed", zap.Any("form", form))
 		w.WriteHeader(http.StatusUnauthorized)
@@ -90,7 +90,7 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form := forms.NewSignupForm(r.Form)
+	form := contracts.NewSignupForm(r.Form)
 	if valid := h.SignupFormValidator.Validate(ctx, &form); !valid {
 		log.Debug("signup failed", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)

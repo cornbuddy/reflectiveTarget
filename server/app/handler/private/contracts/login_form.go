@@ -1,4 +1,4 @@
-package forms
+package contracts
 
 import (
 	"net/url"

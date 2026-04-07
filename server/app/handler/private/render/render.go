@@ -7,7 +7,7 @@ import (
 
 	"github.com/abiosoft/mold"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 )
@@ -30,11 +30,11 @@ type TargetsData struct {
 }
 
 type SignupData struct {
-	forms.SignupForm
+	contracts.SignupForm
 }
 
 type LoginData struct {
-	forms.LoginForm
+	contracts.LoginForm
 }
 
 type viewData struct {

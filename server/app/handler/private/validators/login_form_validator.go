@@ -3,7 +3,7 @@ package validators
 import (
 	"context"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
@@ -12,7 +12,7 @@ type LoginFormValidator struct {
 }
 
 func (v LoginFormValidator) Validate(
-	ctx context.Context, form *forms.LoginForm,
+	ctx context.Context, form *contracts.LoginForm,
 ) bool {
 
 	emptyUsername := len(form.Username.Value) == 0

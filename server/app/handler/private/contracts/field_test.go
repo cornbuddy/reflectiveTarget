@@ -1,4 +1,4 @@
-package forms_test
+package contracts_test
 
 import (
 	"errors"
@@ -6,13 +6,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 )
 
 func TestFieldMethods(t *testing.T) {
 	t.Parallel()
 
-	field := forms.Field{}
+	field := contracts.Field{}
 	assert.Empty(t, field.Errors)
 	assert.True(t, field.IsValid())
 	assert.False(t, field.IsInvalid())

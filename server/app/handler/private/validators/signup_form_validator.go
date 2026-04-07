@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
@@ -24,7 +24,7 @@ var SpecialChars = []rune{
 var hasDigits = regexp.MustCompile(`\d`)
 
 func (v SignupFormValidator) Validate(
-	ctx context.Context, form *forms.SignupForm,
+	ctx context.Context, form *contracts.SignupForm,
 ) bool {
 
 	user, err := v.UserDao.Find(ctx, form.Username.Value)

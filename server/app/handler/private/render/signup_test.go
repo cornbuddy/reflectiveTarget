@@ -9,13 +9,13 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bloomberg/go-testgroup"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 type RenderSignupTest struct {
-	errors      forms.Errors
+	errors      contracts.Errors
 	erroredData render.SignupData
 }
 
@@ -66,11 +66,11 @@ func (r *RenderSignupTest) HasProperLayoutMarkers(t *testgroup.T) {
 }
 
 func (r *RenderSignupTest) PreGroup(t *testgroup.T) {
-	errs := forms.Errors{errors.New("kek-1"), errors.New("kek-2")}
-	form := forms.SignupForm{
-		Username:     forms.Field{Errors: errs},
-		Password:     forms.Field{Errors: errs},
-		Confirmation: forms.Field{Errors: errs},
+	errs := contracts.Errors{errors.New("kek-1"), errors.New("kek-2")}
+	form := contracts.SignupForm{
+		Username:     contracts.Field{Errors: errs},
+		Password:     contracts.Field{Errors: errs},
+		Confirmation: contracts.Field{Errors: errs},
 	}
 
 	r.errors = errs
