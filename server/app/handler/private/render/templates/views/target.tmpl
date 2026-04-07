@@ -7,8 +7,11 @@
 
 {{ $url := (eq .TargetData.ID 0) | ternary "new" .TargetData.ID }}
 {{ $method := (eq .TargetData.ID 0) | ternary "post" "put" }}
-<form hx-{{ $method }}="/target/{{ $url }}"
+<form
+    hx-{{ $method }}="/target/{{ $url }}"
     hx-trigger="submit"
     hx-target="main">
+
+    <canvas></canvas>
 
 </form>

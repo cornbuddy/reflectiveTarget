@@ -15,29 +15,47 @@ import (
 
 type UpdateTargetTest struct{}
 
-func (u *UpdateTargetTest) ContainsTargetNameIfData(t *testgroup.T) {
-	w := httptest.NewRecorder()
-	tar := aggregations.Target{Name: "kek", ID: 69}
-	render.View.UpdateTarget(anonCtx, w, render.TargetData{tar})
-	utils.AssertContainsTokens(t.T, w.Body, []string{
-		fmt.Sprintf("<h2>%s</h2>", tar.Name),
-		fmt.Sprintf("<form hx-put=\"/target/%d\"", tar.ID),
-		"hx-trigger=\"submit\"",
-		"hx-target=\"main\"",
-		"</form>",
-	})
-}
+func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
+	type testCase struct {
+		desc   string
+		data   render.TargetData
+		tokens []string
+	}
 
-func (u *UpdateTargetTest) RendersProperViewForNewTarget(t *testgroup.T) {
-	w := httptest.NewRecorder()
-	render.View.UpdateTarget(anonCtx, w, render.TargetData{})
-	utils.AssertContainsTokens(t.T, w.Body, []string{
-		"New target",
-		"<form hx-post=\"/target/new\"",
-		"hx-trigger=\"submit\"",
-		"hx-target=\"main\"",
-		"</form>",
-	})
+	target := aggregations.Target{Name: "kek", ID: 69}
+	testCases := []testCase{{
+		"empty target",
+		render.TargetData{},
+		[]string{
+			"New target",
+			"<form",
+			"hx-post=\"/target/new\"",
+			"hx-trigger=\"submit\"",
+			"hx-target=\"main\"",
+			"</form>",
+			"<canvas></canvas>",
+		},
+	}, {
+		"non empty target",
+		render.TargetData{target},
+		[]string{
+			fmt.Sprintf("<h2>%s</h2>", target.Name),
+			"<form",
+			fmt.Sprintf("hx-put=\"/target/%d\"", target.ID),
+			"hx-trigger=\"submit\"",
+			"hx-target=\"main\"",
+			"</form>",
+			"<canvas></canvas>",
+		},
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testgroup.T) {
+			w := httptest.NewRecorder()
+			render.View.UpdateTarget(anonCtx, w, tc.data)
+			utils.AssertContainsTokens(t.T, w.Body, tc.tokens)
+		})
+	}
 }
 
 func (u *UpdateTargetTest) HasProperLayoutMarkers(t *testgroup.T) {
