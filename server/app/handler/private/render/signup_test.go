@@ -9,7 +9,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bloomberg/go-testgroup"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )

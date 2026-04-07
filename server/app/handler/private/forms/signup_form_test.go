@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
 )
 
 func TestSignupForm(t *testing.T) {

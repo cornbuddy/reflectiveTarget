@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/forms"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/forms"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
 
