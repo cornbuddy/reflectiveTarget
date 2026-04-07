@@ -1,12 +1,13 @@
-{{- if .TargetData.Name }}
-    <h2>{{ .TargetData.Name }}</h2>
-{{- else }}
+{{- $new := eq .TargetData.ID 0 }}
+{{- if $new }}
     <h2>New target</h2>
+{{- else }}
+    <h2>{{ .TargetData.Name }}</h2>
 {{- end }}
 
 
-{{ $url := (eq .TargetData.ID 0) | ternary "new" .TargetData.ID }}
-{{ $method := (eq .TargetData.ID 0) | ternary "post" "put" }}
+{{ $url := $new | ternary "new" .TargetData.ID }}
+{{ $method := $new | ternary "post" "put" }}
 <form
     hx-{{ $method }}="/target/{{ $url }}"
     hx-trigger="submit"
@@ -14,4 +15,6 @@
 
     <canvas></canvas>
 
+    {{- $text := $new | ternary "Create" "Update" }}
+    <button type="submit">{{ $text }}</button>
 </form>

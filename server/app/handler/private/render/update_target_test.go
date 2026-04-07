@@ -34,6 +34,7 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 			"hx-target=\"main\"",
 			"</form>",
 			"<canvas></canvas>",
+			"<button type=\"submit\">Create</button>",
 		},
 	}, {
 		"non empty target",
@@ -46,6 +47,7 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 			"hx-target=\"main\"",
 			"</form>",
 			"<canvas></canvas>",
+			"<button type=\"submit\">Update</button>",
 		},
 	}}
 
