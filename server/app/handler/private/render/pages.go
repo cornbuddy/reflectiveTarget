@@ -14,7 +14,7 @@ import (
 func (e engine) UpdateTarget(
 	ctx context.Context, w http.ResponseWriter, data TargetData,
 ) {
-	e.render(ctx, "views/targets.tmpl", w, data)
+	e.render(ctx, "views/target.tmpl", w, data)
 }
 
 func (e engine) Targets(
