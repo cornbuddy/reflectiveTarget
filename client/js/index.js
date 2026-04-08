@@ -2,11 +2,12 @@
 
 import htmx from "htmx.org";
 
-import { toggleNavigation, htmxBeforeSwap } from "./handlers.js";
+import { htmxBeforeSwap, toggleNavigation, addQuestion } from "./handlers.js";
 
 window.htmx = htmx;
 window.toggleNavigation = toggleNavigation;
+window.addQuestion = addQuestion;
 
-document.addEventListener("DOMContentLoaded", () => {
+htmx.onLoad(() => {
     document.body.addEventListener("htmx:beforeSwap", htmxBeforeSwap);
 });

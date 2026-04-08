@@ -1,5 +1,16 @@
 "use strict";
 
+export function addQuestion() {
+    const amountOfQuestions = document
+        .querySelectorAll("input[name^='question_']")
+        .length;
+    const question = document.createElement("input");
+    question.name = `question_${amountOfQuestions}`;
+    question.type = "text";
+    const form = document.querySelector("form");
+    form.appendChild(question);
+}
+
 export function toggleNavigation() {
     const NAVBAR_WIDTH = "250px";
     const nav = document.querySelector("nav");

@@ -17,6 +17,10 @@ def test_target_view_has_proer_components(user):
             "by": By.XPATH,
             "selector": "//button[@type='submit']",
         },
+        "target_name": {
+            "by": By.XPATH,
+            "selector": "//input[@type='text'][@name='name']",
+        },
     }
     for _, select in components.items():
         elem = user.driver.find_element(select["by"], select["selector"])
@@ -30,7 +34,7 @@ def test_target_view_has_proer_components(user):
 def test_user_should_be_able_to_create_target(user):
     user.go_to_new_target()
     driver = user.driver
-    inputs_xpath = "//input[@type='text'][starts-with(@name, 'question')]"
+    inputs_xpath = "//input[@type='text'][starts-with(@name, 'question_')]"
     inputs = driver.find_elements(By.XPATH, inputs_xpath)
     assert len(inputs) == 0
 
