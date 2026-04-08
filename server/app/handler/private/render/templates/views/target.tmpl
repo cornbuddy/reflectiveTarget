@@ -13,8 +13,10 @@
     hx-trigger="submit"
     hx-target="main">
 
+    <button hx-on:click="addQuestion()">Add question</button>
+
     <canvas></canvas>
 
     {{- $text := $new | ternary "Create" "Update" }}
-    <button type="submit">{{ $text }}</button>
+    <button type="submit" disabled>{{ $text }}</button>
 </form>

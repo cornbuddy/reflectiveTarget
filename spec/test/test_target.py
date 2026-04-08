@@ -22,13 +22,24 @@ def test_target_view_has_proer_components(user):
         elem = user.driver.find_element(select["by"], select["selector"])
         select["element"] = elem
         assert elem is not None
-    size = components["canvas"]["element"].size
-    assert size["height"] == size["width"]
+    canvas_size = components["canvas"]["element"].size
+    assert canvas_size["height"] == canvas_size["width"]
+    assert not user.submit.is_enabled()
 
 
 def test_user_should_be_able_to_create_target(user):
     user.go_to_new_target()
-    assert not user.submit.is_enabled()
+    driver = user.driver
+    inputs_xpath = "//input[@type='text'][starts-with(@name, 'question')]"
+    inputs = driver.find_elements(By.XPATH, inputs_xpath)
+    assert len(inputs) == 0
+
+    add_btn = driver.find_element(By.XPATH, "//button[text()='Add question']")
+    assert add_btn.is_enabled()
+
+    add_btn.click()
+    inputs = driver.find_elements(By.XPATH, inputs_xpath)
+    assert len(inputs) == 1
 
 
 @pytest.mark.order(after=test_user_should_be_able_to_create_target.__name__)
