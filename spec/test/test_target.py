@@ -2,12 +2,33 @@ import pytest
 from selenium.webdriver.common.by import By
 
 
+def test_target_view_has_proer_components(user):
+    user.go_to_new_target()
+    components = {
+        "form": {
+            "by": By.TAG_NAME,
+            "selector": "form",
+        },
+        "canvas": {
+            "by": By.TAG_NAME,
+            "selector": "canvas",
+        },
+        "submit": {
+            "by": By.XPATH,
+            "selector": "//button[@type='submit']",
+        },
+    }
+    for _, select in components.items():
+        elem = user.driver.find_element(select["by"], select["selector"])
+        select["element"] = elem
+        assert elem is not None
+    size = components["canvas"]["element"].size
+    assert size["height"] == size["width"]
+
+
 def test_user_should_be_able_to_create_target(user):
-    user.ensure_navigation_opened()
-    user.driver.find_element(By.LINK_TEXT, "Targets").click()
-    user.driver.find_element(By.LINK_TEXT, "New target").click()
-    target_form = user.driver.find_element(By.TAG_NAME, "form")
-    assert target_form is not None
+    user.go_to_new_target()
+    assert not user.submit.is_enabled()
 
 
 @pytest.mark.order(after=test_user_should_be_able_to_create_target.__name__)

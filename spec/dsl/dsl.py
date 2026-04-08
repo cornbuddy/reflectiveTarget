@@ -19,30 +19,43 @@ class DSL:
 
     @property
     def sidebar_toggler(self) -> WebElement:
+        """button to toggle navigation sidebar"""
         return self.driver.find_element(By.ID, "sidebar-toggler")
 
     @property
     def sidebar(self) -> WebElement:
+        """navigation sidebar"""
         return self.driver.find_element(By.TAG_NAME, "nav")
 
-    def signup(self, username: str, password: str, confirmation: str = None):
-        if confirmation is None:
-            confirmation = password
+    @property
+    def submit(self) -> WebElement:
+        """button to submit form"""
+        return self.driver.find_element(By.XPATH, "//button[@type='submit']")
 
-        driver = self.driver
-        driver.get(f"{self._url}/signup")
-        driver.find_element(By.NAME, "username").send_keys(username)
-        driver.find_element(By.NAME, "password").send_keys(password)
-        driver.find_element(By.NAME, "confirmation").send_keys(confirmation)
-        driver.find_element(By.XPATH, "//button[@type='submit']").click()
+    def go_to_new_target(self):
+        """opens 'New target' view"""
+        self.ensure_navigation_opened()
+        self.driver.find_element(By.LINK_TEXT, "Targets").click()
+        self.driver.find_element(By.LINK_TEXT, "New target").click()
+
+    def signup(self, username: str, password: str, confirm: str = None):
+        if confirm is None:
+            confirm = password
+
+        self.ensure_navigation_opened()
+        self.driver.find_element(By.LINK_TEXT, "Signup").click()
+        self.driver.find_element(By.NAME, "username").send_keys(username)
+        self.driver.find_element(By.NAME, "password").send_keys(password)
+        self.driver.find_element(By.NAME, "confirmation").send_keys(confirm)
+        self.submit.click()
         sleep(ANIMATION_DURATION_SECS)
 
     def login(self, username: str, password: str):
-        driver = self.driver
-        driver.get(f"{self._url}/login")
-        driver.find_element(By.NAME, "username").send_keys(username)
-        driver.find_element(By.NAME, "password").send_keys(password)
-        driver.find_element(By.XPATH, "//button[@type='submit']").click()
+        self.ensure_navigation_opened()
+        self.driver.find_element(By.LINK_TEXT, "Login").click()
+        self.driver.find_element(By.NAME, "username").send_keys(username)
+        self.driver.find_element(By.NAME, "password").send_keys(password)
+        self.submit.click()
         sleep(ANIMATION_DURATION_SECS)
 
     def logout(self):

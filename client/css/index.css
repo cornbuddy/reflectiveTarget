@@ -52,3 +52,10 @@ nav .closebtn {
 #sidebar-toggler:hover {
     background-color: #444;
 }
+
+canvas {
+    height: 80vw;
+    width: 80vw;
+    max-height: 70vh;
+    max-width: 70vh;
+}
