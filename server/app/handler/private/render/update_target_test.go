@@ -2,6 +2,7 @@ package render_test
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -21,12 +22,16 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 		desc   string
 		data   render.TargetData
 		tokens []string
+		assert func(*testing.T, io.Reader, []string)
 	}
 
+	addQuestion := "<button hx-on:click=\"addQuestion()\">Add question</button>"
 	target := aggregations.Target{
-		Name:      "kek",
-		ID:        69,
-		Questions: valueobjects.Questions{{Text: "kek?"}},
+		Name: "kek",
+		ID:   69,
+		Questions: valueobjects.Questions{
+			{Text: "kek1?"}, {Text: "kek2?"},
+		},
 	}
 	testCases := []testCase{{
 		"empty target",
@@ -38,11 +43,13 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 			"hx-trigger=\"submit\"",
 			"hx-target=\"main\"",
 			"<button type=\"submit\">Create</button>",
-			"<input name=\"name\" placeholder=\"Target name\">",
+			"<input name=\"name\" placeholder=\"Target name\" value=\"\">",
 			"<input name=\"question_0\" placeholder=\"Question 1\">",
+			addQuestion,
 		},
+		utils.AssertContainsTokens,
 	}, {
-		"non empty target",
+		"non empty target contains",
 		render.TargetData{target},
 		[]string{
 			fmt.Sprintf("<h2>%s</h2>", target.Name),
@@ -59,14 +66,24 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 				"<input name=\"question_0\" placeholder=\"Question 1\" value=\"%s\">",
 				target.Questions[0].Text,
 			),
+			fmt.Sprintf(
+				"<input name=\"question_1\" placeholder=\"Question 2\" value=\"%s\">",
+				target.Questions[1].Text,
+			),
 		},
+		utils.AssertContainsTokens,
+	}, {
+		"non empty target doesn't contain",
+		render.TargetData{target},
+		[]string{addQuestion},
+		utils.AssertNotContainsTokens,
 	}}
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testgroup.T) {
 			w := httptest.NewRecorder()
 			render.View.UpdateTarget(anonCtx, w, tc.data)
-			utils.AssertContainsTokens(t.T, w.Body, tc.tokens)
+			tc.assert(t.T, w.Body, tc.tokens)
 		})
 	}
 }

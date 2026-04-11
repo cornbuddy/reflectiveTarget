@@ -1,8 +1,9 @@
 {{- $new := eq .TargetData.ID 0 }}
+
 {{- if $new }}
-    <h2>New target</h2>
+<h2>New target</h2>
 {{- else }}
-    <h2>{{ .TargetData.Name }}</h2>
+<h2>{{ .TargetData.Name }}</h2>
 {{- end }}
 
 
@@ -13,10 +14,26 @@
     hx-trigger="submit"
     hx-target="main">
 
+    {{- $value := $new | ternary "" .TargetData.Name }}
+    <input name="name" placeholder="Target name" value="{{ $value }}">
+
+{{- if $new }}
+    <input name="question_0" placeholder="Question 1">
+{{- else }}
+    {{- range $i, $q := .TargetData.Questions }}
+    {{- $name := printf "question_%d" $i }}
+    {{- $plchldr := printf "Question %d" (add $i 1) }}
+    {{- $val := $q.Text }}
+    <input name="{{ $name }}" placeholder="{{ $plchldr }}" value="{{ $val }}">
+    {{- end }}
+{{- end }}
+
     <canvas></canvas>
 
     {{- $text := $new | ternary "Create" "Update" }}
     <button type="submit">{{ $text }}</button>
 </form>
 
+{{- if $new }}
 <button hx-on:click="addQuestion()">Add question</button>
+{{- end }}
