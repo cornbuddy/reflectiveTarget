@@ -10,6 +10,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -22,7 +23,11 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 		tokens []string
 	}
 
-	target := aggregations.Target{Name: "kek", ID: 69}
+	target := aggregations.Target{
+		Name:      "kek",
+		ID:        69,
+		Questions: valueobjects.Questions{{Text: "kek?"}},
+	}
 	testCases := []testCase{{
 		"empty target",
 		render.TargetData{},
@@ -32,9 +37,9 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 			"hx-post=\"/target/new\"",
 			"hx-trigger=\"submit\"",
 			"hx-target=\"main\"",
-			"</form>",
-			"<canvas></canvas>",
 			"<button type=\"submit\">Create</button>",
+			"<input name=\"name\" placeholder=\"Target name\">",
+			"<input name=\"question_0\" placeholder=\"Question 1\">",
 		},
 	}, {
 		"non empty target",
@@ -45,9 +50,15 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 			fmt.Sprintf("hx-put=\"/target/%d\"", target.ID),
 			"hx-trigger=\"submit\"",
 			"hx-target=\"main\"",
-			"</form>",
-			"<canvas></canvas>",
 			"<button type=\"submit\">Update</button>",
+			fmt.Sprintf(
+				"<input name=\"name\" placeholder=\"Target name\" value=\"%s\">",
+				target.Name,
+			),
+			fmt.Sprintf(
+				"<input name=\"question_0\" placeholder=\"Question 1\" value=\"%s\">",
+				target.Questions[0].Text,
+			),
 		},
 	}}
 
