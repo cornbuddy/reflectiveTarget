@@ -13,7 +13,7 @@ stop:
 
 .PHONY: clean
 clean: stop
-	docker compose -f $(COMPOSE) down --rmi all
+	docker compose -f $(COMPOSE) down --rmi all --volumes
 
 .PHONY: build
 build:
@@ -35,7 +35,7 @@ test:
 	@$(MAKE) -C server test
 
 .PHONY: spec
-spec: build
+spec: build clean
 	$(MAKE) run &
 	sleep 10
 	$(MAKE) -C spec spec; ret=$$?; \

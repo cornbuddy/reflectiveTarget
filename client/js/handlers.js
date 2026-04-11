@@ -1,14 +1,12 @@
 "use strict";
 
 export function addQuestion() {
-    const amountOfQuestions = document
-        .querySelectorAll("input[name^='question_']")
-        .length;
-    const question = document.createElement("input");
-    question.name = `question_${amountOfQuestions}`;
-    question.type = "text";
-    const form = document.querySelector("form");
-    form.appendChild(question);
+    const inputs = document.querySelectorAll("input[name^='question_']");
+    const amountOfQuestions = inputs.length;
+    const questionInput = document.createElement("input");
+    questionInput.name = `question_${amountOfQuestions}`;
+    questionInput.placeholder = `Question ${amountOfQuestions + 1}`;
+    inputs[amountOfQuestions - 1].after(questionInput);
 }
 
 export function toggleNavigation() {

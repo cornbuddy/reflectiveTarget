@@ -7,8 +7,8 @@ from selenium.webdriver.common.by import By
     (By.TAG_NAME, "canvas"),
     (By.XPATH, "//button[@type='submit']"),
     (By.XPATH, "//button[text()='Add question']"),
-    (By.XPATH, "//input[@type='text'][@name='name']"),
-    (By.XPATH, "//input[@type='text'][starts-with(@name, 'question_')]"),
+    (By.XPATH, "//input[@name='name']"),
+    (By.XPATH, "//input[starts-with(@name, 'question_')]"),
 ])
 def test_has_proper_components(user, by, value):
     user.go_to_new_target()
@@ -26,7 +26,7 @@ def test_question_can_be_added(user):
     driver = user.driver
     add_btn = driver.find_element(By.XPATH, "//button[text()='Add question']")
     add_btn.click()
-    inputs_xpath = "//input[@type='text'][starts-with(@name, 'question_')]"
+    inputs_xpath = "//input[starts-with(@name, 'question_')]"
     inputs = driver.find_elements(By.XPATH, inputs_xpath)
     assert len(inputs) == 2
 
