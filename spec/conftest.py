@@ -33,10 +33,18 @@ def user():
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item):
     """makes screenshots for each test case"""
+    driver = None
+    test_args = item.funcargs
+    if test_args.get("user", False):
+        driver = test_args["user"].driver
+    elif test_args.get("anon", False):
+        driver = test_args["anon"].driver
+    else:
+        raise RuntimeError(f"failed to get driver from args: {test_args}")
+
     outcome = yield
     test_report = outcome.get_result()
-    driver = item.funcargs.get("driver", None)
-    if driver and test_report.when == "call":
+    if test_report.when == "call":
         screenshot = driver.get_screenshot_as_base64()
         pytest_html = item.config.pluginmanager.getplugin("html")
         extras = getattr(test_report, "extra", [])
