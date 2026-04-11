@@ -21,6 +21,18 @@ type TargetsSuite struct {
 	foreignTargets aggregations.Targets
 }
 
+func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
+	t.Fail("not implemented")
+	// TODO: make post request with invalid target as form
+	// TODO: ensure that POST /targets/new responds with 400 code
+}
+
+func (s *TargetsSuite) ShouldAddTargetIfValid(t *testgroup.T) {
+	t.Fail("not implemented")
+	// TODO: make post request with valid target as form
+	// TODO: ensure that /targets endpoint contains new target name
+}
+
 func (s *TargetsSuite) ShouldRespondOnValidCreds(t *testgroup.T) {
 	r := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/targets/new", router, nil, s.session...,
