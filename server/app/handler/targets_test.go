@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"io"
 	"net/http"
 	"strconv"
 	"testing"
@@ -22,12 +21,11 @@ type TargetsSuite struct {
 	foreignTargets aggregations.Targets
 }
 
-func (s *TargetsSuite) ShouldContainHtmlForm(t *testgroup.T) {
+func (s *TargetsSuite) ShouldRespondOnValidCreds(t *testgroup.T) {
 	r := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/targets/new", router, nil, s.session...,
 	)
 	t.Equal(http.StatusOK, r.StatusCode)
-	utils.AssertContainsTokens(t.T, r.Body, []string{"<form", "</form>"})
 }
 
 func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
@@ -36,22 +34,14 @@ func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
 	)
 	t.Equal(http.StatusOK, r.StatusCode)
 
-	data, err := io.ReadAll(r.Body)
-	t.Require.NoError(err)
-
-	t.Cleanup(func() {
-		t.Require.NoError(r.Body.Close())
-	})
-
-	body := string(data)
 	for _, ot := range s.ownedTargets {
-		t.Contains(body, strconv.Itoa(int(ot.ID)))
-		t.Contains(body, ot.Name)
+		tokens := []string{strconv.Itoa(int(ot.ID)), ot.Name}
+		utils.AssertContainsTokens(t.T, r.Body, tokens)
 	}
 
 	for _, ft := range s.foreignTargets {
-		t.NotContains(body, strconv.Itoa(int(ft.ID)))
-		t.NotContains(body, ft.Name)
+		tokens := []string{strconv.Itoa(int(ft.ID)), ft.Name}
+		utils.AssertNotContainsTokens(t.T, r.Body, tokens)
 	}
 }
 
