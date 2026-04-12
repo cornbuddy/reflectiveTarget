@@ -13,18 +13,21 @@ func TestTargetFormValidator(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		form contracts.TargetForm
-		want validators.ValidationResult
+		form     contracts.TargetForm
+		wantForm contracts.TargetForm
+		wantRes  bool
 	}
 
 	testCases := []testCase{{
 		contracts.TargetForm{},
-		validators.ValidationResult{},
+		contracts.TargetForm{},
+		false,
 	}}
 
 	v := validators.TargetFormValidator{}
 	for _, tc := range testCases {
 		got := v.Validate(&tc.form)
-		assert.Equal(t, tc.want, got)
+		assert.Equal(t, tc.wantRes, got)
+		assert.EqualExportedValues(t, tc.wantForm, tc.form)
 	}
 }
