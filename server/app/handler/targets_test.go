@@ -2,10 +2,12 @@ package handler
 
 import (
 	"net/http"
+	"net/url"
 	"strconv"
 	"testing"
 
 	"github.com/bloomberg/go-testgroup"
+	"github.com/stretchr/testify/assert"
 
 	appconst "github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
@@ -16,6 +18,7 @@ import (
 )
 
 type TargetsSuite struct {
+	handler        http.HandlerFunc
 	session        []*http.Cookie
 	ownedTargets   aggregations.Targets
 	foreignTargets aggregations.Targets
@@ -28,9 +31,21 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 }
 
 func (s *TargetsSuite) ShouldAddTargetIfValid(t *testgroup.T) {
-	t.Fail("not implemented")
-	// TODO: make post request with valid target as form
-	// TODO: ensure that /targets endpoint contains new target name
+	target := aggregations.Target{
+		Name:      "valid target",
+		Questions: vo.Questions{{Text: "q1?"}, {Text: "q2?"}},
+	}
+	form := url.Values{
+		"name":       []string{target.Name},
+		"question_0": []string{target.Questions[0].Text},
+		"question_1": []string{target.Questions[1].Text},
+	}
+	assert.HTTPStatusCode(
+		t.T, s.handler, http.MethodPost, "/targets/new", form, http.StatusCreated,
+	)
+	assert.HTTPBodyContains(
+		t.T, s.handler, http.MethodGet, "/targets", nil, target.Name,
+	)
 }
 
 func (s *TargetsSuite) ShouldRespondOnValidCreds(t *testgroup.T) {
@@ -46,20 +61,16 @@ func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
 	)
 	t.Equal(http.StatusOK, r.StatusCode)
 
-	t.Run("should contain owned targets", func(t *testgroup.T) {
-		for _, ot := range s.ownedTargets {
-			tokens := []string{strconv.Itoa(int(ot.ID)), ot.Name}
-			utils.AssertContainsTokens(t.T, r, tokens)
+	for _, ot := range s.ownedTargets {
+		tokens := []string{strconv.Itoa(int(ot.ID)), ot.Name}
+		utils.AssertContainsTokens(t.T, r, tokens)
 
-		}
-	})
+	}
 
-	t.Run("should not contain foreign targets", func(t *testgroup.T) {
-		for _, ft := range s.foreignTargets {
-			tokens := []string{strconv.Itoa(int(ft.ID)), ft.Name}
-			utils.AssertNotContainsTokens(t.T, r, tokens)
-		}
-	})
+	for _, ft := range s.foreignTargets {
+		tokens := []string{strconv.Itoa(int(ft.ID)), ft.Name}
+		utils.AssertNotContainsTokens(t.T, r, tokens)
+	}
 }
 
 func (s *TargetsSuite) PreGroup(t *testgroup.T) {
@@ -115,6 +126,13 @@ func (s *TargetsSuite) PreGroup(t *testgroup.T) {
 		Name:  appconst.SessionCookieName,
 		Value: token,
 	}}
+	s.handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		for _, c := range s.session {
+			r.AddCookie(c)
+		}
+
+		router(w, r)
+	})
 }
 
 func TestTargetsHandler(t *testing.T) {
