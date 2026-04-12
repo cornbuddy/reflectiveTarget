@@ -54,7 +54,7 @@ func (r *RenderSignupTest) HasSignupForm(t *testgroup.T) {
 	w := httptest.NewRecorder()
 	render.View.Signup(anonCtx, w, render.SignupData{})
 	tokens := []string{"Signup", "<form hx-post=\"/signup\"", "</form>"}
-	utils.AssertContainsTokens(t.T, w.Body, tokens)
+	utils.AssertContainsTokens(t.T, w.Result(), tokens)
 }
 
 func (r *RenderSignupTest) HasProperLayoutMarkers(t *testgroup.T) {

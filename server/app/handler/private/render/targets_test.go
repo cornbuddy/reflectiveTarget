@@ -31,14 +31,14 @@ func (r *RenderTargetsTest) RendersTargetLinksProperly(t *testgroup.T) {
 
 	w := httptest.NewRecorder()
 	render.View.Targets(anonCtx, w, data)
-	utils.AssertContainsTokens(t.T, w.Body, tokens)
+	utils.AssertContainsTokens(t.T, w.Result(), tokens)
 }
 
 func (r *RenderTargetsTest) AllowsToCreateNewTarget(t *testgroup.T) {
 	w := httptest.NewRecorder()
 	render.View.Targets(anonCtx, w, render.TargetsData{})
 	tokens := []string{"Targets", "New target", "href=\"/targets/new\""}
-	utils.AssertContainsTokens(t.T, w.Body, tokens)
+	utils.AssertContainsTokens(t.T, w.Result(), tokens)
 }
 
 func (r *RenderTargetsTest) HasProperLayoutMarkers(t *testgroup.T) {

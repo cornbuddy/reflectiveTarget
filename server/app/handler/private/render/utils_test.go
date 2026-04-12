@@ -2,7 +2,6 @@ package render_test
 
 import (
 	"context"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,7 +17,7 @@ type (
 	layoutMarkersTestCase  struct {
 		desc   string
 		render render.Render
-		assert func(*testing.T, io.Reader, []string)
+		assert func(*testing.T, *http.Response, []string)
 	}
 )
 
@@ -50,7 +49,7 @@ func (tcs *layoutMarkersTestCases) run(t *testing.T, rc renderClosure) {
 		t.Run(tc.desc, func(t *testing.T) {
 			w := httptest.NewRecorder()
 			rc(tc.render)(w)
-			tc.assert(t, w.Body, layoutMakrers)
+			tc.assert(t, w.Result(), layoutMakrers)
 		})
 	}
 }

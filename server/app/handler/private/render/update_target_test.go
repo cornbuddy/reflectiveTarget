@@ -2,7 +2,6 @@ package render_test
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -22,7 +21,7 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 		desc   string
 		data   render.TargetData
 		tokens []string
-		assert func(*testing.T, io.Reader, []string)
+		assert func(*testing.T, *http.Response, []string)
 	}
 
 	addQuestion := "<button hx-on:click=\"addQuestion()\">Add question</button>"
@@ -83,7 +82,7 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 		t.Run(tc.desc, func(t *testgroup.T) {
 			w := httptest.NewRecorder()
 			render.View.UpdateTarget(anonCtx, w, tc.data)
-			tc.assert(t.T, w.Body, tc.tokens)
+			tc.assert(t.T, w.Result(), tc.tokens)
 		})
 	}
 }

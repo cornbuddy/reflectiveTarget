@@ -46,15 +46,20 @@ func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
 	)
 	t.Equal(http.StatusOK, r.StatusCode)
 
-	for _, ot := range s.ownedTargets {
-		tokens := []string{strconv.Itoa(int(ot.ID)), ot.Name}
-		utils.AssertContainsTokens(t.T, r.Body, tokens)
-	}
+	t.Run("should contain owned targets", func(t *testgroup.T) {
+		for _, ot := range s.ownedTargets {
+			tokens := []string{strconv.Itoa(int(ot.ID)), ot.Name}
+			utils.AssertContainsTokens(t.T, r, tokens)
 
-	for _, ft := range s.foreignTargets {
-		tokens := []string{strconv.Itoa(int(ft.ID)), ft.Name}
-		utils.AssertNotContainsTokens(t.T, r.Body, tokens)
-	}
+		}
+	})
+
+	t.Run("should not contain foreign targets", func(t *testgroup.T) {
+		for _, ft := range s.foreignTargets {
+			tokens := []string{strconv.Itoa(int(ft.ID)), ft.Name}
+			utils.AssertNotContainsTokens(t.T, r, tokens)
+		}
+	})
 }
 
 func (s *TargetsSuite) PreGroup(t *testgroup.T) {

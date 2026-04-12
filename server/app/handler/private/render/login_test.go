@@ -17,7 +17,7 @@ func (r *RenderLoginTest) HasLoginForm(t *testgroup.T) {
 	w := httptest.NewRecorder()
 	render.View.Login(anonCtx, w, render.LoginData{})
 	tokens := []string{"Login", "<form hx-post=\"/login\"", "</form>"}
-	utils.AssertContainsTokens(t.T, w.Body, tokens)
+	utils.AssertContainsTokens(t.T, w.Result(), tokens)
 }
 
 func (r *RenderLoginTest) HasProperLayoutMarkers(t *testgroup.T) {

@@ -17,14 +17,14 @@ func (r *RenderIndexTest) UserSeesButtons(t *testgroup.T) {
 	w := httptest.NewRecorder()
 	render.Layout.Index(userCtx, w)
 	tokens := []string{"Targets", "Logout"}
-	utils.AssertContainsTokens(t.T, w.Body, tokens)
+	utils.AssertContainsTokens(t.T, w.Result(), tokens)
 }
 
 func (r *RenderIndexTest) AnonSeesButtons(t *testgroup.T) {
 	w := httptest.NewRecorder()
 	render.Layout.Index(anonCtx, w)
 	tokens := []string{"Login", "Signup"}
-	utils.AssertContainsTokens(t.T, w.Body, tokens)
+	utils.AssertContainsTokens(t.T, w.Result(), tokens)
 }
 
 func (r *RenderIndexTest) HasProperLayoutMarkers(t *testgroup.T) {

@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"bytes"
 	"io"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,28 +12,33 @@ import (
 
 type assertFunc func(assert.TestingT, any, any, ...any) bool
 
-func AssertContainsTokens(t *testing.T, body io.Reader, tokens []string) {
+// checks if response body contains substrings
+func AssertContainsTokens(t *testing.T, r *http.Response, tokens []string) {
 	t.Helper()
 
-	assertTokens(t, body, tokens, assert.Contains)
+	assertTokens(t, r, tokens, assert.Contains)
 }
 
-func AssertNotContainsTokens(t *testing.T, body io.Reader, tokens []string) {
+// checks if response body does not contain substrings
+func AssertNotContainsTokens(t *testing.T, r *http.Response, tokens []string) {
 	t.Helper()
 
-	assertTokens(t, body, tokens, assert.NotContains)
+	assertTokens(t, r, tokens, assert.NotContains)
 }
 
 func assertTokens(
-	t *testing.T, body io.Reader, tokens []string, asrt assertFunc,
+	t *testing.T, r *http.Response, tokens []string, asrt assertFunc,
 ) {
 	t.Helper()
 
-	raw, err := io.ReadAll(body)
+	raw, err := io.ReadAll(r.Body)
 	require.NoError(t, err)
+	require.NoError(t, r.Body.Close())
 
-	strBody := string(raw)
+	r.Body = io.NopCloser(bytes.NewBuffer(raw))
+
+	body := string(raw)
 	for _, token := range tokens {
-		asrt(t, strBody, token)
+		asrt(t, body, token)
 	}
 }
