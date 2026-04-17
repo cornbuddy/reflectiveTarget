@@ -8,6 +8,7 @@ import (
 
 	"github.com/bloomberg/go-testgroup"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
@@ -16,7 +17,7 @@ import (
 
 type UpdateTargetTest struct{}
 
-func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
+func (u *UpdateTargetTest) RendersProperViewForm(t *testgroup.T) {
 	type testCase struct {
 		desc   string
 		data   render.TargetData
@@ -31,6 +32,14 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 		Questions: valueobjects.Questions{
 			{Text: "kek1?"}, {Text: "kek2?"},
 		},
+	}
+	formQuestions := make(contracts.Fields, len(target.Questions))
+	for i, q := range target.Questions {
+		formQuestions[i] = contracts.Field{Value: q.Text}
+	}
+	form := contracts.TargetForm{
+		Name:      contracts.Field{Value: target.Name},
+		Questions: formQuestions,
 	}
 	testCases := []testCase{{
 		"empty target",
@@ -49,7 +58,7 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 		utils.AssertContainsTokens,
 	}, {
 		"non empty target contains",
-		render.TargetData{target},
+		render.TargetData{form},
 		[]string{
 			fmt.Sprintf("<h2>%s</h2>", target.Name),
 			"<form",
@@ -73,7 +82,7 @@ func (u *UpdateTargetTest) RendersProperViewFor(t *testgroup.T) {
 		utils.AssertContainsTokens,
 	}, {
 		"non empty target doesn't contain",
-		render.TargetData{target},
+		render.TargetData{form},
 		[]string{addQuestion},
 		utils.AssertNotContainsTokens,
 	}}

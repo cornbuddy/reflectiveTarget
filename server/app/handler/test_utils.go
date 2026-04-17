@@ -2,7 +2,6 @@ package handler
 
 import (
 	"database/sql"
-	"math/rand"
 	"net/http"
 	"testing"
 	"time"

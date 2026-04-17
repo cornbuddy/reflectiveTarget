@@ -28,7 +28,7 @@ var Layout = makeRender("layout.tmpl")
 var View = makeRender("empty-layout.tmpl")
 
 type TargetData struct {
-	aggregations.Target
+	contracts.TargetForm
 }
 
 type TargetsData struct {

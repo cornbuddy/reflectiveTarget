@@ -52,7 +52,7 @@ func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {
 	if valid := h.formValidator.Validate(&form); !valid {
 		log.Debug("form is invalid", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)
-		render.View.UpdateTarget(ctx, w, render.TargetData{Target: form})
+		render.View.UpdateTarget(ctx, w, render.TargetData{TargetForm: form})
 		return
 	}
 

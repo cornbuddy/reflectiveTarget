@@ -12,13 +12,65 @@ import (
 func TestFieldsMethods(t *testing.T) {
 	t.Parallel()
 
-	fields := contracts.Fields{{}}
-	assert.True(t, fields.AreValid())
-	assert.False(t, fields.AreInvalid())
+	type testCase struct {
+		desc   string
+		fields contracts.Fields
+		valid  bool
+	}
 
-	fields = contracts.Fields{{Errors: contracts.Errors{errors.New("kek")}}}
-	assert.False(t, fields.AreValid())
-	assert.True(t, fields.AreInvalid())
+	err := errors.New("kek")
+	testCases := []testCase{{
+		"empty fields are valid",
+		contracts.Fields{},
+		true,
+	}, {
+		"all valid fields are valid",
+		contracts.Fields{{
+			Value: "",
+		}, {
+			Value: "",
+		}},
+		true,
+	}, {
+		"single field with error is invalid",
+		contracts.Fields{{
+			Errors: contracts.Errors{err},
+		}},
+		false,
+	}, {
+		"errored field in the end makes fields invalid",
+		contracts.Fields{{
+			Value: "kek",
+		}, {
+			Errors: contracts.Errors{err},
+		}},
+		false,
+	}, {
+		"errored field in the beginning makes fields invalid",
+		contracts.Fields{{
+			Errors: contracts.Errors{err},
+		}, {
+			Value: "kek",
+		}},
+		false,
+	}, {
+		"errored field in the middle makes fields invalid",
+		contracts.Fields{{
+			Value: "kek",
+		}, {
+			Errors: contracts.Errors{err},
+		}, {
+			Value: "kek",
+		}},
+		false,
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			assert.Equal(t, tc.valid, tc.fields.AreValid())
+			assert.Equal(t, !tc.valid, tc.fields.AreInvalid())
+		})
+	}
 }
 
 func TestFieldMethods(t *testing.T) {

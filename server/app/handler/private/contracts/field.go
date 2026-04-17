@@ -10,25 +10,17 @@ type Field struct {
 }
 
 func (fs Fields) AreValid() bool {
-	valid := false
-	for _, f := range fs {
-		if valid = f.IsValid(); valid {
-			break
-		}
+	if len(fs) == 0 {
+		return true
 	}
 
-	return valid
+	return all(fs, func(f Field) bool {
+		return f.IsValid()
+	})
 }
 
 func (fs Fields) AreInvalid() bool {
-	invalid := false
-	for _, f := range fs {
-		if invalid = f.IsInvalid(); invalid {
-			break
-		}
-	}
-
-	return invalid
+	return !fs.AreValid()
 }
 
 func (f *Field) AddError(err error) {
@@ -40,5 +32,15 @@ func (f *Field) IsValid() bool {
 }
 
 func (f *Field) IsInvalid() bool {
-	return len(f.Errors) > 0
+	return !f.IsValid()
+}
+
+func all[T any](ts []T, pred func(T) bool) bool {
+	for _, t := range ts {
+		if !pred(t) {
+			return false
+		}
+	}
+
+	return true
 }

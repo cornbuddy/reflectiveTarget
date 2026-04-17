@@ -38,7 +38,10 @@ func NewRouter(config *config.Config) http.Handler {
 	r.HandleFunc("/signup", authz.getSignup).Methods(http.MethodGet)
 	r.HandleFunc("/signup", authz.postSignup).Methods(http.MethodPost)
 
-	targets := targetsHandler{config.TargetRepo}
+	targets := targetsHandler{
+		config.TargetRepo,
+		validators.TargetFormValidator{},
+	}
 	child := r.PathPrefix("/targets").Subrouter()
 	child.Use(mw.IsAuthenticated)
 	child.HandleFunc("", targets.list).Methods(http.MethodGet)
