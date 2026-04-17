@@ -9,6 +9,18 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 )
 
+func TestFieldsMethods(t *testing.T) {
+	t.Parallel()
+
+	fields := contracts.Fields{{}}
+	assert.True(t, fields.AreValid())
+	assert.False(t, fields.AreInvalid())
+
+	fields = contracts.Fields{{Errors: contracts.Errors{errors.New("kek")}}}
+	assert.False(t, fields.AreValid())
+	assert.True(t, fields.AreInvalid())
+}
+
 func TestFieldMethods(t *testing.T) {
 	t.Parallel()
 

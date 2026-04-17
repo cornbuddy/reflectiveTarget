@@ -24,6 +24,17 @@ var ErrPasswordTooShort = fmt.Errorf(
 	"password should be at least %d characters long", MinPasswordLength,
 )
 
+var ErrTooLongTargetName = fmt.Errorf(
+	"target name should be less than %d characters long", MaxTargetNameLen,
+)
+
+var ErrTooLongQuestion = fmt.Errorf(
+	"question should be less than %d characters long", MaxQuestionLen,
+)
+var ErrExcessiveQuestion = fmt.Errorf(
+	"target should have no more than %d questions", MaxNumOfQuestions,
+)
+
 func runesToString(runes []rune) string {
 	var result []string
 	for _, r := range runes {

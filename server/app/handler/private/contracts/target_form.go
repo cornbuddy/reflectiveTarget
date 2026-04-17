@@ -8,7 +8,7 @@ import (
 
 type TargetForm struct {
 	Name      Field
-	Questions []Field
+	Questions Fields
 }
 
 func NewTargetForm(form url.Values) TargetForm {

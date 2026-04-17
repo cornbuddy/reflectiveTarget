@@ -31,20 +31,17 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 }
 
 func (s *TargetsSuite) ShouldAddTargetIfValid(t *testgroup.T) {
-	target := aggregations.Target{
-		Name:      "valid target",
-		Questions: vo.Questions{{Text: "q1?"}, {Text: "q2?"}},
-	}
+	name := "valid target"
 	form := url.Values{
-		"name":       []string{target.Name},
-		"question_0": []string{target.Questions[0].Text},
-		"question_1": []string{target.Questions[1].Text},
+		"name":       []string{name},
+		"question_0": []string{"q1?"},
+		"question_1": []string{"q2?"},
 	}
 	assert.HTTPStatusCode(
 		t.T, s.handler, http.MethodPost, "/targets/new", form, http.StatusCreated,
 	)
 	assert.HTTPBodyContains(
-		t.T, s.handler, http.MethodGet, "/targets", nil, target.Name,
+		t.T, s.handler, http.MethodGet, "/targets", nil, name,
 	)
 }
 

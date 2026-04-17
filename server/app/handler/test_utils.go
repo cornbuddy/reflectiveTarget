@@ -31,7 +31,7 @@ func makeTestTarget(db *sql.DB, userID int) (int, error) {
 }
 
 func makeTestUser(db *sql.DB) (*entities.User, error) {
-	username := makeRandomString(10)
+	username := utils.MakeRandomString(10)
 	user, err := entities.NewUser(username, defaultPassword)
 	if err != nil {
 		return nil, err
@@ -42,16 +42,6 @@ func makeTestUser(db *sql.DB) (*entities.User, error) {
 	}
 
 	return user, nil
-}
-
-func makeRandomString(length int) string {
-	letters := []rune("abcdefghijklmnopqrstuvwxyz")
-	result := make([]rune, length)
-	for i := range result {
-		result[i] = letters[rand.Intn(len(letters))]
-	}
-
-	return string(result)
 }
 
 func assertSessionCookieIsSet(t *testing.T, resp *http.Response, msg string) {
