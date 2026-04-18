@@ -11,6 +11,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
 type Render interface {
@@ -18,7 +19,7 @@ type Render interface {
 	Login(context.Context, http.ResponseWriter, LoginData)
 	Signup(context.Context, http.ResponseWriter, SignupData)
 	Targets(context.Context, http.ResponseWriter, TargetsData)
-	UpdateTarget(context.Context, http.ResponseWriter, TargetData)
+	TargetForm(context.Context, http.ResponseWriter, TargetData)
 }
 
 // renders view with layout (eg navbar, head, header, footer, etc)
@@ -29,6 +30,7 @@ var View = makeRender("empty-layout.tmpl")
 
 type TargetData struct {
 	contracts.TargetForm
+	valueobjects.ID
 }
 
 type TargetsData struct {

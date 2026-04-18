@@ -58,7 +58,7 @@ func (u *UpdateTargetTest) RendersProperViewForm(t *testgroup.T) {
 		utils.AssertContainsTokens,
 	}, {
 		"non empty target contains",
-		render.TargetData{form},
+		render.TargetData{form, target.ID},
 		[]string{
 			fmt.Sprintf("<h2>%s</h2>", target.Name),
 			"<form",
@@ -82,7 +82,7 @@ func (u *UpdateTargetTest) RendersProperViewForm(t *testgroup.T) {
 		utils.AssertContainsTokens,
 	}, {
 		"non empty target doesn't contain",
-		render.TargetData{form},
+		render.TargetData{form, target.ID},
 		[]string{addQuestion},
 		utils.AssertNotContainsTokens,
 	}}
@@ -90,7 +90,7 @@ func (u *UpdateTargetTest) RendersProperViewForm(t *testgroup.T) {
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testgroup.T) {
 			w := httptest.NewRecorder()
-			render.View.UpdateTarget(anonCtx, w, tc.data)
+			render.View.TargetForm(anonCtx, w, tc.data)
 			tc.assert(t.T, w.Result(), tc.tokens)
 		})
 	}
@@ -99,7 +99,7 @@ func (u *UpdateTargetTest) RendersProperViewForm(t *testgroup.T) {
 func (u *UpdateTargetTest) HasProperLayoutMarkers(t *testgroup.T) {
 	testCases.run(t.T, func(r render.Render) func(w http.ResponseWriter) {
 		return func(w http.ResponseWriter) {
-			r.UpdateTarget(anonCtx, w, render.TargetData{})
+			r.TargetForm(anonCtx, w, render.TargetData{})
 		}
 	})
 }

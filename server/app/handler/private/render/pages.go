@@ -11,10 +11,10 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
-func (e engine) UpdateTarget(
+func (e engine) TargetForm(
 	ctx context.Context, w http.ResponseWriter, data TargetData,
 ) {
-	e.render(ctx, "views/target.tmpl", w, data)
+	e.render(ctx, "views/target-form.tmpl", w, data)
 }
 
 func (e engine) Targets(
