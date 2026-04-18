@@ -6,7 +6,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/bloomberg/go-testgroup"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
@@ -20,34 +19,22 @@ type RenderSignupTest struct {
 }
 
 func (r *RenderSignupTest) RendersValidationErrors(t *testgroup.T) {
-	type testCase struct {
-		selector string
-	}
-
-	testCases := []testCase{{
-		selector: "section#username ul.errors",
+	testCases := fieldErrorsTestCases{{
+		"section#username ul.errors",
+		r.errors,
 	}, {
 
-		selector: "section#password ul.errors",
+		"section#password ul.errors",
+		r.errors,
 	}, {
 
-		selector: "section#confirmation ul.errors",
+		"section#confirmation ul.errors",
+		r.errors,
 	}}
 
 	w := httptest.NewRecorder()
 	render.View.Signup(userCtx, w, r.erroredData)
-	doc, err := goquery.NewDocumentFromReader(w.Body)
-	t.Require.NoError(err)
-
-	for _, tc := range testCases {
-		ul := doc.Find(tc.selector)
-		t.NotEmpty(ul.Nodes, tc.selector)
-
-		ul.Children().Each(func(_ int, li *goquery.Selection) {
-			err := errors.New(li.Text())
-			t.Contains(r.errors, err, tc.selector)
-		})
-	}
+	testCases.assert(t.T, w.Body)
 }
 
 func (r *RenderSignupTest) HasSignupForm(t *testgroup.T) {
@@ -58,7 +45,7 @@ func (r *RenderSignupTest) HasSignupForm(t *testgroup.T) {
 }
 
 func (r *RenderSignupTest) HasProperLayoutMarkers(t *testgroup.T) {
-	testCases.run(t.T, func(r render.Render) func(w http.ResponseWriter) {
+	layoutTestCases.assert(t.T, func(r render.Render) func(w http.ResponseWriter) {
 		return func(w http.ResponseWriter) {
 			r.Signup(anonCtx, w, render.SignupData{})
 		}

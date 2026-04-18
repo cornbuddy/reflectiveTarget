@@ -14,18 +14,36 @@
     hx-trigger="submit"
     hx-target="main">
 
-    {{- $value := $new | ternary "" .TargetData.Name.Value }}
-    <input name="name" placeholder="Target name" value="{{ $value }}">
+    <section id="username">
+        <label for="name">Target name</label>
+        {{- $value := $new | ternary "" .TargetData.Name.Value }}
+        <input name="name" placeholder="Target name" value="{{ $value }}">
+
+        {{ partial "components/errors.tmpl" .TargetData.Name.Errors }}
+    </section>
 
 {{- if $new }}
-    <input name="question_0" placeholder="Question 1">
+
+    <section id="question_0">
+        <input name="question_0" placeholder="Question 1">
+    </section>
+
 {{- else }}
+
     {{- range $i, $q := .TargetData.Questions }}
     {{- $name := printf "question_%d" $i }}
-    {{- $plchldr := printf "Question %d" (add $i 1) }}
-    {{- $val := $q.Value }}
-    <input name="{{ $name }}" placeholder="{{ $plchldr }}" value="{{ $val }}">
+    <section id="{{ $name }}">
+        {{- $ph := printf "Question %d" (add $i 1) }}
+        {{- $val := $q.Value }}
+        <input name="{{ $name }}" placeholder="{{ $ph }}" value="{{ $val }}">
+
+        {{- /* Debug: print type and value */ -}}
+        {{- printf "Type: %T, Value: %v" $q.Errors $q.Errors }}
+
+        {{ partial "components/errors.tmpl" $q.Errors }}
+    </section>
     {{- end }}
+
 {{- end }}
 
     <canvas></canvas>

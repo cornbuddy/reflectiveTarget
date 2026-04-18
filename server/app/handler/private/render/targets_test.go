@@ -42,7 +42,7 @@ func (r *RenderTargetsTest) AllowsToCreateNewTarget(t *testgroup.T) {
 }
 
 func (r *RenderTargetsTest) HasProperLayoutMarkers(t *testgroup.T) {
-	testCases.run(t.T, func(r render.Render) func(w http.ResponseWriter) {
+	layoutTestCases.assert(t.T, func(r render.Render) func(w http.ResponseWriter) {
 		return func(w http.ResponseWriter) {
 			r.Targets(anonCtx, w, render.TargetsData{})
 		}

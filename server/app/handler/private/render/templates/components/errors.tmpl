@@ -1,3 +1,6 @@
+{{- /* Debug: print type and value */ -}}
+{{- printf "Type: %T, Value: %v" . . }}
+
 {{- if . }}
 <ul class="errors">
     {{- range . }}

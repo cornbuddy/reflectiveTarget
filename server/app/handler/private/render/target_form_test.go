@@ -1,6 +1,7 @@
 package render_test
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -15,9 +16,51 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
-type UpdateTargetTest struct{}
+type TargetFormTest struct{}
 
-func (u *UpdateTargetTest) RendersProperViewForm(t *testgroup.T) {
+func (u *TargetFormTest) RendersErrorsProperly(t *testgroup.T) {
+	t.Skip()
+
+	err1 := errors.New("error 1")
+	err2 := errors.New("error 2")
+	data := render.TargetData{
+		TargetForm: contracts.TargetForm{
+			Name: contracts.Field{
+				Value:  "",
+				Errors: contracts.Errors{err1},
+			},
+			Questions: contracts.Fields{{
+				Value:  "kek1",
+				Errors: contracts.Errors{err2},
+			}, {
+				Value:  "kek12",
+				Errors: contracts.Errors{err1, err2},
+			}, {
+				Value: "kek0",
+			}},
+		},
+	}
+
+	testCases := fieldErrorsTestCases{{
+		"section#name ul.errors",
+		contracts.Errors{err1},
+	}, {
+		"section#question_0 ul.errors",
+		contracts.Errors{err2},
+	}, {
+		"section#question_1 ul.errors",
+		contracts.Errors{err1, err2},
+	}, {
+		"section#question_2 ul.errors",
+		contracts.Errors{},
+	}}
+
+	w := httptest.NewRecorder()
+	render.View.TargetForm(anonCtx, w, data)
+	testCases.assert(t.T, w.Body)
+}
+
+func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 	type testCase struct {
 		desc   string
 		data   render.TargetData
@@ -30,7 +73,7 @@ func (u *UpdateTargetTest) RendersProperViewForm(t *testgroup.T) {
 		Name: "kek",
 		ID:   69,
 		Questions: valueobjects.Questions{
-			{Text: "kek1?"}, {Text: "kek2?"},
+			{Text: "fails there"}, {Text: "kek2?"},
 		},
 	}
 	formQuestions := make(contracts.Fields, len(target.Questions))
@@ -51,7 +94,7 @@ func (u *UpdateTargetTest) RendersProperViewForm(t *testgroup.T) {
 			"hx-trigger=\"submit\"",
 			"hx-target=\"main\"",
 			"<button type=\"submit\">Create</button>",
-			"<input name=\"name\" placeholder=\"Target name\" value=\"\">",
+			"<input name=\"name\" placeholder=\"Target name\" value=\"\"",
 			"<input name=\"question_0\" placeholder=\"Question 1\">",
 			addQuestion,
 		},
@@ -67,7 +110,7 @@ func (u *UpdateTargetTest) RendersProperViewForm(t *testgroup.T) {
 			"hx-target=\"main\"",
 			"<button type=\"submit\">Update</button>",
 			fmt.Sprintf(
-				"<input name=\"name\" placeholder=\"Target name\" value=\"%s\">",
+				"<input name=\"name\" placeholder=\"Target name\" value=\"%s\"",
 				target.Name,
 			),
 			fmt.Sprintf(
@@ -96,8 +139,8 @@ func (u *UpdateTargetTest) RendersProperViewForm(t *testgroup.T) {
 	}
 }
 
-func (u *UpdateTargetTest) HasProperLayoutMarkers(t *testgroup.T) {
-	testCases.run(t.T, func(r render.Render) func(w http.ResponseWriter) {
+func (u *TargetFormTest) HasProperLayoutMarkers(t *testgroup.T) {
+	layoutTestCases.assert(t.T, func(r render.Render) func(w http.ResponseWriter) {
 		return func(w http.ResponseWriter) {
 			r.TargetForm(anonCtx, w, render.TargetData{})
 		}
@@ -107,5 +150,5 @@ func (u *UpdateTargetTest) HasProperLayoutMarkers(t *testgroup.T) {
 func TestUpdateTarget(t *testing.T) {
 	t.Parallel()
 
-	testgroup.RunInParallel(t, new(UpdateTargetTest))
+	testgroup.RunInParallel(t, new(TargetFormTest))
 }
