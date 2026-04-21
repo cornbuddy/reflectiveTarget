@@ -19,7 +19,7 @@ tidy:
 COVERPROFILE = cover.out
 COVERREPORT = cover.html
 PACKAGES = ./...
-TESTS = ^.+$
+TESTS = ^.+\$
 GO_TEST_CMD = go test -vet=all -count=1 \
 -run $(TESTS) \
 -coverprofile=$(COVERPROFILE) \

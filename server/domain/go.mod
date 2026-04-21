@@ -1,6 +1,6 @@
 module github.com/cornbuddy/reflectiveTarget/server/domain
 
-go 1.25.3
+go 1.26.2
 
 require (
 	github.com/alexedwards/argon2id v1.0.0

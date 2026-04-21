@@ -1,6 +1,6 @@
 module github.com/cornbuddy/reflectiveTarget/server/infra
 
-go 1.25.3
+go 1.26.2
 
 replace github.com/cornbuddy/reflectiveTarget/server/app => ../app
 
