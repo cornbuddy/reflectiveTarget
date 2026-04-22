@@ -1,0 +1,28 @@
+package render
+
+templ login(data LoginData) {
+	<h1>Login</h1>
+	<form hx-post="/login" hx-trigger="submit" hx-target={ hxTarget }>
+		<section id="username">
+			<label for="username">Username</label>
+			<input
+				name="username"
+				type="text"
+				autocomplete="username"
+				required
+			/>
+			@errors(data.Username.Errors)
+		</section>
+		<section id="password">
+			<label for="password">Password</label>
+			<input
+				name="password"
+				type="password"
+				autocomplete="password"
+				required
+			/>
+			@errors(data.Password.Errors)
+		</section>
+		<button type="submit">Login</button>
+	</form>
+}

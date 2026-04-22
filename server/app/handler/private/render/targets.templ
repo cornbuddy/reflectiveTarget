@@ -1,0 +1,17 @@
+package render
+
+import "fmt"
+
+templ targets(data TargetsData) {
+	<h1>Targets</h1>
+	<a href="/targets/new">New target</a>
+	<ul>
+		for _, t := range data.Targets {
+			<li>
+				<a href={ templ.URL(fmt.Sprintf("/targets/%d", t.ID)) }>
+					{ t.Name }
+				</a>
+			</li>
+		}
+	</ul>
+}

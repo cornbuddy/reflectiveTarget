@@ -10,6 +10,7 @@ replace github.com/cornbuddy/reflectiveTarget/server/test => ../test
 
 require (
 	github.com/PuerkitoBio/goquery v1.11.0
+	github.com/a-h/templ v0.3.1001
 	github.com/abiosoft/mold v0.0.0-20250328135240-0a4c28cb836a
 	github.com/bloomberg/go-testgroup v1.1.1
 	github.com/caarlos0/env/v11 v11.3.1
@@ -34,7 +35,6 @@ require (
 	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
-	github.com/a-h/templ v0.3.1001 // indirect
 	github.com/alexedwards/argon2id v1.0.0 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect

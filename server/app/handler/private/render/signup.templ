@@ -1,0 +1,40 @@
+package render
+
+templ signup(data SignupData) {
+	<h1>Signup</h1>
+	<form hx-post="/signup" hx-trigger="submit" hx-target={ hxTarget }>
+		<section id="username">
+			<label for="username">Username</label>
+			<input
+				value={ data.Username.Value }
+				name="username"
+				type="text"
+				required
+			/>
+			@errors(data.Username.Errors)
+		</section>
+		<section id="password">
+			<label for="password">Password</label>
+			<input
+				value={ data.Password.Value }
+				name="password"
+				type="password"
+				required
+			/>
+			@errors(data.Password.Errors)
+		</section>
+		<section id="confirmation">
+			<label for="confirmation">Password confirmation</label>
+			<input
+				value={ data.Confirmation.Value }
+				name="confirmation"
+				type="password"
+				required
+			/>
+			@errors(data.Confirmation.Errors)
+		</section>
+		<button type="submit">Sign up</button>
+	</form>
+	<hr/>
+	<p>Already have an account? <a href="/login">Sign in</a></p>
+}

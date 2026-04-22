@@ -1,0 +1,54 @@
+package render
+
+import (
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+)
+
+const hxTarget = "main"
+
+templ layout(data viewData, component templ.Component) {
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<meta charset="UTF-8"/>
+			<title>Reflective target</title>
+			<link rel="stylesheet" href="/static/main.css"/>
+		</head>
+		<body>
+			@navigation(data.SessionData)
+			<main>
+				@component
+			</main>
+			<script src="/static/main.js"></script>
+		</body>
+	</html>
+}
+
+templ errors(errs contracts.Errors) {
+	if errs != nil || len(errs) > 0 {
+		<ul class="errors">
+			for _, err := range errs {
+				<li>{ err.Error() }</li>
+			}
+		</ul>
+	}
+}
+
+templ navigation(data sessiondata.SessionData) {
+	<button
+		id="sidebar-toggler"
+		hx-on:click="toggleNavigation()"
+	>
+		kek
+	</button>
+	<nav>
+		if data.IsAuthenticated {
+			<a href="/targets">Targets</a>
+			<a href="/logout">Logout</a>
+		} else {
+			<a href="/login">Login</a>
+			<a href="/signup">Signup</a>
+		}
+	</nav>
+}
