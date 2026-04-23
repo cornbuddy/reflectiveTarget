@@ -1,7 +1,11 @@
 package validators
 
+import (
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
+)
+
 type ValidationResult struct {
-	Errors []error
+	contracts.Errors
 }
 
 func (r ValidationResult) IsValid() bool {

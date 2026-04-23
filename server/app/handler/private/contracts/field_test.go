@@ -9,6 +9,40 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 )
 
+func TestErrors(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		desc string
+		errs contracts.Errors
+		want string
+	}
+
+	testCases := []testCase{{
+		"single item",
+		contracts.Errors{errors.New("kek")},
+		"kek",
+	}, {
+		"mutliple items",
+		contracts.Errors{errors.New("kek1"), errors.New("kek2")},
+		"kek1\nkek2",
+	}, {
+		"empty list",
+		contracts.Errors{},
+		"",
+	}, {
+		"nil",
+		nil,
+		"",
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			assert.Equal(t, tc.want, tc.errs.Error())
+		})
+	}
+}
+
 func TestFieldsMethods(t *testing.T) {
 	t.Parallel()
 

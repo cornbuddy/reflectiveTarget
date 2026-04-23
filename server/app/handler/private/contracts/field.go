@@ -1,5 +1,9 @@
 package contracts
 
+import (
+	"errors"
+)
+
 type Errors []error
 
 type Fields []Field
@@ -7,6 +11,14 @@ type Fields []Field
 type Field struct {
 	Value string
 	Errors
+}
+
+func (errs Errors) Error() string {
+	if len(errs) == 0 {
+		return ""
+	}
+
+	return errors.Join(errs...).Error()
 }
 
 func (fs Fields) AreValid() bool {
