@@ -25,9 +25,7 @@ func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 
 	targets, err := h.repo.ListTargetsOfUser(ctx, session.Username)
 	if err != nil {
-		msg := "failed to fetch list of targets"
-		log.Error(msg, zap.Error(err))
-		http.Error(w, msg, http.StatusInternalServerError)
+		utils.InternalServerError(log, w, "failed to fetch list of targets", err)
 		return
 	}
 
@@ -43,8 +41,7 @@ func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {
 	log := utils.LoggerFromCtx(ctx)
 
 	if err := r.ParseForm(); err != nil {
-		log.Error("failed to parse form", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.BadRequest(log, w, "failed to parse form", err)
 		return
 	}
 

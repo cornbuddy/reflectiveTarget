@@ -30,8 +30,7 @@ func (h shotsHandler) get(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	targetID, err := strconv.Atoi(vars["targetID"])
 	if err != nil {
-		log.Error("failed to parse target id", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.BadRequest(log, w, "failed to parse target id", err)
 		return
 	}
 
@@ -39,19 +38,16 @@ func (h shotsHandler) get(w http.ResponseWriter, r *http.Request) {
 
 	shots, err := h.ShotsDao.List(ctx, valueobjects.ID(targetID))
 	if stderr.Is(err, errors.ErrNotFound) {
-		log.Warn("target not found")
-		http.Error(w, err.Error(), http.StatusNotFound)
+		utils.NotFound(log, w, "target not found", err)
 		return
 	} else if err != nil {
-		log.Error("cannot fetch shots", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.InternalServerError(log, w, "cannot fetch shots", err)
 		return
 	}
 
 	data, err := json.Marshal(contracts.ShotsResponse{Shots: shots})
 	if err != nil {
-		log.Error("cannot marshal response", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.InternalServerError(log, w, "cannot marshal response", err)
 		return
 	}
 
@@ -67,8 +63,7 @@ func (h shotsHandler) post(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	targetID, err := strconv.Atoi(vars["targetID"])
 	if err != nil {
-		log.Error("failed to parse target id", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.BadRequest(log, w, "failed to parse target id", err)
 		return
 	}
 
@@ -76,31 +71,28 @@ func (h shotsHandler) post(w http.ResponseWriter, r *http.Request) {
 
 	var shots contracts.ShotsRequest
 	if err := json.NewDecoder(r.Body).Decode(&shots); err != nil {
-		log.Error("failed to decode body", zap.Error(err))
-		http.Error(w, "bad request", http.StatusBadRequest)
+		utils.BadRequest(log, w, "failed to decode body", err)
 		return
 	}
 
 	if res := h.Validator.Validate(shots); res.IsInvalid() {
-		log.Error("failed to decode body",
-			zap.Errors("errors", res.Errors),
-		)
-		http.Error(w, "invalid payload", http.StatusBadRequest)
+		utils.BadRequest(log, w, "invalid payload", res.Errors)
 		return
 	}
 
 	cookies := r.CookiesNamed(constants.SessionCookieName)
 	if len(cookies) != 1 {
-		log.Error("too much of cookies", zap.Any("cookies", cookies))
-		http.Error(w, "bad cookies", http.StatusBadRequest)
+		utils.BadRequest(
+			log.With(zap.Any("cookies", cookies)),
+			w, "too much cookies", nil,
+		)
 		return
 	}
 
 	shooter := cookies[0].Value
 	id := valueobjects.ID(targetID)
 	if err := h.ShotsDao.Save(ctx, shooter, id, shots.Shots); err != nil {
-		log.Error("cannot save shots", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.InternalServerError(log, w, "cannot save shots", err)
 		return
 	}
 

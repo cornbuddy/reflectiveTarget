@@ -28,8 +28,7 @@ func (h authzHandler) getLogout(w http.ResponseWriter, r *http.Request) {
 	store := h.SessionStore
 	data := sessiondata.SessionData{}
 	if _, err := utils.SaveSession(ctx, store, data, w); err != nil {
-		log.Error("failed to save session", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.InternalServerError(log, w, "failed to save session", err)
 		return
 	}
 
@@ -42,8 +41,7 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 	log := utils.LoggerFromCtx(ctx)
 
 	if err := r.ParseForm(); err != nil {
-		log.Error("failed to parse form", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.BadRequest(log, w, "failed to parse form", err)
 		return
 	}
 
@@ -57,11 +55,11 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.UserDao.Find(ctx, form.Username.Value)
 	if err != nil {
-		log.Error("failed to fetch user", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.InternalServerError(log, w, "failed to fetch user", err)
 		return
 	}
 
+	log = log.With(zap.String("username", user.Username))
 	data := sessiondata.SessionData{
 		IsAuthenticated: true,
 		UserID:          user.ID,
@@ -69,14 +67,11 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	store := h.SessionStore
 	if _, err := utils.SaveSession(ctx, store, data, w); err != nil {
-		log.Error("failed to register session", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.InternalServerError(log, w, "failed to register session", err)
 		return
 	}
 
-	log.Info("user is logged in",
-		zap.String("username", form.Username.Value),
-	)
+	log.Info("user is logged in")
 	utils.Redirect(w, r, "/", "Login succeeded")
 }
 
@@ -85,8 +80,7 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 	log := utils.LoggerFromCtx(ctx)
 
 	if err := r.ParseForm(); err != nil {
-		log.Error("failed to parse form", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.BadRequest(log, w, "failed to parse form", err)
 		return
 	}
 
@@ -101,14 +95,12 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 	username := form.Username.Value
 	user, err := entities.NewUser(username, form.Password.Value)
 	if err != nil {
-		log.Error("failed to create user object", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.InternalServerError(log, w, "failed to create user object", err)
 		return
 	}
 
 	if err := h.UserDao.Save(ctx, user); err != nil {
-		log.Error("failed to save user object", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.InternalServerError(log, w, "failed to save user object", err)
 		return
 	}
 
@@ -119,8 +111,7 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 	}
 	store := h.SessionStore
 	if _, err := utils.SaveSession(ctx, store, data, w); err != nil {
-		log.Error("failed to save session", zap.Error(err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		utils.InternalServerError(log, w, "failed to save session", err)
 		return
 	}
 
