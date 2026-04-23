@@ -20,7 +20,7 @@ templ targetForm(data TargetFormData) {
 		hx-trigger="submit"
 		hx-target={ hxTarget }
 	>
-		<section id="username">
+		<section id="name">
 			<label for="name">Target name</label>
 			<input name="name" placeholder="Target name" value={ data.Name.Value }/>
 			@errors(data.Name.Errors)
@@ -40,15 +40,11 @@ templ targetForm(data TargetFormData) {
 			}
 		}
 		<canvas></canvas>
-		{{ var text string }}
 		if new {
-			{{ text = "Create" }}
+			<button type="submit">Create</button>
+			<button hx-on:click="addQuestion()">Add question</button>
 		} else {
-			{{ text = "Update" }}
+			<button type="submit">Update</button>
 		}
-		<button type="submit">{ text }</button>
 	</form>
-	if new {
-		<button hx-on:click="addQuestion()">Add question</button>
-	}
 }
