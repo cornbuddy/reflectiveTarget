@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 )
 
 func (mw Middleware) SetTimeout(timeout time.Duration) mux.MiddlewareFunc {

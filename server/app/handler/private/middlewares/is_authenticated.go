@@ -3,8 +3,8 @@ package middlewares
 import (
 	"net/http"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
-	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
 // checks if user is authenticated, otherwise throws 403

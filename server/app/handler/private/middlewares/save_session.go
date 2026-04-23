@@ -7,8 +7,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
-	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 )
 
 // saves session into store. updates request contexts with session data
@@ -26,7 +26,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 			log.Info("registering new session...")
 			_, err := utils.SaveSession(ctx, store, emptySession, w)
 			if err != nil {
-				internalServerError(w, err.Error())
+				utils.InternalServerError(log, w, "failed to save session", err)
 				return
 			}
 
@@ -41,7 +41,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		log.Debug("validating session...")
 		session, err := store.Get(ctx, sessionId)
 		if err != nil {
-			internalServerError(w, err.Error())
+			utils.InternalServerError(log, w, "failed to fetch session", err)
 			return
 		}
 
@@ -53,7 +53,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 			session = &emptySession
 			_, err := utils.SaveSession(ctx, store, *session, w)
 			if err != nil {
-				internalServerError(w, err.Error())
+				utils.InternalServerError(log, w, "failed to save session", err)
 				return
 			}
 		}

@@ -11,8 +11,8 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
-	"github.com/cornbuddy/reflectiveTarget/server/app/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
