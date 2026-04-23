@@ -8,10 +8,16 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/middlewares"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 )
 
-func NewRouter(config *config.Config) http.Handler {
+var (
+	view   = render.View
+	layout = render.Layout
+)
+
+func MakeHandler(config *config.Config) http.Handler {
 	r := mux.NewRouter()
 	mw := middlewares.Middleware{
 		SessionStore: config.SessionStore,

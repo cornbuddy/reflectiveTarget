@@ -29,11 +29,11 @@ func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.Layout.Targets(ctx, w, render.TargetsData{Targets: targets})
+	layout.Targets(ctx, w, render.TargetsData{Targets: targets})
 }
 
 func (h targetsHandler) makeNew(w http.ResponseWriter, r *http.Request) {
-	render.Layout.TargetForm(r.Context(), w, render.TargetFormData{})
+	layout.TargetForm(r.Context(), w, render.TargetFormData{})
 }
 
 func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +49,7 @@ func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {
 	if valid := h.formValidator.Validate(&form); !valid {
 		log.Debug("form is invalid", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)
-		render.View.TargetForm(ctx, w, render.TargetFormData{TargetForm: form})
+		view.TargetForm(ctx, w, render.TargetFormData{TargetForm: form})
 		return
 	}
 

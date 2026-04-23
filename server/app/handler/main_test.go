@@ -53,7 +53,7 @@ func TestMain(m *testing.M) {
 	}()
 
 	db = testDb
-	router = NewRouter(makeTestConfig(testDb, testCache)).ServeHTTP
+	router = MakeHandler(makeTestConfig(testDb, testCache)).ServeHTTP
 	sessionStore = daos.SessionStore{Cache: testCache}
 	userDao = daos.UserDao{DB: testDb}
 
