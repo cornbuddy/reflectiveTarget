@@ -2,7 +2,7 @@ package render
 
 import "fmt"
 
-templ targetForm(data TargetData) {
+templ targetForm(data TargetFormData) {
 	{{ new := data.ID == 0 }}
 	if new {
 		<h2>New target</h2>
@@ -11,9 +11,9 @@ templ targetForm(data TargetData) {
 	}
 	{{ var url, method string }}
 	if new {
-		{{ url, method = "/targets/new", "post" }}
+		{{ url, method = "/target/new", "post" }}
 	} else {
-		{{ url, method = fmt.Sprintf("/targets/%d", data.ID), "put" }}
+		{{ url, method = fmt.Sprintf("/target/%d", data.ID), "put" }}
 	}
 	<form
 		{ "hx-" + method }={ templ.URL(url) }

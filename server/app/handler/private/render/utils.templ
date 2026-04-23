@@ -7,7 +7,7 @@ import (
 
 const hxTarget = "main"
 
-templ layout(data viewData, component templ.Component) {
+templ layout(data sessiondata.SessionData, component templ.Component) {
 	<!DOCTYPE html>
 	<html>
 		<head>
@@ -16,7 +16,7 @@ templ layout(data viewData, component templ.Component) {
 			<link rel="stylesheet" href="/static/main.css"/>
 		</head>
 		<body>
-			@navigation(data.SessionData)
+			@navigation(data)
 			<main>
 				@component
 			</main>

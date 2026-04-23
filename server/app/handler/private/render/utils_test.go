@@ -32,7 +32,12 @@ type (
 )
 
 var (
-	layoutMakrers   = []string{"<!DOCTYPE html>", "</html>"}
+	layoutMakrers = []string{
+		"<!doctype html>", "</html>",
+		`<meta charset="UTF-8">`,
+		`<link rel="stylesheet" href="/static/main.css">`,
+		`<script src="/static/main.js"></script>`,
+	}
 	layoutTestCases = layoutMarkersTestCases{{
 		"layout render",
 		render.Layout,

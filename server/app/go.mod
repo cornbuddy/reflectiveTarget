@@ -11,13 +11,11 @@ replace github.com/cornbuddy/reflectiveTarget/server/test => ../test
 require (
 	github.com/PuerkitoBio/goquery v1.11.0
 	github.com/a-h/templ v0.3.1001
-	github.com/abiosoft/mold v0.0.0-20250328135240-0a4c28cb836a
 	github.com/bloomberg/go-testgroup v1.1.1
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/cornbuddy/reflectiveTarget/server/domain v0.0.0-00010101000000-000000000000
 	github.com/cornbuddy/reflectiveTarget/server/infra v0.0.0-00010101000000-000000000000
 	github.com/cornbuddy/reflectiveTarget/server/test v0.0.0-00010101000000-000000000000
-	github.com/go-task/slim-sprig/v3 v3.0.0
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/jackc/pgx/v5 v5.7.6

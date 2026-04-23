@@ -23,7 +23,7 @@ func (u *TargetFormTest) RendersErrorsProperly(t *testgroup.T) {
 
 	err1 := errors.New("error 1")
 	err2 := errors.New("error 2")
-	data := render.TargetData{
+	data := render.TargetFormData{
 		TargetForm: contracts.TargetForm{
 			Name: contracts.Field{
 				Value:  "",
@@ -63,7 +63,7 @@ func (u *TargetFormTest) RendersErrorsProperly(t *testgroup.T) {
 func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 	type testCase struct {
 		desc   string
-		data   render.TargetData
+		data   render.TargetFormData
 		tokens []string
 		assert func(*testing.T, *http.Response, []string)
 	}
@@ -86,7 +86,7 @@ func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 	}
 	testCases := []testCase{{
 		"empty target",
-		render.TargetData{},
+		render.TargetFormData{},
 		[]string{
 			"New target",
 			"<form",
@@ -101,7 +101,7 @@ func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 		utils.AssertContainsTokens,
 	}, {
 		"non empty target contains",
-		render.TargetData{form, target.ID},
+		render.TargetFormData{form, target.ID},
 		[]string{
 			fmt.Sprintf("<h2>%s</h2>", target.Name),
 			"<form",
@@ -125,7 +125,7 @@ func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 		utils.AssertContainsTokens,
 	}, {
 		"non empty target doesn't contain",
-		render.TargetData{form, target.ID},
+		render.TargetFormData{form, target.ID},
 		[]string{addQuestion},
 		utils.AssertNotContainsTokens,
 	}}
@@ -142,7 +142,7 @@ func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 func (u *TargetFormTest) HasProperLayoutMarkers(t *testgroup.T) {
 	layoutTestCases.assert(t.T, func(r render.Render) func(w http.ResponseWriter) {
 		return func(w http.ResponseWriter) {
-			r.TargetForm(anonCtx, w, render.TargetData{})
+			r.TargetForm(anonCtx, w, render.TargetFormData{})
 		}
 	})
 }
