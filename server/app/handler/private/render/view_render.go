@@ -7,30 +7,30 @@ import (
 
 type viewRender struct{}
 
-func (viewRender) Index(ctx context.Context, w http.ResponseWriter) error {
-	return index().Render(ctx, w)
+func (viewRender) Index(ctx context.Context, w http.ResponseWriter) {
+	render(ctx, w, index())
 }
 
 func (viewRender) Login(
 	ctx context.Context, w http.ResponseWriter, data LoginData,
-) error {
-	return login(data).Render(ctx, w)
+) {
+	render(ctx, w, login(data))
 }
 
 func (viewRender) Signup(
 	ctx context.Context, w http.ResponseWriter, data SignupData,
-) error {
-	return signup(data).Render(ctx, w)
+) {
+	render(ctx, w, signup(data))
 }
 
 func (viewRender) Targets(
 	ctx context.Context, w http.ResponseWriter, data TargetsData,
-) error {
-	return targets(data).Render(ctx, w)
+) {
+	render(ctx, w, targets(data))
 }
 
 func (viewRender) TargetForm(
 	ctx context.Context, w http.ResponseWriter, data TargetFormData,
-) error {
-	return targetForm(data).Render(ctx, w)
+) {
+	render(ctx, w, targetForm(data))
 }
