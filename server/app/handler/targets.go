@@ -5,6 +5,7 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/builders"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
@@ -15,6 +16,7 @@ import (
 
 type targetsHandler struct {
 	repo          repositories.TargetRepo
+	builder       builders.TargetBuilder
 	formValidator validators.TargetFormValidator
 }
 
@@ -46,10 +48,16 @@ func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := contracts.NewTargetForm(r.Form)
-	if valid := h.formValidator.Validate(&form); !valid {
+	target := h.builder.Target(&form)
+	if target == nil {
 		log.Debug("form is invalid", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)
 		view.TargetForm(ctx, w, render.TargetFormData{TargetForm: form})
+		return
+	}
+
+	if err := h.repo.Save(ctx, target); err != nil {
+		utils.InternalServerError(log, w, "failed to save target", err)
 		return
 	}
 
