@@ -7,8 +7,7 @@ import (
 	"testing"
 
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
-	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
-	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 var (
@@ -18,22 +17,18 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	cleanupDb, testDb, err := testutils.SetupTestDb(ctx)
+	cleanup, db, err := utils.SetupDB(ctx)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
 	}
 
 	defer func() {
-		if err := cleanupDb(); err != nil {
+		if err := cleanup(); err != nil {
 			log.Fatalf("failed to cleanup db: %v", err)
 		}
 	}()
 
-	if err := utils.InitDatabase(testDb); err != nil {
-		log.Fatalf("failed to init db: %v", err)
-	}
-
-	targetRepo = repositories.TargetRepo{DB: testDb}
+	targetRepo = repositories.TargetRepo{DB: db}
 
 	os.Exit(m.Run())
 }

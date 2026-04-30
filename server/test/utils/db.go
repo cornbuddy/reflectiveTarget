@@ -122,7 +122,7 @@ func InsertTarget(db *sql.DB, target *aggregations.Target) error {
 }
 
 // starts and initializes database
-func SetupTestDB(ctx context.Context) (Cleanup, *sql.DB, error) {
+func SetupDB(ctx context.Context) (Cleanup, *sql.DB, error) {
 	cleanup, db, err := StartDB(ctx)
 	if err != nil {
 		return cleanup, nil, err
