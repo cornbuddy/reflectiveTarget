@@ -36,6 +36,8 @@ var ErrExcessiveQuestion = fmt.Errorf(
 	"target should have no more than %d questions", MaxNumOfQuestions,
 )
 
+var ErrShotBadCoordinate = errors.New("bad coordinate for shot")
+
 func runesToString(runes []rune) string {
 	var result []string
 	for _, r := range runes {

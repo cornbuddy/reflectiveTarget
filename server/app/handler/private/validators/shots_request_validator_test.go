@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
@@ -43,7 +42,7 @@ func TestShotsValidator(t *testing.T) {
 			Shots: []valueobjects.Shot{{X: -1, Y: 0}},
 		},
 		ValidationResult{
-			Errors: []error{errors.ErrShotBadCoordinate},
+			Errors: []error{ErrShotBadCoordinate},
 		},
 	}, {
 		"should not be valid if both coordinates are less than 0",
@@ -52,8 +51,8 @@ func TestShotsValidator(t *testing.T) {
 		},
 		ValidationResult{
 			Errors: []error{
-				errors.ErrShotBadCoordinate,
-				errors.ErrShotBadCoordinate,
+				ErrShotBadCoordinate,
+				ErrShotBadCoordinate,
 			}},
 	}, {
 		"should not be valid if x > 100 and y < 0",
@@ -62,8 +61,8 @@ func TestShotsValidator(t *testing.T) {
 		},
 		ValidationResult{
 			Errors: []error{
-				errors.ErrShotBadCoordinate,
-				errors.ErrShotBadCoordinate,
+				ErrShotBadCoordinate,
+				ErrShotBadCoordinate,
 			}},
 	}, {
 		"should not be valid if x < 0 and y > 100",
@@ -72,8 +71,8 @@ func TestShotsValidator(t *testing.T) {
 		},
 		ValidationResult{
 			Errors: []error{
-				errors.ErrShotBadCoordinate,
-				errors.ErrShotBadCoordinate,
+				ErrShotBadCoordinate,
+				ErrShotBadCoordinate,
 			}},
 	}}
 
