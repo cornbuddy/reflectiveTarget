@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/builders"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/middlewares"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
@@ -45,8 +46,10 @@ func MakeHandler(config *config.Config) http.Handler {
 	r.HandleFunc("/signup", authz.postSignup).Methods(http.MethodPost)
 
 	targets := targetsHandler{
-		config.TargetRepo,
-		validators.TargetFormValidator{},
+		repo: config.TargetRepo,
+		builder: builders.TargetBuilder{
+			Validator: validators.TargetFormValidator{},
+		},
 	}
 	child := r.PathPrefix("/targets").Subrouter()
 	child.Use(mw.IsAuthenticated)

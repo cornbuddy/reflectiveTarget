@@ -43,21 +43,16 @@ func TestTargetFormValidator(t *testing.T) {
 		},
 		false,
 	}, {
-		"should reject if questions are empty",
+		"should reject if question is empty",
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: []contracts.Field{{
-				Value: "",
-			}, {
 				Value: "",
 			}},
 		},
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: []contracts.Field{{
-				Value:  "",
-				Errors: contracts.Errors{ErrEmpty},
-			}, {
 				Value:  "",
 				Errors: contracts.Errors{ErrEmpty},
 			}},
@@ -106,13 +101,10 @@ func TestTargetFormValidator(t *testing.T) {
 		},
 		false,
 	}, {
-
-		"should reject if questions are too long",
+		"should reject if question text is too long",
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: contracts.Fields{{
-				Value: longQuestion,
-			}, {
 				Value: longQuestion,
 			}},
 		},
@@ -121,9 +113,26 @@ func TestTargetFormValidator(t *testing.T) {
 			Questions: contracts.Fields{{
 				Value:  longQuestion,
 				Errors: contracts.Errors{ErrTooLongQuestion},
+			}},
+		},
+		false,
+	}, {
+		"should reject if questions are repeated",
+		contracts.TargetForm{
+			Name: contracts.Field{Value: notSoLongTargetName},
+			Questions: contracts.Fields{{
+				Value: notSoLongQuestion,
 			}, {
-				Value:  longQuestion,
-				Errors: contracts.Errors{ErrTooLongQuestion},
+				Value: notSoLongQuestion,
+			}},
+		},
+		contracts.TargetForm{
+			Name: contracts.Field{Value: notSoLongTargetName},
+			Questions: contracts.Fields{{
+				Value: notSoLongQuestion,
+			}, {
+				Value:  notSoLongQuestion,
+				Errors: contracts.Errors{ErrRepeatedQuestion},
 			}},
 		},
 		false,

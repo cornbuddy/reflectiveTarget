@@ -9,6 +9,8 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
 func TestTargetAssembler(t *testing.T) {
@@ -17,24 +19,44 @@ func TestTargetAssembler(t *testing.T) {
 	type testCase struct {
 		desc       string
 		form       contracts.TargetForm
+		ownerID    valueobjects.ID
 		wantTarget *aggregations.Target
 		wantForm   contracts.TargetForm
 	}
 
+	ownerID := valueobjects.ID(69)
 	testCases := []testCase{{
 		"returns target if form is valid",
 		contracts.TargetForm{
-			Name:      contracts.Field{},
-			Questions: contracts.Fields{},
+			Name: contracts.Field{Value: "name"},
+			Questions: contracts.Fields{{
+				Value: "kek1",
+			}, {
+				Value: "kek2",
+			}},
 		},
-		&aggregations.Target{},
+		ownerID,
+		&aggregations.Target{
+			Name:  "name",
+			Owner: entities.User{ID: ownerID},
+			Questions: valueobjects.Questions{{
+				Text: "kek1",
+			}, {
+				Text: "kek2",
+			}},
+		},
 		contracts.TargetForm{
-			Name:      contracts.Field{},
-			Questions: contracts.Fields{},
+			Name: contracts.Field{Value: "name"},
+			Questions: contracts.Fields{{
+				Value: "kek1",
+			}, {
+				Value: "kek2",
+			}},
 		},
 	}, {
 		"returns nil if form is invalid and validates the form",
 		contracts.TargetForm{},
+		ownerID,
 		nil,
 		contracts.TargetForm{
 			Name: contracts.Field{
@@ -46,10 +68,10 @@ func TestTargetAssembler(t *testing.T) {
 		},
 	}}
 
-	asm := builders.TargetAssembler{}
+	asm := builders.TargetBuilder{}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			gotTarget := asm.Target(&tc.form)
+			gotTarget := asm.Target(&tc.form, tc.ownerID)
 			assert.Equal(t, tc.wantTarget, gotTarget)
 			assert.EqualExportedValues(t, tc.wantForm, tc.form)
 		})

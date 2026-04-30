@@ -21,6 +21,7 @@ func (v *TargetFormValidator) Validate(form *contracts.TargetForm) bool {
 		form.Name.AddError(ErrTooLongTargetName)
 	}
 
+	texts := make(map[string]bool, len(form.Questions))
 	for i, q := range form.Questions {
 		if len(q.Value) == 0 {
 			form.Questions[i].AddError(ErrEmpty)
@@ -33,6 +34,12 @@ func (v *TargetFormValidator) Validate(form *contracts.TargetForm) bool {
 		if i >= MaxNumOfQuestions {
 			form.Questions[i].AddError(ErrExcessiveQuestion)
 		}
+
+		if _, found := texts[q.Value]; found {
+			form.Questions[i].AddError(ErrRepeatedQuestion)
+		}
+
+		texts[q.Value] = true
 	}
 
 	if len(form.Questions) == 0 {

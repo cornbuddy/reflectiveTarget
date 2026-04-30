@@ -28,6 +28,7 @@ var ErrTooLongTargetName = fmt.Errorf(
 	"target name should be less than %d characters long", MaxTargetNameLen,
 )
 
+var ErrRepeatedQuestion = errors.New("question already exists in the target")
 var ErrTooLongQuestion = fmt.Errorf(
 	"question should be less than %d characters long", MaxQuestionLen,
 )

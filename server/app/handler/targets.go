@@ -9,15 +9,13 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
 )
 
 type targetsHandler struct {
-	repo          repositories.TargetRepo
-	builder       builders.TargetBuilder
-	formValidator validators.TargetFormValidator
+	repo    repositories.TargetRepo
+	builder builders.TargetBuilder
 }
 
 func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
@@ -47,8 +45,9 @@ func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	session := sessiondata.Read(ctx)
 	form := contracts.NewTargetForm(r.Form)
-	target := h.builder.Target(&form)
+	target := h.builder.Target(&form, session.UserID)
 	if target == nil {
 		log.Debug("form is invalid", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)

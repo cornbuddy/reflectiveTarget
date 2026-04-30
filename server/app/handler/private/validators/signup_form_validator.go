@@ -29,6 +29,8 @@ func (v SignupFormValidator) Validate(
 
 	user, err := v.UserDao.Find(ctx, form.Username.Value)
 	if err != nil {
+		// NOTE: this is not the best idea. instead, I should return
+		// error from this function
 		form.Username.AddError(err)
 	} else if user != nil {
 		form.Username.AddError(ErrUserAlreadyExists)
