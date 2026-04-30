@@ -47,11 +47,14 @@ func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {
 
 	session := sessiondata.Read(ctx)
 	form := contracts.NewTargetForm(r.Form)
-	target := h.builder.Target(&form, session.UserID)
+	target, err := h.builder.Target(ctx, &form, session.UserID)
 	if target == nil {
 		log.Debug("form is invalid", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)
 		view.TargetForm(ctx, w, render.TargetFormData{TargetForm: form})
+		return
+	} else if err != nil {
+		utils.InternalServerError(log, w, "failed to validate form", err)
 		return
 	}
 

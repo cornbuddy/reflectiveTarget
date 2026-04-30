@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/builders"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
@@ -68,10 +69,13 @@ func TestTargetAssembler(t *testing.T) {
 		},
 	}}
 
-	asm := builders.TargetBuilder{}
+	builder := builders.TargetBuilder{
+		validators.TargetFormValidator{TargetRepo: targetRepo},
+	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			gotTarget := asm.Target(&tc.form, tc.ownerID)
+			gotTarget, err := builder.Target(ctx, &tc.form, tc.ownerID)
+			require.NoError(t, err)
 			assert.Equal(t, tc.wantTarget, gotTarget)
 			assert.EqualExportedValues(t, tc.wantForm, tc.form)
 		})

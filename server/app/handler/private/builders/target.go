@@ -1,6 +1,8 @@
 package builders
 
 import (
+	"context"
+
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
@@ -14,12 +16,13 @@ type TargetBuilder struct {
 
 // builds target from the form. validates form as a side effect
 func (b TargetBuilder) Target(
-	form *contracts.TargetForm,
-	ownerID valueobjects.ID,
-) *aggregations.Target {
+	ctx context.Context, form *contracts.TargetForm, ownerID valueobjects.ID,
+) (*aggregations.Target, error) {
 
-	if valid := b.Validator.Validate(form); !valid {
-		return nil
+	if valid, err := b.Validator.Validate(ctx, form, ownerID); !valid {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
 	}
 
 	questions := make(valueobjects.Questions, 0, len(form.Questions))
@@ -32,5 +35,5 @@ func (b TargetBuilder) Target(
 		Name:      form.Name.Value,
 		Owner:     entities.User{ID: ownerID},
 		Questions: questions,
-	}
+	}, nil
 }
