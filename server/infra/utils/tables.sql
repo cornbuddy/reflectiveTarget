@@ -7,13 +7,15 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS targets (
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(128) NOT NULL,
-    owner_id INT REFERENCES users(id) NOT NULL
+    owner_id INT REFERENCES users(id) NOT NULL,
+    UNIQUE (name, owner_id)
 );
 
 CREATE TABLE IF NOT EXISTS questions (
     id SERIAL PRIMARY KEY NOT NULL,
     text VARCHAR(128) NOT NULL,
-    target_id INT REFERENCES targets(id) NOT NULL
+    target_id INT REFERENCES targets(id) NOT NULL,
+    UNIQUE (text, target_id)
 );
 
 CREATE TABLE IF NOT EXISTS shots (

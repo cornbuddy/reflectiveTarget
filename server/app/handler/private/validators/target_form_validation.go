@@ -13,6 +13,10 @@ const (
 type TargetFormValidator struct{}
 
 func (v *TargetFormValidator) Validate(form *contracts.TargetForm) bool {
+	panic(
+		"need to ensure that target with the given name do not exist for the user",
+	)
+
 	if len(form.Name.Value) == 0 {
 		form.Name.AddError(ErrEmpty)
 	}

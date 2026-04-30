@@ -9,6 +9,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 func TestShotsDaoListShouldReturnEmptyListWhenNoShotsForTarget(t *testing.T) {
@@ -16,7 +17,8 @@ func TestShotsDaoListShouldReturnEmptyListWhenNoShotsForTarget(t *testing.T) {
 
 	var targetID valueobjects.ID
 	q := "INSERT INTO targets (name, owner_id) VALUES ($1, $2) RETURNING id"
-	require.NoError(t, db.QueryRow(q, "kek?", user.ID).Scan(&targetID))
+	name := utils.MakeRandomString(5)
+	require.NoError(t, db.QueryRow(q, name, user.ID).Scan(&targetID))
 
 	got, err := shotsDao.List(ctx, targetID)
 	require.NoError(t, err)

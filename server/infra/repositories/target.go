@@ -16,6 +16,45 @@ type TargetRepo struct {
 }
 
 func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
+	tx, err := r.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	defer tx.Rollback()
+
+	q := strings.Join([]string{
+		"INSERT INTO targets (name, owner_id)",
+		"VALUES ($1, $2::integer)",
+		"ON CONFLICT (name, owner_id) DO UPDATE",
+		"SET name = excluded.name, owner_id = excluded.owner_id",
+		"RETURNING id",
+	}, "\n")
+	if err := tx.QueryRowContext(
+		ctx, q, target.ID, target.Owner.ID,
+	).Scan(&target.ID); err != nil {
+		return err
+	}
+
+	for i, question := range target.Questions {
+		q := strings.Join([]string{
+			"INSERT INTO questions (text, target_id)",
+			"VALUES ($1, $2::integer)",
+			"ON CONFLICT (text, target_id) DO UPDATE",
+			"SET text = excluded.text, target_id = excluded.target_id",
+			"RETURNING id",
+		}, "\n")
+		if err := tx.QueryRowContext(
+			ctx, q, question.Text, target.ID,
+		).Scan(&target.Questions[i].ID); err != nil {
+			return err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
 	return errors.New("not implemented")
 }
 
