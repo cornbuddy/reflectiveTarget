@@ -1,20 +1,30 @@
 package validators
 
 import (
+	"database/sql"
 	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 func TestTargetFormValidator(t *testing.T) {
 	t.Parallel()
 
+	target, owner, err := insertTestTarget(db)
+	require.NoError(t, err)
+
 	type testCase struct {
 		desc     string
+		ownerID  valueobjects.ID
 		form     contracts.TargetForm
 		wantForm contracts.TargetForm
 		wantRes  bool
@@ -32,6 +42,7 @@ func TestTargetFormValidator(t *testing.T) {
 
 	testCases := []testCase{{
 		"should reject if fields are empty",
+		owner.ID,
 		contracts.TargetForm{},
 		contracts.TargetForm{
 			Name: contracts.Field{
@@ -44,6 +55,7 @@ func TestTargetFormValidator(t *testing.T) {
 		false,
 	}, {
 		"should reject if question is empty",
+		owner.ID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: []contracts.Field{{
@@ -60,6 +72,7 @@ func TestTargetFormValidator(t *testing.T) {
 		false,
 	}, {
 		"should reject if too much questions",
+		owner.ID,
 		contracts.TargetForm{
 			Name:      contracts.Field{Value: notSoLongTargetName},
 			Questions: aLotOfQuestions,
@@ -71,6 +84,7 @@ func TestTargetFormValidator(t *testing.T) {
 		false,
 	}, {
 		"should reject if target name is too long",
+		owner.ID,
 		contracts.TargetForm{
 			Name:      contracts.Field{Value: longTargetName},
 			Questions: allowedAmountOfQuestions,
@@ -86,6 +100,7 @@ func TestTargetFormValidator(t *testing.T) {
 	}, {
 
 		"should reject if question name is too long",
+		owner.ID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: contracts.Fields{{
@@ -102,6 +117,7 @@ func TestTargetFormValidator(t *testing.T) {
 		false,
 	}, {
 		"should reject if question text is too long",
+		owner.ID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: contracts.Fields{{
@@ -118,6 +134,7 @@ func TestTargetFormValidator(t *testing.T) {
 		false,
 	}, {
 		"should reject if questions are repeated",
+		owner.ID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: contracts.Fields{{
@@ -137,7 +154,45 @@ func TestTargetFormValidator(t *testing.T) {
 		},
 		false,
 	}, {
+		"should reject if user already has target with this name",
+		owner.ID,
+		contracts.TargetForm{
+			Name: contracts.Field{Value: target.Name},
+			Questions: contracts.Fields{{
+				Value: notSoLongQuestion,
+			}},
+		},
+		contracts.TargetForm{
+			Name: contracts.Field{
+				Value: target.Name,
+				Errors: contracts.Errors{
+					ErrTargetAlreadyExists,
+				},
+			},
+			Questions: contracts.Fields{{
+				Value: notSoLongQuestion,
+			}},
+		},
+		false,
+	}, {
+		"should be valid if another user has target with the same name",
+		69,
+		contracts.TargetForm{
+			Name: contracts.Field{Value: target.Name},
+			Questions: contracts.Fields{{
+				Value: notSoLongQuestion,
+			}},
+		},
+		contracts.TargetForm{
+			Name: contracts.Field{Value: target.Name},
+			Questions: contracts.Fields{{
+				Value: notSoLongQuestion,
+			}},
+		},
+		true,
+	}, {
 		"should be valid with max number of questions",
+		owner.ID,
 		contracts.TargetForm{
 			Name:      contracts.Field{Value: notSoLongTargetName},
 			Questions: allowedAmountOfQuestions,
@@ -149,6 +204,7 @@ func TestTargetFormValidator(t *testing.T) {
 		true,
 	}, {
 		"should be valid if lengths are maxed",
+		owner.ID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: contracts.Fields{{
@@ -164,14 +220,44 @@ func TestTargetFormValidator(t *testing.T) {
 		true,
 	}}
 
-	v := TargetFormValidator{}
+	v := TargetFormValidator{repositories.TargetRepo{DB: db}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			got := v.Validate(&tc.form)
+			got, err := v.Validate(ctx, &tc.form, tc.ownerID)
+			require.NoError(t, err)
 			assert.Equal(t, tc.wantRes, got)
 			assert.EqualExportedValues(t, tc.wantForm, tc.form)
 		})
 	}
+}
+
+func insertTestTarget(db *sql.DB) (
+	*aggregations.Target, *entities.User, error,
+) {
+
+	user, err := entities.NewUser(utils.MakeRandomString(5), "kek")
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if err := utils.InsertUser(db, user); err != nil {
+		return nil, nil, err
+	}
+
+	target := &aggregations.Target{
+		Name:  utils.MakeRandomString(5),
+		Owner: *user,
+		Questions: valueobjects.Questions{{
+			Text: utils.MakeRandomString(5),
+		}, {
+			Text: utils.MakeRandomString(5),
+		}},
+	}
+	if err := utils.InsertTarget(db, target); err != nil {
+		return nil, nil, err
+	}
+
+	return target, user, nil
 }
 
 func makeRandomFields(amount int) contracts.Fields {

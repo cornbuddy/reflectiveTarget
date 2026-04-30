@@ -15,6 +15,7 @@ type TargetRepo struct {
 	*sql.DB
 }
 
+// creates or updates the target
 func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 	tx, err := r.DB.BeginTx(ctx, nil)
 	if err != nil {
@@ -31,7 +32,7 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 		"RETURNING id",
 	}, "\n")
 	if err := tx.QueryRowContext(
-		ctx, q, target.ID, target.Owner.ID,
+		ctx, q, target.Name, target.Owner.ID,
 	).Scan(&target.ID); err != nil {
 		return err
 	}
@@ -55,7 +56,7 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 		return err
 	}
 
-	return errors.New("not implemented")
+	return nil
 }
 
 // returns list of hollow (without nested fields) targets

@@ -15,7 +15,7 @@ import (
 )
 
 func (s *TargetRepoTests) SaveShouldUpdateFieldsWhenChanged(t *testgroup.T) {
-	want := makeTarget(s.owner1.ID)
+	want := makeTarget(*s.owner1)
 	t.Require.NoError(s.repo.Save(ctx, &want))
 
 	wantName, wantQuestion := "changed", "changed as well"
@@ -31,7 +31,7 @@ func (s *TargetRepoTests) SaveShouldUpdateFieldsWhenChanged(t *testgroup.T) {
 }
 
 func (s *TargetRepoTests) SaveShouldBeIdempotent(t *testgroup.T) {
-	first := makeTarget(s.owner1.ID)
+	first := makeTarget(*s.owner1)
 	t.Require.NoError(s.repo.Save(ctx, &first))
 
 	second, err := testutils.DeepCopy(first)
@@ -42,7 +42,7 @@ func (s *TargetRepoTests) SaveShouldBeIdempotent(t *testgroup.T) {
 }
 
 func (s *TargetRepoTests) SaveShouldSaveTarget(t *testgroup.T) {
-	want := makeTarget(s.owner1.ID)
+	want := makeTarget(*s.owner1)
 	t.Require.NoError(s.repo.Save(ctx, &want))
 	t.NotZero(want.ID)
 	for _, q := range want.Questions {
@@ -150,14 +150,15 @@ func TestTargetRepo(t *testing.T) {
 	testgroup.RunInParallel(t, new(TargetRepoTests))
 }
 
-func makeTarget(ownerID valueobjects.ID) aggregations.Target {
+func makeTarget(owner entities.User) aggregations.Target {
 	return aggregations.Target{
 		Name:  utils.MakeRandomString(5),
-		Owner: entities.User{ID: ownerID},
+		Owner: owner,
 		Questions: vo.Questions{{
 			Text: utils.MakeRandomString(10),
 		}, {
 			Text: utils.MakeRandomString(10),
 		}},
+		Shots: valueobjects.Shots{},
 	}
 }

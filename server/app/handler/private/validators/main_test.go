@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"log"
-	"net/http"
 	"os"
 	"testing"
 
@@ -16,10 +15,8 @@ import (
 var (
 	ctx = context.TODO()
 
-	db           *sql.DB
-	router       http.HandlerFunc
-	sessionStore daos.SessionStore
-	userDao      daos.UserDao
+	db      *sql.DB
+	userDao daos.UserDao
 )
 
 func TestMain(m *testing.M) {

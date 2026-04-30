@@ -24,6 +24,9 @@ var ErrPasswordTooShort = fmt.Errorf(
 	"password should be at least %d characters long", MinPasswordLength,
 )
 
+var ErrTargetAlreadyExists = errors.New(
+	"target with the given name already exists",
+)
 var ErrTooLongTargetName = fmt.Errorf(
 	"target name should be less than %d characters long", MaxTargetNameLen,
 )

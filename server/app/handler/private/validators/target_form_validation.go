@@ -1,7 +1,11 @@
 package validators
 
 import (
+	"context"
+
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
 )
 
 const (
@@ -10,12 +14,25 @@ const (
 	MaxQuestionLen    = 128
 )
 
-type TargetFormValidator struct{}
+type TargetFormValidator struct {
+	repositories.TargetRepo
+}
 
-func (v *TargetFormValidator) Validate(form *contracts.TargetForm) bool {
-	panic(
-		"need to ensure that target with the given name do not exist for the user",
-	)
+func (v *TargetFormValidator) Validate(
+	ctx context.Context, form *contracts.TargetForm, ownerID valueobjects.ID,
+) (bool, error) {
+
+	targets, err := v.TargetRepo.ListTargetsOfUser(ctx, ownerID)
+	if err != nil {
+		return false, err
+	}
+
+	for _, target := range targets {
+		if form.Name.Value == target.Name {
+			form.Name.AddError(ErrTargetAlreadyExists)
+			break
+		}
+	}
 
 	if len(form.Name.Value) == 0 {
 		form.Name.AddError(ErrEmpty)
@@ -52,5 +69,5 @@ func (v *TargetFormValidator) Validate(form *contracts.TargetForm) bool {
 		}}
 	}
 
-	return form.Name.IsValid() && form.Questions.AreValid()
+	return form.Name.IsValid() && form.Questions.AreValid(), nil
 }
