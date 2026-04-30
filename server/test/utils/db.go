@@ -8,6 +8,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
+	infrautils "github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	tc "github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -120,7 +121,22 @@ func InsertTarget(db *sql.DB, target *aggregations.Target) error {
 	return nil
 }
 
-func SetupTestDb(ctx context.Context) (Cleanup, *sql.DB, error) {
+// starts and initializes database
+func SetupTestDB(ctx context.Context) (Cleanup, *sql.DB, error) {
+	cleanup, db, err := StartDB(ctx)
+	if err != nil {
+		return cleanup, nil, err
+	}
+
+	if err := infrautils.InitDatabase(db); err != nil {
+		return cleanup, nil, err
+	}
+
+	return cleanup, db, nil
+}
+
+// starts testcontainer with database
+func StartDB(ctx context.Context) (Cleanup, *sql.DB, error) {
 	str := wait.ForLog("database system is ready to accept connections").
 		WithOccurrence(2).
 		WithStartupTimeout(5 * time.Second)
