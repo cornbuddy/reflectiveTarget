@@ -23,7 +23,7 @@ func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 	session := sessiondata.Read(ctx)
 	log := utils.LoggerFromCtx(ctx)
 
-	targets, err := h.repo.ListTargetsOfUser(ctx, session.Username)
+	targets, err := h.repo.ListTargetsOfUser(ctx, session.UserID)
 	if err != nil {
 		utils.InternalServerError(log, w, "failed to fetch list of targets", err)
 		return

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	aggr "github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
@@ -20,16 +21,15 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 
 // returns list of hollow (without nested fields) targets
 func (r TargetRepo) ListTargetsOfUser(
-	ctx context.Context, username string,
+	ctx context.Context, ownerID valueobjects.ID,
 ) (aggr.Targets, error) {
 
 	q := strings.Join([]string{
 		"SELECT t.name, t.id",
 		"FROM targets AS t",
-		"JOIN users AS u ON t.owner_id = u.id",
-		"WHERE u.username = $1",
+		"WHERE t.owner_id = $1",
 	}, "\n")
-	rows, err := r.QueryContext(ctx, q, username)
+	rows, err := r.QueryContext(ctx, q, ownerID)
 	if err != nil {
 		return nil, err
 	}
