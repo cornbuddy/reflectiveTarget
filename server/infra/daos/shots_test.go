@@ -1,13 +1,13 @@
 package daos
 
 import (
+	"database/sql"
 	"math/rand/v2"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -29,7 +29,7 @@ func TestShotsDaoListShouldReturnNotFoundErrorWhenNoSuchTarget(t *testing.T) {
 	t.Parallel()
 
 	got, err := shotsDao.List(ctx, 69)
-	require.ErrorIs(t, err, errors.ErrNotFound)
+	require.ErrorIs(t, err, sql.ErrNoRows)
 	assert.Nil(t, got)
 }
 

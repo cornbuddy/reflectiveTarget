@@ -3,9 +3,7 @@ package daos
 import (
 	"context"
 	"database/sql"
-	"errors"
 
-	myerrors "github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
@@ -14,10 +12,9 @@ type ShotsDao struct {
 }
 
 func (d ShotsDao) List(ctx context.Context, targetID vo.ID) (vo.Shots, error) {
-	q := "SELECT * FROM targets WHERE id = $1"
-	err := d.DB.QueryRowContext(ctx, q, targetID).Scan()
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, myerrors.ErrNotFound
+	q := "SELECT id FROM targets WHERE id = $1"
+	if err := d.DB.QueryRowContext(ctx, q, targetID).Scan(&targetID); err != nil {
+		return nil, err
 	}
 
 	q = "SELECT x, y FROM shots WHERE target_id = $1"

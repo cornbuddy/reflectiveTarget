@@ -1,8 +1,9 @@
 package handler
 
 import (
+	"database/sql"
 	"encoding/json"
-	stderr "errors"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -13,7 +14,6 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/errors"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 )
@@ -37,7 +37,7 @@ func (h shotsHandler) get(w http.ResponseWriter, r *http.Request) {
 	log = log.With(zap.Int("target-id", targetID))
 
 	shots, err := h.ShotsDao.List(ctx, valueobjects.ID(targetID))
-	if stderr.Is(err, errors.ErrNotFound) {
+	if errors.Is(err, sql.ErrNoRows) {
 		utils.NotFound(log, w, "target not found", err)
 		return
 	} else if err != nil {
