@@ -2,14 +2,12 @@ package utils
 
 import (
 	"database/sql"
-	_ "embed"
+
+	"github.com/cornbuddy/reflectiveTarget/server/infra/migrations"
 )
 
-//go:embed tables.sql
-var initQuery string
-
 func InitDatabase(db *sql.DB) error {
-	if _, err := db.Exec(initQuery); err != nil {
+	if _, err := db.Exec(migrations.InitQuery); err != nil {
 		return err
 	}
 

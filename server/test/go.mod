@@ -4,8 +4,11 @@ go 1.26.2
 
 replace github.com/cornbuddy/reflectiveTarget/server/domain => ../domain
 
+replace github.com/cornbuddy/reflectiveTarget/server/infra => ../infra
+
 require (
 	github.com/cornbuddy/reflectiveTarget/server/domain v0.0.0-00010101000000-000000000000
+	github.com/cornbuddy/reflectiveTarget/server/infra v0.0.0-00010101000000-000000000000
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/redis/go-redis/v9 v9.17.2
 	github.com/stretchr/testify v1.11.1

@@ -8,7 +8,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
-	infrautils "github.com/cornbuddy/reflectiveTarget/server/infra/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/migrations"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	tc "github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -128,7 +128,7 @@ func SetupDB(ctx context.Context) (Cleanup, *sql.DB, error) {
 		return cleanup, nil, err
 	}
 
-	if err := infrautils.InitDatabase(db); err != nil {
+	if _, err := db.Exec(migrations.InitQuery); err != nil {
 		return cleanup, nil, err
 	}
 

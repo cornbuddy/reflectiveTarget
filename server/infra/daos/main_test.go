@@ -13,8 +13,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
-	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
-	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 var (
@@ -34,7 +33,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	cleanUpDb, testDb, err := testutils.SetupTestDb(ctx)
+	cleanUpDb, testDb, err := utils.StartDB(ctx)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
 	}
@@ -45,11 +44,7 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
-	if err := utils.InitDatabase(testDb); err != nil {
-		log.Fatalf("failed to init db: %v", err)
-	}
-
-	cleanUpCache, testCache, err := testutils.SetupCache(ctx)
+	cleanUpCache, testCache, err := utils.SetupCache(ctx)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
 	}
@@ -97,12 +92,12 @@ func fillDatabase(
 	shots valueobjects.Shots,
 ) error {
 
-	if err := testutils.InsertUser(db, user); err != nil {
+	if err := utils.InsertUser(db, user); err != nil {
 		return err
 	}
 
 	target.Owner = *user
-	if err := testutils.InsertTarget(db, target); err != nil {
+	if err := utils.InsertTarget(db, target); err != nil {
 		return err
 	}
 

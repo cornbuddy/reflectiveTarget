@@ -12,7 +12,7 @@ import (
 func TestHealthShouldReturnErrorWhenDependenciesDontWork(t *testing.T) {
 	t.Parallel()
 
-	cleanUpDb, db, err := testutils.SetupTestDb(ctx)
+	cleanUpDb, db, err := testutils.StartDB(ctx)
 	require.NoError(t, err)
 
 	t.Cleanup(func() {

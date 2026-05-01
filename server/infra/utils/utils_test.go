@@ -16,7 +16,7 @@ func TestInitDatabase(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.TODO()
-	cleanup, db, err := utils.SetupTestDb(ctx)
+	cleanup, db, err := utils.StartDB(ctx)
 	require.NoError(t, err)
 
 	t.Cleanup(func() {

@@ -22,7 +22,7 @@ func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 func TestHealthHandlerShouldFailWhenDbsDontWork(t *testing.T) {
 	t.Parallel()
 
-	dbCleanup, db, err := utils.SetupTestDb(ctx)
+	dbCleanup, db, err := utils.StartDB(ctx)
 	assert.NoError(t, err)
 
 	t.Cleanup(func() {

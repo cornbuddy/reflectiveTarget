@@ -11,8 +11,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
-	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
-	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -26,7 +25,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	cleanupDb, testDb, err := testutils.SetupTestDb(ctx)
+	cleanupDb, testDb, err := utils.SetupDB(ctx)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
 	}
@@ -37,11 +36,7 @@ func TestMain(m *testing.M) {
 		}
 	}()
 
-	if err := utils.InitDatabase(testDb); err != nil {
-		log.Fatalf("failed to init db: %v", err)
-	}
-
-	cleanUpCache, testCache, err := testutils.SetupCache(ctx)
+	cleanUpCache, testCache, err := utils.SetupCache(ctx)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
 	}
