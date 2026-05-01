@@ -25,7 +25,7 @@ func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 
 	targets, err := h.repo.ListTargetsOfUser(ctx, session.UserID)
 	if err != nil {
-		utils.InternalServerError(log, w, "failed to fetch list of targets", err)
+		utils.InternalServerError(log, w, "failed to fetch targets", err)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	utils.Redirect(w, r, "/targets", "target created")
 }
 
 func (h targetsHandler) update(w http.ResponseWriter, r *http.Request) {}

@@ -1,15 +1,17 @@
 package handler
 
 import (
+	"io"
 	"net/http"
-	"net/url"
+	neturl "net/url"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/bloomberg/go-testgroup"
-	"github.com/stretchr/testify/assert"
 
 	appconst "github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
@@ -25,24 +27,61 @@ type TargetsSuite struct {
 }
 
 func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
-	t.Fail("not implemented")
-	// TODO: make post request with invalid target as form
-	// TODO: ensure that POST /targets/new responds with 400 code
+	type testCase struct {
+		form     neturl.Values
+		contains string
+	}
+	testCases := []testCase{{
+		neturl.Values{
+			"name":       []string{s.ownedTargets[0].Name},
+			"question_0": []string{"q1?"},
+			"question_1": []string{"q2?"},
+		},
+		validators.ErrTargetAlreadyExists.Error(),
+	}, {
+		neturl.Values{
+			"name": []string{"kek"},
+		},
+		validators.ErrEmpty.Error(),
+	}, {
+		neturl.Values{
+			"name":       []string{"totally unique target"},
+			"question_0": []string{"q1?"},
+			"question_1": []string{"q1?"},
+		},
+		validators.ErrRepeatedQuestion.Error(),
+	}}
+
+	status := http.StatusBadRequest
+	method := http.MethodPost
+	url := "/targets/new"
+	ct := "application/x-www-form-urlencoded"
+	for _, tc := range testCases {
+		form := strings.NewReader(tc.form.Encode())
+		r := utils.MakeRequest(ct, method, url, s.handler, form)
+		t.Equal(status, r.StatusCode)
+
+		data, err := io.ReadAll(r.Body)
+		t.Require.NoError(err)
+
+		t.Cleanup(func() { r.Body.Close() })
+
+		body := string(data)
+		t.Contains(body, tc.contains)
+	}
 }
 
 func (s *TargetsSuite) ShouldAddTargetIfValid(t *testgroup.T) {
 	name := "valid target"
-	form := url.Values{
+	form := neturl.Values{
 		"name":       []string{name},
 		"question_0": []string{"q1?"},
 		"question_1": []string{"q2?"},
 	}
-	assert.HTTPStatusCode(
-		t.T, s.handler, http.MethodPost, "/targets/new", form, http.StatusCreated,
+	t.HTTPStatusCode(
+		s.handler, http.MethodPost, "/targets/new", form, http.StatusSeeOther,
 	)
-	assert.HTTPBodyContains(
-		t.T, s.handler, http.MethodGet, "/targets", nil, name,
-	)
+	t.HTTPBodyContains(s.handler, http.MethodGet, "/targets", nil, name)
 }
 
 func (s *TargetsSuite) ShouldRespondOnValidCreds(t *testgroup.T) {

@@ -17,6 +17,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 )
 
+// TODO: use *sql.Db and interface of SessionStore as fields
 type Config struct {
 	daos.HealthDao
 	daos.SessionStore
