@@ -67,6 +67,29 @@ func TestTargetAssembler(t *testing.T) {
 				Errors: contracts.Errors{validators.ErrEmpty},
 			}},
 		},
+	}, {
+		"returns nil if questions are wrong",
+		contracts.TargetForm{
+			Name: contracts.Field{Value: "name"},
+			Questions: contracts.Fields{{
+				Value: "kek1",
+			}, {
+				Value: "kek1",
+			}},
+		},
+		ownerID,
+		nil,
+		contracts.TargetForm{
+			Name: contracts.Field{Value: "name"},
+			Questions: contracts.Fields{{
+				Value: "kek1",
+			}, {
+				Value: "kek1",
+				Errors: contracts.Errors{
+					validators.ErrRepeatedQuestion,
+				},
+			}},
+		},
 	}}
 
 	builder := builders.TargetBuilder{

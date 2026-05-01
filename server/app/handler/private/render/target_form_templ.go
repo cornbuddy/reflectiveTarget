@@ -58,9 +58,9 @@ func targetForm(data TargetFormData) templ.Component {
 		}
 		var url, method string
 		if new {
-			url, method = "/target/new", "post"
+			url, method = "/targets/new", "post"
 		} else {
-			url, method = fmt.Sprintf("/target/%d", data.ID), "put"
+			url, method = fmt.Sprintf("/targets/%d", data.ID), "put"
 		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form")
 		if templ_7745c5c3_Err != nil {
@@ -210,7 +210,7 @@ func targetForm(data TargetFormData) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if new {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<button type=\"submit\">Create</button> <button hx-on:click=\"addQuestion()\">Add question</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<button type=\"submit\">Create</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -223,6 +223,12 @@ func targetForm(data TargetFormData) templ.Component {
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
+		}
+		if new {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<button hx-on:click=\"addQuestion()\">Add question</button>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
 		}
 		return nil
 	})

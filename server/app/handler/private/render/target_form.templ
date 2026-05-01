@@ -11,9 +11,9 @@ templ targetForm(data TargetFormData) {
 	}
 	{{ var url, method string }}
 	if new {
-		{{ url, method = "/target/new", "post" }}
+		{{ url, method = "/targets/new", "post" }}
 	} else {
-		{{ url, method = fmt.Sprintf("/target/%d", data.ID), "put" }}
+		{{ url, method = fmt.Sprintf("/targets/%d", data.ID), "put" }}
 	}
 	<form
 		{ "hx-" + method }={ templ.URL(url) }
@@ -42,9 +42,11 @@ templ targetForm(data TargetFormData) {
 		<canvas></canvas>
 		if new {
 			<button type="submit">Create</button>
-			<button hx-on:click="addQuestion()">Add question</button>
 		} else {
 			<button type="submit">Update</button>
 		}
 	</form>
+	if new {
+		<button hx-on:click="addQuestion()">Add question</button>
+	}
 }

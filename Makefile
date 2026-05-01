@@ -17,7 +17,7 @@ clean: stop
 
 .PHONY: build
 build:
-	docker compose -f $(COMPOSE) build --pull
+	docker compose -f $(COMPOSE) build --pull $(ARGS)
 
 .PHONY: lint
 lint:

@@ -14,7 +14,8 @@ type TargetBuilder struct {
 	Validator validators.TargetFormValidator
 }
 
-// builds target from the form. validates form as a side effect
+// builds target from the form. returns nil if form is invalid. validates form
+// as a side effect
 func (b TargetBuilder) Target(
 	ctx context.Context, form *contracts.TargetForm, ownerID valueobjects.ID,
 ) (*aggregations.Target, error) {

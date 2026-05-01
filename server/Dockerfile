@@ -7,11 +7,7 @@ ENV CGO_ENABLED=0
 WORKDIR /workspace
 COPY . .
 WORKDIR /workspace/app
-RUN go build \
-    -a -v \
-    -gcflags=all="-l -B" \
-    -ldflags="-w -s" \
-    -o reflecitve-target .
+RUN make build
 
 FROM scratch
 COPY --from=builder /workspace/app/reflecitve-target .

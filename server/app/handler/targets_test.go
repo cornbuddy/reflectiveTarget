@@ -28,10 +28,13 @@ type TargetsSuite struct {
 
 func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 	type testCase struct {
+		desc     string
 		form     neturl.Values
 		contains string
 	}
+
 	testCases := []testCase{{
+		"rejects target with existing name name",
 		neturl.Values{
 			"name":       []string{s.ownedTargets[0].Name},
 			"question_0": []string{"q1?"},
@@ -39,13 +42,15 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 		},
 		validators.ErrTargetAlreadyExists.Error(),
 	}, {
+		"rejects target with no questions",
 		neturl.Values{
-			"name": []string{"kek"},
+			"name": []string{"no questions"},
 		},
 		validators.ErrEmpty.Error(),
 	}, {
+		"rejects target with repeated questions",
 		neturl.Values{
-			"name":       []string{"totally unique target"},
+			"name":       []string{"same question twice"},
 			"question_0": []string{"q1?"},
 			"question_1": []string{"q1?"},
 		},
@@ -57,17 +62,21 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 	url := "/targets/new"
 	ct := "application/x-www-form-urlencoded"
 	for _, tc := range testCases {
-		form := strings.NewReader(tc.form.Encode())
-		r := utils.MakeRequest(ct, method, url, s.handler, form)
-		t.Equal(status, r.StatusCode)
+		t.Run(tc.desc, func(t *testgroup.T) {
+			t.Parallel()
 
-		data, err := io.ReadAll(r.Body)
-		t.Require.NoError(err)
+			form := strings.NewReader(tc.form.Encode())
+			r := utils.MakeRequest(ct, method, url, s.handler, form)
+			t.Equal(status, r.StatusCode)
 
-		t.Cleanup(func() { r.Body.Close() })
+			data, err := io.ReadAll(r.Body)
+			t.Require.NoError(err)
 
-		body := string(data)
-		t.Contains(body, tc.contains)
+			t.Cleanup(func() { r.Body.Close() })
+
+			body := string(data)
+			t.Contains(body, tc.contains)
+		})
 	}
 }
 

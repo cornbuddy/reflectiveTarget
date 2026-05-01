@@ -7,3 +7,10 @@ generate:
 test: generate
 
 lint: generate
+
+build: generate
+	go build \
+		-a -v \
+		-gcflags=all="-l -B" \
+		-ldflags="-w -s" \
+		-o reflecitve-target .

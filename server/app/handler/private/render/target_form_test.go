@@ -90,7 +90,7 @@ func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 		[]string{
 			"New target",
 			"<form",
-			"hx-post=\"/target/new\"",
+			"hx-post=\"/targets/new\"",
 			"hx-trigger=\"submit\"",
 			"hx-target=\"main\"",
 			"<button type=\"submit\">Create</button>",
@@ -105,7 +105,7 @@ func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 		[]string{
 			fmt.Sprintf("<h2>%s</h2>", target.Name),
 			"<form",
-			fmt.Sprintf("hx-put=\"/target/%d\"", target.ID),
+			fmt.Sprintf("hx-put=\"/targets/%d\"", target.ID),
 			"hx-trigger=\"submit\"",
 			"hx-target=\"main\"",
 			"<button type=\"submit\">Update</button>",
