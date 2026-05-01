@@ -48,7 +48,9 @@ func MakeHandler(config *config.Config) http.Handler {
 	targets := targetsHandler{
 		repo: config.TargetRepo,
 		builder: builders.TargetBuilder{
-			Validator: validators.TargetFormValidator{},
+			Validator: validators.TargetFormValidator{
+				TargetRepo: config.TargetRepo,
+			},
 		},
 	}
 	child := r.PathPrefix("/targets").Subrouter()
