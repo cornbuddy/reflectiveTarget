@@ -1,23 +1,24 @@
-COMPOSE = develop/compose.yml
+COMPOSE = docker compose -f develop/compose.yml
 
 .PHONY: all
 all: build run
 
 .PHONY: run
 run: stop
-	docker compose -f $(COMPOSE) up
+	$(COMPOSE) up
 
 .PHONY: stop
 stop:
-	- docker compose -f $(COMPOSE) down
+	- $(COMPOSE) down
 
 .PHONY: clean
 clean: stop
-	docker compose -f $(COMPOSE) down --rmi all --volumes
+	$(COMPOSE) down --volumes
 
 .PHONY: build
 build:
-	docker compose -f $(COMPOSE) build --pull $(ARGS)
+	$(COMPOSE) pull --include-deps
+	$(COMPOSE) build --pull $(BUILD_ARGS)
 
 .PHONY: lint
 lint:
@@ -35,7 +36,7 @@ test:
 	@$(MAKE) -C server test
 
 .PHONY: spec
-spec: build clean
+spec: clean build
 	$(MAKE) run &
 	sleep 10
 	$(MAKE) -C spec spec; ret=$$?; \
