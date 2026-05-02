@@ -25,7 +25,7 @@ templ targetForm(data TargetFormData) {
 			<input name="name" placeholder="Target name" value={ data.Name.Value }/>
 			@errors(data.Name.Errors)
 		</section>
-		if new {
+		if new && len(data.Questions) == 0 {
 			<section id="question_0">
 				<input name="question_0" placeholder="Question 1"/>
 			</section>

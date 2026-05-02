@@ -26,6 +26,7 @@ services:
       PGUSER: *pguser
       PGDATABASE: *pgdatabase
       PGHOST: db
+
   frontend:
     depends_on: [server]
     build:

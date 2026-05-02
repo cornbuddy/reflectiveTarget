@@ -126,7 +126,7 @@ func targetForm(data TargetFormData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if new {
+		if new && len(data.Questions) == 0 {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<section id=\"question_0\"><input name=\"question_0\" placeholder=\"Question 1\"></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
