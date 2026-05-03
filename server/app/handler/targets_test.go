@@ -43,10 +43,11 @@ func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 		"name":       []string{wantName},
 		"question_0": []string{wantQuestion},
 	}.Encode())
+
 	r, body, err := utils.MakeRequest(ct, http.MethodPut, url, s.handler, form)
 	t.Require.NoError(err)
 	t.Equal(http.StatusSeeOther, r.StatusCode)
-	t.Equal("updated", body)
+	t.Equal("target updated", body)
 
 	t.HTTPBodyContains(s.handler, http.MethodGet, url, nil, wantName)
 	t.HTTPBodyContains(s.handler, http.MethodGet, url, nil, wantQuestion)

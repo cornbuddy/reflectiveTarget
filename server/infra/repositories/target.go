@@ -24,6 +24,7 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 
 	defer tx.Rollback()
 
+	// TODO: should consider target id as conflict field
 	q := strings.Join([]string{
 		"INSERT INTO targets (name, owner_id)",
 		"VALUES ($1, $2::integer)",
