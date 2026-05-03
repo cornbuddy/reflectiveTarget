@@ -60,6 +60,10 @@ func TestMakeHttpHandler(t *testing.T) {
 		method:     http.MethodPut,
 		statusCode: http.StatusForbidden,
 	}, {
+		url:        "/targets/1",
+		method:     http.MethodGet,
+		statusCode: http.StatusForbidden,
+	}, {
 		url:        "/api/health",
 		method:     http.MethodGet,
 		statusCode: http.StatusOK,

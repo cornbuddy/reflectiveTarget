@@ -67,3 +67,5 @@ func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h targetsHandler) update(w http.ResponseWriter, r *http.Request) {}
+
+func (h targetsHandler) edit(w http.ResponseWriter, r *http.Request) {}
