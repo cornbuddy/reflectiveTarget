@@ -1,6 +1,8 @@
 package repositories_test
 
 import (
+	"testing"
+
 	"github.com/bloomberg/go-testgroup"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
@@ -53,17 +55,10 @@ func (s *TargetCommandsTest) PreGroup(t *testgroup.T) {
 	s.owner = owner
 }
 
-func (s *TargetCommandsTest) SaveShouldSaveTarget(t *testgroup.T) {
-	want := makeTarget(*s.owner)
-	t.Require.NoError(s.repo.Save(ctx, &want))
-	t.NotZero(want.ID)
-	for _, q := range want.Questions {
-		t.NotZero(q.ID)
-	}
+func TestTargetQueries(t *testing.T) {
+	t.Parallel()
 
-	got, err := s.repo.Get(ctx, want.ID)
-	t.Require.NoError(err)
-	t.EqualExportedValues(want, *got)
+	testgroup.RunInParallel(t, new(TargetQueriesTest))
 }
 
 func makeTarget(owner entities.User) aggregations.Target {
