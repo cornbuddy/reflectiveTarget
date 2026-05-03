@@ -12,7 +12,7 @@ import (
 	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
-type TargetReadsTest struct {
+type TargetQueriesTest struct {
 	targets aggregations.Targets
 	repo    *repositories.TargetRepo
 	// owns 1 targets
@@ -21,13 +21,13 @@ type TargetReadsTest struct {
 	owner2 *entities.User
 }
 
-func (s *TargetReadsTest) GetShouldReturnNilIfTargetNotExist(t *testgroup.T) {
+func (s *TargetQueriesTest) GetShouldReturnNilIfTargetNotExist(t *testgroup.T) {
 	got, err := s.repo.Get(ctx, 69)
 	t.Require.NoError(err)
 	t.Nil(got)
 }
 
-func (s *TargetReadsTest) GetShouldReturnTargetIfExist(t *testgroup.T) {
+func (s *TargetQueriesTest) GetShouldReturnTargetIfExist(t *testgroup.T) {
 	want := s.targets[0]
 	got, err := s.repo.Get(ctx, want.ID)
 	t.Require.NoError(err)
@@ -35,13 +35,13 @@ func (s *TargetReadsTest) GetShouldReturnTargetIfExist(t *testgroup.T) {
 	t.EqualValues(want, *got)
 }
 
-func (s *TargetReadsTest) ListShouldReturnEmptyListIfNoUser(t *testgroup.T) {
+func (s *TargetQueriesTest) ListShouldReturnEmptyListIfNoUser(t *testgroup.T) {
 	targets, err := s.repo.ListTargetsOfUser(ctx, 69)
 	t.Require.NoError(err)
 	t.Empty(targets)
 }
 
-func (s *TargetReadsTest) ListShouldReturnTargetsIfExist(t *testgroup.T) {
+func (s *TargetQueriesTest) ListShouldReturnTargetsIfExist(t *testgroup.T) {
 	got1, err := s.repo.ListTargetsOfUser(ctx, s.owner1.ID)
 	t.Require.NoError(err)
 	t.Len(got1, 1)
@@ -60,7 +60,7 @@ func (s *TargetReadsTest) ListShouldReturnTargetsIfExist(t *testgroup.T) {
 	}
 }
 
-func (s *TargetReadsTest) PreGroup(t *testgroup.T) {
+func (s *TargetQueriesTest) PreGroup(t *testgroup.T) {
 	owner1, err := entities.NewUser("user1", "password")
 	t.Require.NoError(err)
 
@@ -105,5 +105,5 @@ func (s *TargetReadsTest) PreGroup(t *testgroup.T) {
 func TestTargetRepo(t *testing.T) {
 	t.Parallel()
 
-	testgroup.RunInParallel(t, new(TargetReadsTest))
+	testgroup.RunInParallel(t, new(TargetQueriesTest))
 }
