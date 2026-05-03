@@ -19,21 +19,14 @@ func TestLogoutShouldUpdateSessionCookie(t *testing.T) {
 	const url = "/logout"
 
 	ct := "application/x-www-form-urlencoded"
-	res := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
-	require.NotNil(t, res)
+	res, body, err := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
+	require.NoError(t, err)
 	assert.Equal(t, http.StatusSeeOther, res.StatusCode)
 	assert.Equal(t, "/", res.Header.Get("Location"))
 	assertAuthenticationStatusIsChanged(t, res,
 		"logout should update session cookie",
 	)
-
-	data, err := io.ReadAll(res.Body)
-	assert.NoError(t, err)
-
-	t.Cleanup(func() { res.Body.Close() })
-
-	gotBody := string(data)
-	assert.Contains(t, gotBody, "Logout succeeded")
+	assert.Contains(t, body, "Logout succeeded")
 }
 
 func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {

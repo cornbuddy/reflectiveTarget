@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	neturl "net/url"
@@ -24,6 +25,14 @@ type TargetsSuite struct {
 	session        []*http.Cookie
 	ownedTargets   aggregations.Targets
 	foreignTargets aggregations.Targets
+}
+
+func (s *TargetsSuite) ShouldRenderFormWithTarget(t *testgroup.T) {
+	target := s.ownedTargets[0]
+	url := fmt.Sprintf("/targets/%d", target.ID)
+	t.HTTPStatusCode(s.handler, http.MethodGet, url, nil, http.StatusOK)
+
+	r, body, err := utils.MakeRequest("", http.MethodGet, url, s.handler, nil)
 }
 
 func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
@@ -66,15 +75,9 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 			t.Parallel()
 
 			form := strings.NewReader(tc.form.Encode())
-			r := utils.MakeRequest(ct, method, url, s.handler, form)
-			t.Equal(status, r.StatusCode)
-
-			data, err := io.ReadAll(r.Body)
+			r, body, err := utils.MakeRequest(ct, method, url, s.handler, form)
 			t.Require.NoError(err)
-
-			t.Cleanup(func() { r.Body.Close() })
-
-			body := string(data)
+			t.Equal(status, r.StatusCode)
 			t.Contains(body, tc.contains)
 		})
 	}
