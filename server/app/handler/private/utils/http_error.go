@@ -6,27 +6,29 @@ import (
 	"go.uber.org/zap"
 )
 
+type logger func(string, ...zap.Field)
+
 func InternalServerError(
 	log *zap.Logger, w http.ResponseWriter, msg string, err error,
 ) {
-	httpError(log, w, http.StatusInternalServerError, msg, err)
+	httpError(log.Error, w, http.StatusInternalServerError, msg, err)
 }
 
 func BadRequest(
 	log *zap.Logger, w http.ResponseWriter, msg string, err error,
 ) {
-	httpError(log, w, http.StatusBadRequest, msg, err)
+	httpError(log.Warn, w, http.StatusBadRequest, msg, err)
 }
 
 func NotFound(
 	log *zap.Logger, w http.ResponseWriter, msg string, err error,
 ) {
-	httpError(log, w, http.StatusNotFound, msg, err)
+	httpError(log.Warn, w, http.StatusNotFound, msg, err)
 }
 
 func httpError(
-	log *zap.Logger, w http.ResponseWriter, code int, msg string, err error,
+	log logger, w http.ResponseWriter, code int, msg string, err error,
 ) {
-	log.Error(msg, zap.Error(err))
+	log(msg, zap.Error(err))
 	http.Error(w, msg, code)
 }

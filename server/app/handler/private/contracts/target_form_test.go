@@ -7,9 +7,44 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
-func TestTargetForm(t *testing.T) {
+func TestNewTargetFormFromTarget(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		target aggregations.Target
+		form   contracts.TargetForm
+	}
+
+	testCases := []testCase{{
+		aggregations.Target{
+			Name: "kek",
+			Questions: valueobjects.Questions{{
+				Text: "kek1",
+			}, {
+				Text: "kek2",
+			}},
+		},
+		contracts.TargetForm{
+			Name: contracts.Field{Value: "kek"},
+			Questions: contracts.Fields{{
+				Value: "kek1",
+			}, {
+				Value: "kek2",
+			}},
+		},
+	}}
+
+	for _, tc := range testCases {
+		got := contracts.NewTargetFormFromTarget(tc.target)
+		assert.EqualValues(t, tc.form, got)
+	}
+}
+
+func TestNewTargetForm(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {

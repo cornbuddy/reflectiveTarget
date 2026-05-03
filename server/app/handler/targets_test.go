@@ -33,12 +33,21 @@ func (s *TargetsSuite) ShouldRenderFormWithTarget(t *testgroup.T) {
 	t.Require.NoError(err)
 	t.Equal(http.StatusOK, r.StatusCode)
 
-	tokens := []string{target.Name}
+	tokens := []string{target.Name, "Update"}
 	for _, q := range target.Questions {
 		tokens = append(tokens, q.Text)
 	}
 
 	utils.AssertContainsTokens(t.T, r, tokens)
+	utils.AssertNotContainsTokens(t.T, r, []string{"Create", "Add question"})
+}
+
+func (s *TargetsSuite) ShouldRespondWithNotFoundIfNoTarget(t *testgroup.T) {
+	url := "/targets/69"
+	r, body, err := utils.MakeRequest("", http.MethodGet, url, s.handler, nil)
+	t.Require.NoError(err)
+	t.Equal(http.StatusNotFound, r.StatusCode)
+	t.Contains(body, "not found")
 }
 
 func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {

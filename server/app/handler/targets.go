@@ -21,6 +21,8 @@ type targetsHandler struct {
 	builder builders.TargetBuilder
 }
 
+func (h targetsHandler) update(w http.ResponseWriter, r *http.Request) {}
+
 func (h targetsHandler) edit(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := utils.LoggerFromCtx(ctx)
@@ -38,13 +40,15 @@ func (h targetsHandler) edit(w http.ResponseWriter, r *http.Request) {
 		utils.InternalServerError(log, w, "failed to fetch target", err)
 		return
 	} else if target == nil {
-		panic("raise 404")
+		utils.NotFound(log, w, "target not found", nil)
+		return
 	}
 
-	layout.TargetForm(ctx, w, render.TargetFormData{TargetForm: target})
+	layout.TargetForm(ctx, w, render.TargetFormData{
+		TargetForm: contracts.NewTargetFormFromTarget(*target),
+		ID:         target.ID,
+	})
 }
-
-func (h targetsHandler) update(w http.ResponseWriter, r *http.Request) {}
 
 func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()

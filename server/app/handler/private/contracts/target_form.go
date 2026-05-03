@@ -4,11 +4,26 @@ import (
 	"net/url"
 	"slices"
 	"strings"
+
+	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 )
 
 type TargetForm struct {
 	Name      Field
 	Questions Fields
+}
+
+func NewTargetFormFromTarget(target aggregations.Target) TargetForm {
+	questions := make(Fields, 0, len(target.Questions))
+	for _, question := range target.Questions {
+		field := Field{Value: question.Text}
+		questions = append(questions, field)
+	}
+
+	return TargetForm{
+		Name:      Field{Value: target.Name},
+		Questions: questions,
+	}
 }
 
 func NewTargetForm(form url.Values) TargetForm {

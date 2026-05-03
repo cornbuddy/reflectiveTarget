@@ -24,22 +24,16 @@ func TestHealthHandlerShouldFailWhenDbsDontWork(t *testing.T) {
 	t.Parallel()
 
 	dbCleanup, db, err := utils.StartDB(ctx)
-	assert.NoError(t, err)
-
-	t.Cleanup(func() {
-		require.NoError(t, dbCleanup())
-	})
+	require.NoError(t, err)
 
 	cacheCleanup, cache, err := utils.SetupCache(ctx)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	t.Cleanup(func() {
-		require.NoError(t, cacheCleanup())
-	})
+	// connections will be closed as side effect
+	require.NoError(t, dbCleanup())
+	require.NoError(t, cacheCleanup())
 
-	db.Close()
-	cache.Close()
-
+	// let's build handler with broken dependencies
 	config := makeTestConfig(db, cache)
 	router := MakeHandler(config).ServeHTTP
 	res, _, err := utils.MakeRequest("", http.MethodGet, healthUrl, router, nil)

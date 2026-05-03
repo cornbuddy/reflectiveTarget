@@ -46,11 +46,7 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 			Addr: cfg.CacheAddr,
 		})
 
-		if err := cache.Ping(ctx).Err(); err != nil {
-			return err
-		}
-
-		return nil
+		return cache.Ping(ctx).Err()
 	}); err != nil {
 		return nil, err
 	}
@@ -67,11 +63,7 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 			return err
 		}
 
-		if err := db.Ping(); err != nil {
-			return err
-		}
-
-		return nil
+		return db.Ping()
 	}); err != nil {
 		return nil, err
 	}
