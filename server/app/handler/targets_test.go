@@ -35,12 +35,11 @@ func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 	}
 	t.Require.NoError(utils.InsertTarget(db, &target))
 
-	wantName := utils.MakeRandomString(10)
 	wantQuestion := utils.MakeRandomString(10)
 	ct := "application/x-www-form-urlencoded"
 	url := fmt.Sprintf("/targets/%d", target.ID)
 	form := strings.NewReader(neturl.Values{
-		"name":       []string{wantName},
+		"name":       []string{target.Name},
 		"question_0": []string{wantQuestion},
 	}.Encode())
 
@@ -49,7 +48,7 @@ func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 	t.Equal(http.StatusSeeOther, r.StatusCode)
 	t.Equal("target updated", body)
 
-	t.HTTPBodyContains(s.handler, http.MethodGet, url, nil, wantName)
+	t.HTTPBodyContains(s.handler, http.MethodGet, url, nil, target.Name)
 	t.HTTPBodyContains(s.handler, http.MethodGet, url, nil, wantQuestion)
 }
 

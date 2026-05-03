@@ -25,6 +25,7 @@ func TestTargetFormValidator(t *testing.T) {
 	type testCase struct {
 		desc     string
 		ownerID  valueobjects.ID
+		targetID valueobjects.ID
 		form     contracts.TargetForm
 		wantForm contracts.TargetForm
 		wantRes  bool
@@ -40,9 +41,11 @@ func TestTargetFormValidator(t *testing.T) {
 	aLotOfQuestionsWithError[len(aLotOfQuestionsWithError)-1].
 		AddError(ErrExcessiveQuestion)
 
+	newTargetID := valueobjects.ID(0)
 	testCases := []testCase{{
 		"should reject if fields are empty",
 		owner.ID,
+		newTargetID,
 		contracts.TargetForm{},
 		contracts.TargetForm{
 			Name: contracts.Field{
@@ -56,6 +59,7 @@ func TestTargetFormValidator(t *testing.T) {
 	}, {
 		"should reject if question is empty",
 		owner.ID,
+		newTargetID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: []contracts.Field{{
@@ -73,6 +77,7 @@ func TestTargetFormValidator(t *testing.T) {
 	}, {
 		"should reject if too much questions",
 		owner.ID,
+		newTargetID,
 		contracts.TargetForm{
 			Name:      contracts.Field{Value: notSoLongTargetName},
 			Questions: aLotOfQuestions,
@@ -85,6 +90,7 @@ func TestTargetFormValidator(t *testing.T) {
 	}, {
 		"should reject if target name is too long",
 		owner.ID,
+		newTargetID,
 		contracts.TargetForm{
 			Name:      contracts.Field{Value: longTargetName},
 			Questions: allowedAmountOfQuestions,
@@ -101,6 +107,7 @@ func TestTargetFormValidator(t *testing.T) {
 
 		"should reject if question name is too long",
 		owner.ID,
+		newTargetID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: contracts.Fields{{
@@ -118,6 +125,7 @@ func TestTargetFormValidator(t *testing.T) {
 	}, {
 		"should reject if question text is too long",
 		owner.ID,
+		newTargetID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: contracts.Fields{{
@@ -135,6 +143,7 @@ func TestTargetFormValidator(t *testing.T) {
 	}, {
 		"should reject if questions are repeated",
 		owner.ID,
+		newTargetID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: contracts.Fields{{
@@ -156,6 +165,7 @@ func TestTargetFormValidator(t *testing.T) {
 	}, {
 		"should reject if user already has target with this name",
 		owner.ID,
+		newTargetID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: target.Name},
 			Questions: contracts.Fields{{
@@ -177,6 +187,24 @@ func TestTargetFormValidator(t *testing.T) {
 	}, {
 		"should be valid if another user has target with the same name",
 		69,
+		newTargetID,
+		contracts.TargetForm{
+			Name: contracts.Field{Value: target.Name},
+			Questions: contracts.Fields{{
+				Value: notSoLongQuestion,
+			}},
+		},
+		contracts.TargetForm{
+			Name: contracts.Field{Value: target.Name},
+			Questions: contracts.Fields{{
+				Value: notSoLongQuestion,
+			}},
+		},
+		true,
+	}, {
+		"should be valid if changing questions for existing target",
+		owner.ID,
+		target.ID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: target.Name},
 			Questions: contracts.Fields{{
@@ -193,6 +221,7 @@ func TestTargetFormValidator(t *testing.T) {
 	}, {
 		"should be valid with max number of questions",
 		owner.ID,
+		newTargetID,
 		contracts.TargetForm{
 			Name:      contracts.Field{Value: notSoLongTargetName},
 			Questions: allowedAmountOfQuestions,
@@ -205,6 +234,7 @@ func TestTargetFormValidator(t *testing.T) {
 	}, {
 		"should be valid if lengths are maxed",
 		owner.ID,
+		newTargetID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: contracts.Fields{{
@@ -223,7 +253,7 @@ func TestTargetFormValidator(t *testing.T) {
 	v := TargetFormValidator{repositories.TargetRepo{DB: db}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			got, err := v.Validate(ctx, &tc.form, tc.ownerID)
+			got, err := v.Validate(ctx, &tc.form, tc.ownerID, tc.targetID)
 			require.NoError(t, err)
 			assert.Equal(t, tc.wantRes, got)
 			assert.EqualExportedValues(t, tc.wantForm, tc.form)

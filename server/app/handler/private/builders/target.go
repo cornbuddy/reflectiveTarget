@@ -18,9 +18,10 @@ type TargetBuilder struct {
 // as a side effect
 func (b TargetBuilder) Target(
 	ctx context.Context, form *contracts.TargetForm, ownerID valueobjects.ID,
+	targetID valueobjects.ID,
 ) (*aggregations.Target, error) {
 
-	if valid, err := b.Validator.Validate(ctx, form, ownerID); !valid {
+	if valid, err := b.Validator.Validate(ctx, form, ownerID, targetID); !valid {
 		return nil, nil
 	} else if err != nil {
 		return nil, err

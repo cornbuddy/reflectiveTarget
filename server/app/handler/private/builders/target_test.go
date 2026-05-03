@@ -20,12 +20,11 @@ func TestTargetAssembler(t *testing.T) {
 	type testCase struct {
 		desc       string
 		form       contracts.TargetForm
-		ownerID    valueobjects.ID
 		wantTarget *aggregations.Target
 		wantForm   contracts.TargetForm
 	}
 
-	ownerID := valueobjects.ID(69)
+	ownerID, targetID := valueobjects.ID(69), valueobjects.ID(69)
 	testCases := []testCase{{
 		"returns target if form is valid",
 		contracts.TargetForm{
@@ -36,7 +35,6 @@ func TestTargetAssembler(t *testing.T) {
 				Value: "kek2",
 			}},
 		},
-		ownerID,
 		&aggregations.Target{
 			Name:  "name",
 			Owner: entities.User{ID: ownerID},
@@ -57,7 +55,6 @@ func TestTargetAssembler(t *testing.T) {
 	}, {
 		"returns nil if form is invalid and validates the form",
 		contracts.TargetForm{},
-		ownerID,
 		nil,
 		contracts.TargetForm{
 			Name: contracts.Field{
@@ -77,7 +74,6 @@ func TestTargetAssembler(t *testing.T) {
 				Value: "kek1",
 			}},
 		},
-		ownerID,
 		nil,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: "name"},
@@ -97,7 +93,7 @@ func TestTargetAssembler(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			gotTarget, err := builder.Target(ctx, &tc.form, tc.ownerID)
+			gotTarget, err := builder.Target(ctx, &tc.form, ownerID, targetID)
 			require.NoError(t, err)
 			assert.Equal(t, tc.wantTarget, gotTarget)
 			assert.EqualExportedValues(t, tc.wantForm, tc.form)

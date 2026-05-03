@@ -57,10 +57,11 @@ def test_user_should_be_able_to_edit_its_target(user):
     driver.get(f"{URL}/targets")
     driver.find_element(By.LINK_TEXT, TARGET_NAME).click()
     want_question = "new question value"
-    driver.find_element(
-        By.XPATH, TARGET_INPUTS["question_0"],
-    ).send_keys(want_question)
+    question = driver.find_element(By.XPATH, TARGET_INPUTS["question_0"])
+    question.clear()
+    question.send_keys(want_question)
     user.submit.click()
+
     driver.find_element(By.LINK_TEXT, TARGET_NAME).click()
     got_question = driver.find_element(
         By.XPATH, TARGET_INPUTS["question_0"],

@@ -41,7 +41,7 @@ func (h targetsHandler) update(w http.ResponseWriter, r *http.Request) {
 	id := valueobjects.ID(targetID)
 	session := sessiondata.Read(ctx)
 	form := contracts.NewTargetForm(r.Form)
-	target, err := h.builder.Target(ctx, &form, session.UserID)
+	target, err := h.builder.Target(ctx, &form, session.UserID, id)
 	if err != nil {
 		utils.InternalServerError(log, w, "failed to build target", err)
 		return
@@ -120,7 +120,7 @@ func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {
 
 	session := sessiondata.Read(ctx)
 	form := contracts.NewTargetForm(r.Form)
-	target, err := h.builder.Target(ctx, &form, session.UserID)
+	target, err := h.builder.Target(ctx, &form, session.UserID, 0)
 	if target == nil {
 		log.Debug("form is invalid", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)

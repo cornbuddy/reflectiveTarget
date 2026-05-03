@@ -20,6 +20,7 @@ type TargetFormValidator struct {
 
 func (v *TargetFormValidator) Validate(
 	ctx context.Context, form *contracts.TargetForm, ownerID valueobjects.ID,
+	targetID valueobjects.ID,
 ) (bool, error) {
 
 	targets, err := v.TargetRepo.ListTargetsOfUser(ctx, ownerID)
@@ -28,7 +29,8 @@ func (v *TargetFormValidator) Validate(
 	}
 
 	for _, target := range targets {
-		if form.Name.Value == target.Name {
+		nameAlreadyTaken := form.Name.Value == target.Name && target.ID != targetID
+		if nameAlreadyTaken {
 			form.Name.AddError(ErrTargetAlreadyExists)
 			break
 		}

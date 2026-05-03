@@ -18,16 +18,12 @@ type IsAuthenticatedSuite struct {
 }
 
 func (s *IsAuthenticatedSuite) ShouldErrorIfNoToken(t *testgroup.T) {
-	t.Skip()
-
 	r, _, err := utils.MakeRequest("", http.MethodGet, "/", s.handler, nil)
 	t.Require.NoError(err)
 	t.Equal(http.StatusForbidden, r.StatusCode)
 }
 
 func (s *IsAuthenticatedSuite) ShouldErrorIfTokenIsInvalid(t *testgroup.T) {
-	t.Skip()
-
 	cookies := []*http.Cookie{{
 		Name:  constants.SessionCookieName,
 		Value: "kek",
