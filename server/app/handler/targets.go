@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"go.uber.org/zap"
 
@@ -10,13 +11,40 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
+	"github.com/gorilla/mux"
 )
 
 type targetsHandler struct {
 	repo    repositories.TargetRepo
 	builder builders.TargetBuilder
 }
+
+func (h targetsHandler) edit(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	log := utils.LoggerFromCtx(ctx)
+
+	vars := mux.Vars(r)
+	targetID, err := strconv.Atoi(vars["targetID"])
+	if err != nil {
+		utils.BadRequest(log, w, "failed to parse target id", err)
+		return
+	}
+
+	log = log.With(zap.Int("target-id", targetID))
+	target, err := h.repo.Get(ctx, valueobjects.ID(targetID))
+	if err != nil {
+		utils.InternalServerError(log, w, "failed to fetch target", err)
+		return
+	} else if target == nil {
+		panic("raise 404")
+	}
+
+	layout.TargetForm(ctx, w, render.TargetFormData{TargetForm: target})
+}
+
+func (h targetsHandler) update(w http.ResponseWriter, r *http.Request) {}
 
 func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -65,7 +93,3 @@ func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {
 
 	utils.Redirect(w, r, "/targets", "target created")
 }
-
-func (h targetsHandler) update(w http.ResponseWriter, r *http.Request) {}
-
-func (h targetsHandler) edit(w http.ResponseWriter, r *http.Request) {}

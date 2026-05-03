@@ -58,8 +58,8 @@ func MakeHandler(config *config.Config) http.Handler {
 	child.HandleFunc("", targets.list).Methods(http.MethodGet)
 	child.HandleFunc("/new", targets.makeNew).Methods(http.MethodGet)
 	child.HandleFunc("/new", targets.saveNew).Methods(http.MethodPost)
-	child.HandleFunc("/{id:[0-9]+}", targets.update).Methods(http.MethodPut)
-	child.HandleFunc("/{id:[0-9]+}", targets.edit).Methods(http.MethodGet)
+	child.HandleFunc("/{targetID:[0-9]+}", targets.update).Methods(http.MethodPut)
+	child.HandleFunc("/{targetID:[0-9]+}", targets.edit).Methods(http.MethodGet)
 
 	health := healthHandler{config.HealthDao}
 	shots := shotsHandler{
