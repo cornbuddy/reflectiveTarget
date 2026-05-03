@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -14,8 +15,8 @@ const healthUrl = "/api/health"
 func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 	t.Parallel()
 
-	res := utils.MakeRequest("", http.MethodGet, healthUrl, router, nil)
-	assert.NotNil(t, res)
+	res, _, err := utils.MakeRequest("", http.MethodGet, healthUrl, router, nil)
+	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
@@ -26,14 +27,14 @@ func TestHealthHandlerShouldFailWhenDbsDontWork(t *testing.T) {
 	assert.NoError(t, err)
 
 	t.Cleanup(func() {
-		assert.NoError(t, dbCleanup())
+		require.NoError(t, dbCleanup())
 	})
 
 	cacheCleanup, cache, err := utils.SetupCache(ctx)
 	assert.NoError(t, err)
 
 	t.Cleanup(func() {
-		cacheCleanup()
+		require.NoError(t, cacheCleanup())
 	})
 
 	db.Close()
@@ -41,7 +42,7 @@ func TestHealthHandlerShouldFailWhenDbsDontWork(t *testing.T) {
 
 	config := makeTestConfig(db, cache)
 	router := MakeHandler(config).ServeHTTP
-	res := utils.MakeRequest("", http.MethodGet, healthUrl, router, nil)
-	assert.NotNil(t, res)
+	res, _, err := utils.MakeRequest("", http.MethodGet, healthUrl, router, nil)
+	require.NoError(t, err)
 	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)
 }

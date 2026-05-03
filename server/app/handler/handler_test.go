@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -78,7 +79,9 @@ func TestMakeHttpHandler(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		resp := utils.MakeRequest("", tc.method, tc.url, router, nil)
+		resp, _, err := utils.MakeRequest("", tc.method, tc.url, router, nil)
+		require.NoError(t, err)
+
 		msg := fmt.Sprintf("%s %s", tc.method, tc.url)
 		assertSessionCookieIsSet(t, resp, msg)
 		assert.Equal(t, tc.statusCode, resp.StatusCode, msg)

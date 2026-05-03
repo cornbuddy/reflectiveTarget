@@ -61,20 +61,12 @@ func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
 		),
 	}}
 
+	ct := "application/x-www-form-urlencoded"
 	for _, tc := range testCases {
-		ct := "application/x-www-form-urlencoded"
-		body := tc.body
-		res := utils.MakeRequest(ct, http.MethodPost, url, router, body)
-		require.NotNil(t, res)
+		res, body, err := utils.MakeRequest(ct, http.MethodPost, url, router, tc.body)
+		require.NoError(t, err)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
-
-		data, err := io.ReadAll(res.Body)
-		assert.NoError(t, err)
-
-		t.Cleanup(func() { res.Body.Close() })
-
-		gotBody := string(data)
-		assert.Contains(t, gotBody, tc.message)
+		assert.Contains(t, body, tc.message)
 	}
 }
 
@@ -87,25 +79,18 @@ func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 	require.NoError(t, err)
 
 	ct := "application/x-www-form-urlencoded"
-	body := strings.NewReader(
+	b := strings.NewReader(
 		fmt.Sprintf(
 			"username=%s&password=%s",
 			user.Username, defaultPassword,
 		),
 	)
-	res := utils.MakeRequest(ct, http.MethodPost, url, router, body)
-	require.NotNil(t, res)
+	res, body, err := utils.MakeRequest(ct, http.MethodPost, url, router, b)
+	require.NoError(t, err)
 	assertAuthenticationStatusIsChanged(t, res,
 		"login should set session cookie",
 	)
-
-	data, err := io.ReadAll(res.Body)
-	require.NoError(t, err)
-
-	t.Cleanup(func() { res.Body.Close() })
-
-	gotBody := string(data)
-	assert.Contains(t, gotBody, "Login succeeded")
+	assert.Contains(t, body, "Login succeeded")
 }
 
 func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
@@ -145,24 +130,16 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 		),
 	}}
 
+	ct := "application/x-www-form-urlencoded"
 	for _, tc := range testCases {
-		ct := "application/x-www-form-urlencoded"
-		body := tc.body
-		res := utils.MakeRequest(ct, http.MethodPost, url, router, body)
-		require.NotNil(t, res)
+		res, body, err := utils.MakeRequest(ct, http.MethodPost, url, router, tc.body)
+		require.NoError(t, err)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
+		assert.Contains(t, body, tc.message)
 
 		isSucceed := res.StatusCode == http.StatusSeeOther
 		if isSucceed {
 			assertAuthenticationStatusIsChanged(t, res, tc.message)
 		}
-
-		data, err := io.ReadAll(res.Body)
-		assert.NoError(t, err)
-
-		t.Cleanup(func() { res.Body.Close() })
-
-		gotBody := string(data)
-		assert.Contains(t, gotBody, tc.message)
 	}
 }

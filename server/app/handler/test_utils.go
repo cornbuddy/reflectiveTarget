@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	appconst "github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
@@ -18,7 +18,6 @@ import (
 
 const defaultPassword = "default-password123@"
 
-// TODO: remove
 func makeTestTarget(db *sql.DB, userID int) (int, error) {
 	var targetID int
 	q := "INSERT INTO targets (name, owner_id) VALUES($1, $2) " +
@@ -30,7 +29,6 @@ func makeTestTarget(db *sql.DB, userID int) (int, error) {
 	return targetID, nil
 }
 
-// TODO: remove
 func makeTestUser(db *sql.DB) (*entities.User, error) {
 	username := utils.MakeRandomString(10)
 	user, err := entities.NewUser(username, defaultPassword)
@@ -51,7 +49,7 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response, msg string) {
 
 	var sessionCookie *http.Cookie
 	for _, cookie := range cookies {
-		if cookie.Name == appconst.SessionCookieName {
+		if cookie.Name == constants.SessionCookieName {
 			sessionCookie = cookie
 			break
 		}

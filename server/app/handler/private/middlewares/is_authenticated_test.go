@@ -20,7 +20,8 @@ type IsAuthenticatedSuite struct {
 func (s *IsAuthenticatedSuite) ShouldErrorIfNoToken(t *testgroup.T) {
 	t.Skip()
 
-	r := utils.MakeRequest("", http.MethodGet, "/", s.handler, nil)
+	r, _, err := utils.MakeRequest("", http.MethodGet, "/", s.handler, nil)
+	t.Require.NoError(err)
 	t.Equal(http.StatusForbidden, r.StatusCode)
 }
 
@@ -31,9 +32,10 @@ func (s *IsAuthenticatedSuite) ShouldErrorIfTokenIsInvalid(t *testgroup.T) {
 		Name:  constants.SessionCookieName,
 		Value: "kek",
 	}}
-	r := utils.MakeRequestWithCookies(
+	r, _, err := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/", s.handler, nil, cookies...,
 	)
+	t.Require.NoError(err)
 	t.Equal(http.StatusForbidden, r.StatusCode)
 }
 
@@ -42,9 +44,10 @@ func (s *IsAuthenticatedSuite) Should200IfAuthenticated(t *testgroup.T) {
 		Name:  constants.SessionCookieName,
 		Value: s.authenticatedToken,
 	}}
-	r := utils.MakeRequestWithCookies(
+	r, _, err := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/", s.handler, nil, cookies...,
 	)
+	t.Require.NoError(err)
 	t.Equal(http.StatusOK, r.StatusCode)
 }
 

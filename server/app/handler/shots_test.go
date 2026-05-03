@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"math/rand/v2"
 	"net/http"
 	"testing"
@@ -31,14 +30,13 @@ func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 
 	ct := "application/json"
 	url := fmt.Sprintf("/api/target/%v/shots", targetID)
-	resp := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
+	resp, body, err := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
+	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 	var shots contracts.ShotsResponse
-	require.NoError(t, json.NewDecoder(resp.Body).Decode(&shots))
+	require.NoError(t, json.Unmarshal([]byte(body), &shots))
 	assert.Len(t, shots.Shots, 0)
-
-	t.Cleanup(func() { resp.Body.Close() })
 }
 
 func TestShotsShould404TargetDoesNotExist(t *testing.T) {
@@ -46,7 +44,8 @@ func TestShotsShould404TargetDoesNotExist(t *testing.T) {
 
 	ct := "application/json"
 	url := "/api/target/69/shots"
-	resp := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
+	resp, _, err := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
+	require.NoError(t, err)
 	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 }
 
@@ -64,25 +63,19 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 		Y: rand.IntN(101),
 	}
 
-	var body bytes.Buffer
-	require.NoError(t, json.NewEncoder(&body).Encode(
+	var shots bytes.Buffer
+	require.NoError(t, json.NewEncoder(&shots).Encode(
 		contracts.ShotsRequest{Shots: []valueobjects.Shot{shot}},
 	))
 
 	url := fmt.Sprintf("/api/target/%v/shots", targetID)
-	resp := utils.MakeRequestWithCookies(
-		"application/json", http.MethodPost, url, router, &body,
+	resp, body, err := utils.MakeRequestWithCookies(
+		"application/json", http.MethodPost, url, router, &shots,
 		&http.Cookie{Name: constants.SessionCookieName, Value: "kek"},
 	)
+	require.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
-
-	data, err := io.ReadAll(resp.Body)
-	assert.NoError(t, err)
-
-	t.Cleanup(func() { resp.Body.Close() })
-
-	gotBody := string(data)
-	assert.Equal(t, "ok", gotBody, "should save shots")
+	assert.Equal(t, "ok", body, "should save shots")
 
 	res, err := db.Query(
 		"SELECT * FROM shots WHERE x = $1 AND y = $2",
@@ -118,7 +111,8 @@ func TestShotsShouldBeValidated(t *testing.T) {
 
 		ct := "application/json"
 		method := http.MethodPost
-		resp := utils.MakeRequest(ct, method, shotsUrl, router, &body)
+		resp, _, err := utils.MakeRequest(ct, method, shotsUrl, router, &body)
+		require.NoError(t, err)
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode, tc.desc)
 	}
 }
@@ -132,6 +126,7 @@ func TestShotsShouldFailIfRequestIsMalformed(t *testing.T) {
 
 	ct := "application/json"
 	method := http.MethodPost
-	resp := utils.MakeRequest(ct, method, shotsUrl, router, &body)
+	resp, _, err := utils.MakeRequest(ct, method, shotsUrl, router, &body)
+	require.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 }

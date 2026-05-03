@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bytes"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -45,12 +46,16 @@ func makeRequest(
 	handle(w, req)
 
 	r := w.Result()
-	body, err := io.ReadAll(r.Body)
+	raw, err := io.ReadAll(r.Body)
 	if err != nil {
 		return nil, "", err
 	}
 
-	defer r.Body.Close()
+	if err := r.Body.Close(); err != nil {
+		return nil, "", err
+	}
 
-	return r, string(body), nil
+	r.Body = io.NopCloser(bytes.NewBuffer(raw))
+
+	return r, string(raw), nil
 }

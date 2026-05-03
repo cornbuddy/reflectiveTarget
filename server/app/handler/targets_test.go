@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	neturl "net/url"
 	"strconv"
@@ -30,9 +29,16 @@ type TargetsSuite struct {
 func (s *TargetsSuite) ShouldRenderFormWithTarget(t *testgroup.T) {
 	target := s.ownedTargets[0]
 	url := fmt.Sprintf("/targets/%d", target.ID)
-	t.HTTPStatusCode(s.handler, http.MethodGet, url, nil, http.StatusOK)
+	r, _, err := utils.MakeRequest("", http.MethodGet, url, s.handler, nil)
+	t.Require.NoError(err)
+	t.Equal(http.StatusOK, r.StatusCode)
 
-	r, body, err := utils.MakeRequest("", http.MethodGet, url, s.handler, nil)
+	tokens := []string{target.Name}
+	for _, q := range target.Questions {
+		tokens = append(tokens, q.Text)
+	}
+
+	utils.AssertContainsTokens(t.T, r, tokens)
 }
 
 func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
@@ -97,16 +103,18 @@ func (s *TargetsSuite) ShouldAddTargetIfValid(t *testgroup.T) {
 }
 
 func (s *TargetsSuite) ShouldRespondOnValidCreds(t *testgroup.T) {
-	r := utils.MakeRequestWithCookies(
+	r, _, err := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/targets/new", router, nil, s.session...,
 	)
+	t.Require.NoError(err)
 	t.Equal(http.StatusOK, r.StatusCode)
 }
 
 func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
-	r := utils.MakeRequestWithCookies(
+	r, _, err := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/targets", router, nil, s.session...,
 	)
+	t.Require.NoError(err)
 	t.Equal(http.StatusOK, r.StatusCode)
 
 	for _, ot := range s.ownedTargets {

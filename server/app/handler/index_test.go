@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"io"
 	"net/http"
 	"testing"
 
@@ -14,15 +13,9 @@ import (
 func TestShouldRenderIndexPage(t *testing.T) {
 	t.Parallel()
 
-	resp := utils.MakeRequest("", http.MethodGet, "/", router, nil)
-	require.NotNil(t, resp)
+	resp, body, err := utils.MakeRequest("", http.MethodGet, "/", router, nil)
+	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-	bytes, err := io.ReadAll(resp.Body)
-	assert.NoError(t, err)
-
-	t.Cleanup(func() { resp.Body.Close() })
-	body := string(bytes)
 
 	for _, tc := range []struct {
 		msg  string
