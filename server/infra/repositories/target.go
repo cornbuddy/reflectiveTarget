@@ -26,28 +26,28 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 
 	// TODO: should consider target id as conflict field
 	q := strings.Join([]string{
-		"INSERT INTO targets (name, owner_id)",
-		"VALUES ($1, $2::integer)",
-		"ON CONFLICT (name, owner_id) DO UPDATE",
+		"INSERT INTO targets (id, name, owner_id)",
+		"VALUES ($1::integer, $2, $3::integer)",
+		"ON CONFLICT (id) DO UPDATE",
 		"SET name = excluded.name, owner_id = excluded.owner_id",
 		"RETURNING id",
 	}, "\n")
 	if err := tx.QueryRowContext(
-		ctx, q, target.Name, target.Owner.ID,
+		ctx, q, target.ID, target.Name, target.Owner.ID,
 	).Scan(&target.ID); err != nil {
 		return err
 	}
 
 	for i, question := range target.Questions {
 		q := strings.Join([]string{
-			"INSERT INTO questions (text, target_id)",
-			"VALUES ($1, $2::integer)",
-			"ON CONFLICT (text, target_id) DO UPDATE",
+			"INSERT INTO questions (id, text, target_id)",
+			"VALUES ($1::integer, $2, $3::integer)",
+			"ON CONFLICT (id) DO UPDATE",
 			"SET text = excluded.text, target_id = excluded.target_id",
 			"RETURNING id",
 		}, "\n")
 		if err := tx.QueryRowContext(
-			ctx, q, question.Text, target.ID,
+			ctx, q, question.ID, question.Text, target.ID,
 		).Scan(&target.Questions[i].ID); err != nil {
 			return err
 		}

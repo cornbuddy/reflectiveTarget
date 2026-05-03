@@ -33,7 +33,7 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	cleanUpDb, testDb, err := utils.StartDB(ctx)
+	cleanUpDb, testDb, err := utils.SetupDB(ctx)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
 	}

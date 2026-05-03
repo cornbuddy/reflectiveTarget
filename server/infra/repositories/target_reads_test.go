@@ -7,60 +7,27 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
-	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
-func (s *TargetRepoTests) SaveShouldUpdateFieldsWhenChanged(t *testgroup.T) {
-	want := makeTarget(*s.owner1)
-	t.Require.NoError(s.repo.Save(ctx, &want))
-
-	wantName, wantQuestion := "changed", "changed as well"
-	want.Name = wantName
-	want.Questions[0].Text = wantQuestion
-	t.Require.NoError(s.repo.Save(ctx, &want))
-	t.Equal(wantName, want.Name)
-	t.Equal(wantQuestion, want.Questions[0].Text)
-
-	got, err := s.repo.Get(ctx, want.ID)
-	t.Require.NoError(err)
-	t.EqualValues(want, *got)
+type TargetReadsTest struct {
+	targets aggregations.Targets
+	repo    *repositories.TargetRepo
+	// owns 1 targets
+	owner1 *entities.User
+	// owns 2 targets
+	owner2 *entities.User
 }
 
-func (s *TargetRepoTests) SaveShouldBeIdempotent(t *testgroup.T) {
-	first := makeTarget(*s.owner1)
-	t.Require.NoError(s.repo.Save(ctx, &first))
-
-	second, err := testutils.DeepCopy(first)
-	t.Require.NoError(err)
-
-	t.Require.NoError(s.repo.Save(ctx, second))
-	t.EqualExportedValues(first, *second)
-}
-
-func (s *TargetRepoTests) SaveShouldSaveTarget(t *testgroup.T) {
-	want := makeTarget(*s.owner1)
-	t.Require.NoError(s.repo.Save(ctx, &want))
-	t.NotZero(want.ID)
-	for _, q := range want.Questions {
-		t.NotZero(q.ID)
-	}
-
-	got, err := s.repo.Get(ctx, want.ID)
-	t.Require.NoError(err)
-	t.EqualExportedValues(want, *got)
-}
-
-func (s *TargetRepoTests) GetShouldReturnNilIfTargetNotExist(t *testgroup.T) {
+func (s *TargetReadsTest) GetShouldReturnNilIfTargetNotExist(t *testgroup.T) {
 	got, err := s.repo.Get(ctx, 69)
 	t.Require.NoError(err)
 	t.Nil(got)
 }
 
-func (s *TargetRepoTests) GetShouldReturnTargetIfExist(t *testgroup.T) {
+func (s *TargetReadsTest) GetShouldReturnTargetIfExist(t *testgroup.T) {
 	want := s.targets[0]
 	got, err := s.repo.Get(ctx, want.ID)
 	t.Require.NoError(err)
@@ -68,13 +35,13 @@ func (s *TargetRepoTests) GetShouldReturnTargetIfExist(t *testgroup.T) {
 	t.EqualValues(want, *got)
 }
 
-func (s *TargetRepoTests) ListShouldReturnEmptyListIfNoUser(t *testgroup.T) {
+func (s *TargetReadsTest) ListShouldReturnEmptyListIfNoUser(t *testgroup.T) {
 	targets, err := s.repo.ListTargetsOfUser(ctx, 69)
 	t.Require.NoError(err)
 	t.Empty(targets)
 }
 
-func (s *TargetRepoTests) ListShouldReturnTargetsIfExist(t *testgroup.T) {
+func (s *TargetReadsTest) ListShouldReturnTargetsIfExist(t *testgroup.T) {
 	got1, err := s.repo.ListTargetsOfUser(ctx, s.owner1.ID)
 	t.Require.NoError(err)
 	t.Len(got1, 1)
@@ -93,16 +60,7 @@ func (s *TargetRepoTests) ListShouldReturnTargetsIfExist(t *testgroup.T) {
 	}
 }
 
-type TargetRepoTests struct {
-	targets aggregations.Targets
-	repo    *repositories.TargetRepo
-	// owns 1 targets
-	owner1 *entities.User
-	// owns 2 targets
-	owner2 *entities.User
-}
-
-func (s *TargetRepoTests) PreGroup(t *testgroup.T) {
+func (s *TargetReadsTest) PreGroup(t *testgroup.T) {
 	owner1, err := entities.NewUser("user1", "password")
 	t.Require.NoError(err)
 
@@ -147,18 +105,5 @@ func (s *TargetRepoTests) PreGroup(t *testgroup.T) {
 func TestTargetRepo(t *testing.T) {
 	t.Parallel()
 
-	testgroup.RunInParallel(t, new(TargetRepoTests))
-}
-
-func makeTarget(owner entities.User) aggregations.Target {
-	return aggregations.Target{
-		Name:  utils.MakeRandomString(5),
-		Owner: owner,
-		Questions: vo.Questions{{
-			Text: utils.MakeRandomString(10),
-		}, {
-			Text: utils.MakeRandomString(10),
-		}},
-		Shots: valueobjects.Shots{},
-	}
+	testgroup.RunInParallel(t, new(TargetReadsTest))
 }
