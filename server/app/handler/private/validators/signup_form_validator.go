@@ -25,13 +25,11 @@ var hasDigits = regexp.MustCompile(`\d`)
 
 func (v SignupFormValidator) Validate(
 	ctx context.Context, form *contracts.SignupForm,
-) bool {
+) (bool, error) {
 
 	user, err := v.UserDao.Find(ctx, form.Username.Value)
 	if err != nil {
-		// NOTE: this is not the best idea. instead, I should return
-		// error from this function
-		form.Username.AddError(err)
+		return false, err
 	} else if user != nil {
 		form.Username.AddError(ErrUserAlreadyExists)
 	}
@@ -56,7 +54,9 @@ func (v SignupFormValidator) Validate(
 		form.Confirmation.AddError(ErrPasswordsShouldMatch)
 	}
 
-	return form.Username.IsValid() &&
+	valid := form.Username.IsValid() &&
 		form.Password.IsValid() &&
 		form.Confirmation.IsValid()
+
+	return valid, nil
 }

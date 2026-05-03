@@ -85,7 +85,10 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := contracts.NewSignupForm(r.Form)
-	if valid := h.SignupFormValidator.Validate(ctx, &form); !valid {
+	if valid, err := h.SignupFormValidator.Validate(ctx, &form); err != nil {
+		utils.InternalServerError(log, w, "failed to validate form", err)
+		return
+	} else if !valid {
 		log.Debug("signup failed", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)
 		render.View.Signup(ctx, w, render.SignupData{SignupForm: form})

@@ -51,6 +51,7 @@ func (h shotsHandler) get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: make middleware for content type
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(data)
@@ -97,6 +98,7 @@ func (h shotsHandler) post(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Info("shots saved")
+	// TODO: make middleware for content type
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("ok"))

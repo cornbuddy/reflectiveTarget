@@ -132,7 +132,8 @@ func TestSignupFormValidator(t *testing.T) {
 
 	validator := SignupFormValidator{UserDao: userDao}
 	for _, tc := range testCases {
-		valid := validator.Validate(ctx, &tc.form)
+		valid, err := validator.Validate(ctx, &tc.form)
+		require.NoError(t, err)
 		assert.Equal(t, tc.want, tc.form)
 		assert.Equal(t, tc.valid, valid)
 	}
