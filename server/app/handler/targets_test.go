@@ -21,9 +21,35 @@ import (
 
 type TargetsSuite struct {
 	handler        http.HandlerFunc
-	session        []*http.Cookie
+	owner          *entities.User
 	ownedTargets   aggregations.Targets
 	foreignTargets aggregations.Targets
+}
+
+func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
+	question := vo.Question{Text: utils.MakeRandomString(5)}
+	target := aggregations.Target{
+		Name:      utils.MakeRandomString(5),
+		Owner:     *s.owner,
+		Questions: vo.Questions{question},
+	}
+	t.Require.NoError(utils.InsertTarget(db, &target))
+
+	wantName := utils.MakeRandomString(10)
+	wantQuestion := utils.MakeRandomString(10)
+	ct := "application/x-www-form-urlencoded"
+	url := fmt.Sprintf("/targets/%d", target.ID)
+	form := strings.NewReader(neturl.Values{
+		"name":       []string{wantName},
+		"question_0": []string{wantQuestion},
+	}.Encode())
+	r, body, err := utils.MakeRequest(ct, http.MethodPut, url, s.handler, form)
+	t.Require.NoError(err)
+	t.Equal(http.StatusSeeOther, r.StatusCode)
+	t.Equal("updated", body)
+
+	t.HTTPBodyContains(s.handler, http.MethodGet, url, nil, wantName)
+	t.HTTPBodyContains(s.handler, http.MethodGet, url, nil, wantQuestion)
 }
 
 func (s *TargetsSuite) ShouldRenderFormWithTarget(t *testgroup.T) {
@@ -112,16 +138,16 @@ func (s *TargetsSuite) ShouldAddTargetIfValid(t *testgroup.T) {
 }
 
 func (s *TargetsSuite) ShouldRespondOnValidCreds(t *testgroup.T) {
-	r, _, err := utils.MakeRequestWithCookies(
-		"", http.MethodGet, "/targets/new", router, nil, s.session...,
+	r, _, err := utils.MakeRequest(
+		"", http.MethodGet, "/targets/new", s.handler, nil,
 	)
 	t.Require.NoError(err)
 	t.Equal(http.StatusOK, r.StatusCode)
 }
 
 func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
-	r, _, err := utils.MakeRequestWithCookies(
-		"", http.MethodGet, "/targets", router, nil, s.session...,
+	r, _, err := utils.MakeRequest(
+		"", http.MethodGet, "/targets", s.handler, nil,
 	)
 	t.Require.NoError(err)
 	t.Equal(http.StatusOK, r.StatusCode)
@@ -185,14 +211,16 @@ func (s *TargetsSuite) PreGroup(t *testgroup.T) {
 	}
 	t.Require.NoError(sessionStore.Update(ctx, token, session))
 
-	s.foreignTargets = foreignTargets
+	s.owner = owner
 	s.ownedTargets = ownedTargets
-	s.session = []*http.Cookie{{
-		Name:  appconst.SessionCookieName,
-		Value: token,
-	}}
+	s.foreignTargets = foreignTargets
 	s.handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		for _, c := range s.session {
+		cookies := []*http.Cookie{{
+			Name:  appconst.SessionCookieName,
+			Value: token,
+		}}
+
+		for _, c := range cookies {
 			r.AddCookie(c)
 		}
 
