@@ -49,3 +49,8 @@ pre-commit:
 	pre-commit install
 	pre-commit install --hook-type commit-msg
 	pre-commit run --verbose --all-files --show-diff-on-failure
+
+.PHONY: venv
+venv:
+	$(eval OS_SHELL := $(shell basename $$SHELL))
+	$(MAKE) -C spec $(OS_SHELL)

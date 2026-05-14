@@ -256,6 +256,10 @@ shell: venv
 bash zsh: venv
 	. $(VENV)/activate && exec $@
 
+.PHONY: fish
+fish: SHELL := /bin/fish
+fish: venv
+	. $(VENV)/activate.fish && exec $@
 
 #
 # Commandline tools (wildcard rule, executable name must match package name)
