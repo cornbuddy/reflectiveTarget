@@ -3,7 +3,7 @@ all: build test
 
 .PHONY: build
 build: deps lint clean
-	@npx webpack
+	npx webpack
 
 .PHONY: clean
 clean:
@@ -11,11 +11,12 @@ clean:
 
 .PHONY: deps
 deps:
-	@npm install
+	npm audit fix --force
+	npm install
 
 .PHONY: lint
 lint: deps
-	@npx eslint js/**
+	npx eslint js/**
 
 .PHONY: test
 test: deps lint
