@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	aggr "github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
@@ -24,33 +23,16 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 
 	defer tx.Rollback()
 
-	// TODO: should consider target id as conflict field
-	q := strings.Join([]string{
-		"INSERT INTO targets (id, name, owner_id)",
-		"VALUES ($1::integer, $2, $3::integer)",
-		"ON CONFLICT (id) DO UPDATE",
-		"SET name = excluded.name, owner_id = excluded.owner_id",
-		"RETURNING id",
-	}, "\n")
-	if err := tx.QueryRowContext(
-		ctx, q, target.ID, target.Name, target.Owner.ID,
-	).Scan(&target.ID); err != nil {
+	if err := r.saveTarget(ctx, tx, target); err != nil {
 		return err
 	}
 
 	for i, question := range target.Questions {
-		q := strings.Join([]string{
-			"INSERT INTO questions (id, text, target_id)",
-			"VALUES ($1::integer, $2, $3::integer)",
-			"ON CONFLICT (id) DO UPDATE",
-			"SET text = excluded.text, target_id = excluded.target_id",
-			"RETURNING id",
-		}, "\n")
-		if err := tx.QueryRowContext(
-			ctx, q, question.ID, question.Text, target.ID,
-		).Scan(&target.Questions[i].ID); err != nil {
+		if err := r.saveQuestion(ctx, tx, target, &question); err != nil {
 			return err
 		}
+
+		target.Questions[i] = question
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -60,9 +42,60 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 	return nil
 }
 
+func (r TargetRepo) saveQuestion(
+	ctx context.Context, tx *sql.Tx, target *aggr.Target, question *vo.Question,
+) error {
+	var row *sql.Row
+	if question.ID == 0 {
+		q := strings.Join([]string{
+			"INSERT INTO questions (text, target_id)",
+			"VALUES ($1, $2::integer)",
+			"RETURNING id",
+		}, "\n")
+		row = tx.QueryRowContext(ctx, q, question.Text, target.ID)
+	} else {
+		q := strings.Join([]string{
+			"INSERT INTO questions (id, text, target_id)",
+			"VALUES ($1::integer, $2, $3::integer)",
+			"ON CONFLICT (id) DO UPDATE",
+			"SET text = excluded.text, target_id = excluded.target_id",
+			"RETURNING id",
+		}, "\n")
+		row = tx.QueryRowContext(ctx, q, question.ID, question.Text, target.ID)
+	}
+
+	return row.Scan(&question.ID)
+}
+
+func (r TargetRepo) saveTarget(
+	ctx context.Context, tx *sql.Tx, target *aggr.Target,
+) error {
+
+	var row *sql.Row
+	if target.ID == 0 {
+		q := strings.Join([]string{
+			"INSERT INTO targets (name, owner_id)",
+			"VALUES ($1, $2::integer)",
+			"RETURNING id",
+		}, "\n")
+		row = tx.QueryRowContext(ctx, q, target.Name, target.Owner.ID)
+	} else {
+		q := strings.Join([]string{
+			"INSERT INTO targets (id, name, owner_id)",
+			"VALUES ($1::integer, $2, $3::integer)",
+			"ON CONFLICT (id) DO UPDATE",
+			"SET name = excluded.name, owner_id = excluded.owner_id",
+			"RETURNING id",
+		}, "\n")
+		row = tx.QueryRowContext(ctx, q, target.ID, target.Name, target.Owner.ID)
+	}
+
+	return row.Scan(&target.ID)
+}
+
 // returns list of hollow (without nested fields) targets
 func (r TargetRepo) ListTargetsOfUser(
-	ctx context.Context, ownerID valueobjects.ID,
+	ctx context.Context, ownerID vo.ID,
 ) (aggr.Targets, error) {
 
 	q := strings.Join([]string{

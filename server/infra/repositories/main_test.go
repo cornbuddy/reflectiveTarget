@@ -7,6 +7,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -31,4 +34,17 @@ func TestMain(m *testing.M) {
 	db = testDb
 
 	os.Exit(m.Run())
+}
+
+func makeTarget(owner entities.User) aggregations.Target {
+	return aggregations.Target{
+		Name:  utils.MakeRandomString(5),
+		Owner: owner,
+		Questions: valueobjects.Questions{{
+			Text: utils.MakeRandomString(10),
+		}, {
+			Text: utils.MakeRandomString(10),
+		}},
+		Shots: valueobjects.Shots{},
+	}
 }

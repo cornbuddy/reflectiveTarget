@@ -5,13 +5,9 @@ import (
 
 	"github.com/bloomberg/go-testgroup"
 
-	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
-	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
-	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
-	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 type TargetCommandsTest struct {
@@ -39,17 +35,30 @@ func (s *TargetCommandsTest) SaveShouldBeIdempotent(t *testgroup.T) {
 	first := makeTarget(*s.owner)
 	t.Require.NoError(s.repo.Save(ctx, &first))
 
-	second, err := testutils.DeepCopy(first)
+	second, err := utils.DeepCopy(first)
 	t.Require.NoError(err)
 
 	t.Require.NoError(s.repo.Save(ctx, second))
 	t.EqualExportedValues(first, *second)
 }
 
+func (s *TargetCommandsTest) SaveShouldSaveTarget(t *testgroup.T) {
+	want := makeTarget(*s.owner)
+	t.Require.NoError(s.repo.Save(ctx, &want))
+	t.NotZero(want.ID)
+	for _, q := range want.Questions {
+		t.NotZero(q.ID)
+	}
+
+	got, err := s.repo.Get(ctx, want.ID)
+	t.Require.NoError(err)
+	t.EqualExportedValues(want, *got)
+}
+
 func (s *TargetCommandsTest) PreGroup(t *testgroup.T) {
 	owner, err := entities.NewUser(utils.MakeRandomString(5), "password")
 	t.Require.NoError(err)
-	t.Require.NoError(testutils.InsertUser(db, owner))
+	t.Require.NoError(utils.InsertUser(db, owner))
 
 	s.repo = &repositories.TargetRepo{db}
 	s.owner = owner
@@ -59,17 +68,4 @@ func TestTargetCommands(t *testing.T) {
 	t.Parallel()
 
 	testgroup.RunInParallel(t, new(TargetCommandsTest))
-}
-
-func makeTarget(owner entities.User) aggregations.Target {
-	return aggregations.Target{
-		Name:  utils.MakeRandomString(5),
-		Owner: owner,
-		Questions: vo.Questions{{
-			Text: utils.MakeRandomString(10),
-		}, {
-			Text: utils.MakeRandomString(10),
-		}},
-		Shots: valueobjects.Shots{},
-	}
 }

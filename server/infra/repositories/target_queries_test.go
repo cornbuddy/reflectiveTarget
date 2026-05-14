@@ -21,19 +21,6 @@ type TargetQueriesTest struct {
 	owner2 *entities.User
 }
 
-func (s *TargetCommandsTest) SaveShouldSaveTarget(t *testgroup.T) {
-	want := makeTarget(*s.owner)
-	t.Require.NoError(s.repo.Save(ctx, &want))
-	t.NotZero(want.ID)
-	for _, q := range want.Questions {
-		t.NotZero(q.ID)
-	}
-
-	got, err := s.repo.Get(ctx, want.ID)
-	t.Require.NoError(err)
-	t.EqualExportedValues(want, *got)
-}
-
 func (s *TargetQueriesTest) GetShouldReturnNilIfTargetNotExist(t *testgroup.T) {
 	got, err := s.repo.Get(ctx, 69)
 	t.Require.NoError(err)
