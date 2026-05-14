@@ -33,6 +33,7 @@ deps:
 
 .PHONY: test
 test:
+	@$(MAKE) -C client test
 	@$(MAKE) -C server test
 
 .PHONY: spec
