@@ -115,8 +115,8 @@ func (s *TargetQueriesTest) PreGroup(t *testgroup.T) {
 	s.targets = targets
 }
 
-func TestTargetCommands(t *testing.T) {
+func TestTargetQueries(t *testing.T) {
 	t.Parallel()
 
-	testgroup.RunInParallel(t, new(TargetCommandsTest))
+	testgroup.RunInParallel(t, new(TargetQueriesTest))
 }

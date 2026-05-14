@@ -47,7 +47,7 @@ func (s *TargetCommandsTest) SaveShouldBeIdempotent(t *testgroup.T) {
 }
 
 func (s *TargetCommandsTest) PreGroup(t *testgroup.T) {
-	owner, err := entities.NewUser("user1", "password")
+	owner, err := entities.NewUser(utils.MakeRandomString(5), "password")
 	t.Require.NoError(err)
 	t.Require.NoError(testutils.InsertUser(db, owner))
 
@@ -55,10 +55,10 @@ func (s *TargetCommandsTest) PreGroup(t *testgroup.T) {
 	s.owner = owner
 }
 
-func TestTargetQueries(t *testing.T) {
+func TestTargetCommands(t *testing.T) {
 	t.Parallel()
 
-	testgroup.RunInParallel(t, new(TargetQueriesTest))
+	testgroup.RunInParallel(t, new(TargetCommandsTest))
 }
 
 func makeTarget(owner entities.User) aggregations.Target {
