@@ -1,33 +1,31 @@
-from shutil import which
+import logging
+from base64 import b64encode
 
 import pytest
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.remote.webdriver import WebDriver
+from playwright.sync_api import Page, sync_playwright
 
 from dsl.dsl import DSL
-from constants import DEBUG, URL, USERNAME, PASSWORD
+from constants import BROWSER, DEBUG, URL, USERNAME, PASSWORD
+
+log = logging.getLogger(__name__)
 
 
-@pytest.fixture(scope="session")
-def anon():
+@pytest.fixture(scope="function")
+def anon(page: Page):
     """starts anonymous user session"""
-    browser = start_browser()
-    yield DSL(browser, URL)
+    yield DSL(page, URL)
 
-    browser.quit()
+    page.close()
 
 
-@pytest.fixture(scope="session")
-def user():
+@pytest.fixture(scope="function")
+def user(page: Page):
     """starts authorized user session"""
-    browser = start_browser()
-    dsl = DSL(browser, URL)
-    dsl.signup(USERNAME, PASSWORD)
+    dsl = DSL(page, URL)
+    dsl.login(USERNAME, PASSWORD)
     yield dsl
 
-    browser.quit()
+    page.close()
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -36,36 +34,22 @@ def pytest_runtest_makereport(item):
     outcome = yield
     test_report = outcome.get_result()
     if test_report.when == "call":
-        driver = None
-        test_args = item.funcargs
-        if test_args.get("user", False):
-            driver = test_args["user"].driver
-        elif test_args.get("anon", False):
-            driver = test_args["anon"].driver
-        else:
-            raise RuntimeError(f"failed to get driver from args: {test_args}")
-
-        screenshot = driver.get_screenshot_as_base64()
+        page = item.funcargs.get("page")
+        screenshot = b64encode(page.screenshot()).decode("utf-8")
         pytest_html = item.config.pluginmanager.getplugin("html")
-        extras = getattr(test_report, "extra", [])
+        extras = getattr(test_report, "extras", [])
         extras.append(pytest_html.extras.image(screenshot))
         test_report.extras = extras
 
 
-def start_browser() -> WebDriver:
-    """configures and runs selenium driver"""
-    opts = list(filter(None, [
-        "--disable-gpu",
-        "--no-sandbox",
-        "--disable-dev-shm-usage",
-        "--headless" if not DEBUG else "",
-    ]))
-    options = Options()
-    for opt in opts:
-        options.add_argument(opt)
-    path = which("firefox.geckodriver")
-    service = Service(executable_path=path)
-    browser = webdriver.Firefox(options=options, service=service)
-    browser.set_window_size(1920, 1080)
-    browser.implicitly_wait(10)
-    return browser
+def pytest_sessionstart():
+    """called before the first test runs"""
+    log.info("creating test user...")
+    with sync_playwright() as playwright:
+        headless = not DEBUG
+        browser = getattr(playwright, BROWSER).launch(headless=headless)
+        page = browser.new_context().new_page()
+        dsl = DSL(page, URL)
+        dsl.signup(USERNAME, PASSWORD)
+        log.info("created user `%s`", USERNAME)
+        browser.close()

@@ -1,19 +1,14 @@
 import pytest
 
-from constants import PASSWORD, USERNAME, URL, SESSION_TOKEN
+from constants import PASSWORD, USERNAME, URL
 
 
 def test_user_should_be_able_to_logout(user):
-    before_logout = user.driver.get_cookie(SESSION_TOKEN)
+    before_logout = user.page.context.cookies()
     user.logout()
-    after_logout = user.driver.get_cookie(SESSION_TOKEN)
+    after_logout = user.page.context.cookies()
     assert before_logout != after_logout
-    assert user.driver.current_url == f"{URL}/"
-
-
-def test_user_should_be_able_to_login(user):
-    user.login(USERNAME, PASSWORD)
-    assert user.driver.current_url == f"{URL}/"
+    assert user.page.url == f"{URL}/"
 
 
 @pytest.mark.parametrize("username,message", [
@@ -21,7 +16,7 @@ def test_user_should_be_able_to_login(user):
 ])
 def test_username_should_be_validated_upon_signup(anon, username, message):
     anon.signup(username, PASSWORD)
-    assert message in anon.driver.page_source
+    assert message in anon.page.content()
 
 
 @pytest.mark.parametrize("password,message", [
@@ -31,7 +26,7 @@ def test_username_should_be_validated_upon_signup(anon, username, message):
 ])
 def test_password_should_be_validated_upon_signup(anon, password, message):
     anon.signup(USERNAME, password)
-    assert message in anon.driver.page_source
+    assert message in anon.page.content()
 
 
 @pytest.mark.parametrize("confirmation,message", [
@@ -41,4 +36,4 @@ def test_confirmation_should_be_validated_upon_signup(
         anon, confirmation, message,
 ):
     anon.signup(USERNAME, PASSWORD, confirmation)
-    assert message in anon.driver.page_source
+    assert message in anon.page.content()

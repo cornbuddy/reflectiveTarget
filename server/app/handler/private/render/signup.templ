@@ -6,6 +6,7 @@ templ signup(data SignupData) {
 		<section id="username">
 			<label for="username">Username</label>
 			<input
+				id="username"
 				value={ data.Username.Value }
 				name="username"
 				type="text"
@@ -16,6 +17,7 @@ templ signup(data SignupData) {
 		<section id="password">
 			<label for="password">Password</label>
 			<input
+				id="password"
 				value={ data.Password.Value }
 				name="password"
 				type="password"
@@ -26,6 +28,7 @@ templ signup(data SignupData) {
 		<section id="confirmation">
 			<label for="confirmation">Password confirmation</label>
 			<input
+				id="confirmation"
 				value={ data.Confirmation.Value }
 				name="confirmation"
 				type="password"

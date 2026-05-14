@@ -42,7 +42,7 @@ func login(data LoginData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><section id=\"username\"><label for=\"username\">Username</label> <input name=\"username\" type=\"text\" autocomplete=\"username\" required>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\"><section id=\"username\"><label for=\"username\">Username</label> <input id=\"username\" name=\"username\" type=\"text\" autocomplete=\"username\" required>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -50,7 +50,7 @@ func login(data LoginData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</section><section id=\"password\"><label for=\"password\">Password</label> <input name=\"password\" type=\"password\" autocomplete=\"password\" required>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</section><section id=\"password\"><label for=\"password\">Password</label> <input id=\"password\" name=\"password\" type=\"password\" autocomplete=\"password\" required>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

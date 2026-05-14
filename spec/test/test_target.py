@@ -1,71 +1,65 @@
 import pytest
-from selenium.webdriver.common.by import By
 
 from constants import URL
 
 TARGET_NAME = "totally unique target"
 TARGET_INPUTS = {
-    "name": "//input[@name='name']",
-    "question_0": "//input[@name='question_0']",
     "add_question": "//button[text()='Add question']",
+    "name": "//input[@name='name']",
+    "questions": "//input[starts-with(@name, 'question_')]",
+    "question_0": "//input[@name='question_0']",
 }
 
 
-@pytest.mark.parametrize("by,value", [
-    (By.TAG_NAME, "form"),
-    (By.TAG_NAME, "canvas"),
-    (By.XPATH, "//button[@type='submit']"),
-    (By.XPATH, TARGET_INPUTS["add_question"]),
-    (By.XPATH, TARGET_INPUTS["name"]),
-    (By.XPATH, TARGET_INPUTS["question_0"]),
+@pytest.mark.parametrize("locator", [
+    ("form"),
+    ("canvas"),
+    ("//button[@type='submit']"),
+    (TARGET_INPUTS["add_question"]),
+    (TARGET_INPUTS["name"]),
+    (TARGET_INPUTS["question_0"]),
 ])
-def test_has_proper_components(user, by, value):
+def test_has_proper_components(user, locator):
     user.go_to_new_target()
-    elems = user.driver.find_elements(by, value)
-    assert len(elems) == 1
+    elems = user.page.locator(locator)
+    assert elems.count() == 1
 
 
 def test_canvas_is_properly_sized(user):
     user.go_to_new_target()
-    canvas = user.driver.find_element(By.TAG_NAME, "canvas")
-    assert canvas.size["height"] == canvas.size["width"]
+    size = user.page.locator("canvas").bounding_box()
+    assert abs(size["height"] - size["width"]) < 1
 
 
 def test_question_can_be_added(user):
     user.go_to_new_target()
-    driver = user.driver
-    add_btn = driver.find_element(By.XPATH, TARGET_INPUTS["add_question"])
-    add_btn.click()
-    inputs_xpath = "//input[starts-with(@name, 'question_')]"
-    inputs = driver.find_elements(By.XPATH, inputs_xpath)
-    assert len(inputs) == 2
+    page = user.page
+    page.locator(TARGET_INPUTS["add_question"]).click()
+    assert page.locator(TARGET_INPUTS["questions"]).count() == 2
 
 
 def test_user_should_be_able_to_create_target(user):
     user.go_to_new_target()
-    driver = user.driver
-    driver.find_element(By.XPATH, TARGET_INPUTS["name"]).send_keys(TARGET_NAME)
-    driver.find_element(By.XPATH, TARGET_INPUTS["question_0"]).send_keys("kek")
+    user.page.locator(TARGET_INPUTS["name"]).fill(TARGET_NAME)
+    user.page.locator(TARGET_INPUTS["question_0"]).fill("kek")
     user.submit.click()
-    assert driver.current_url == f"{URL}/targets"
-    assert len(driver.find_elements(By.LINK_TEXT, TARGET_NAME)) == 1
+    want_url = f"{URL}/targets"
+    user.page.wait_for_url(want_url)
+    assert user.page.url == want_url
+    assert user.page.get_by_text(TARGET_NAME).count() == 1
 
 
 @pytest.mark.order(after=test_user_should_be_able_to_create_target.__name__)
 def test_user_should_be_able_to_edit_its_target(user):
-    driver = user.driver
-    driver.get(f"{URL}/targets")
-    driver.find_element(By.LINK_TEXT, TARGET_NAME).click()
+    user.page.goto(f"{URL}/targets")
+    user.page.get_by_text(TARGET_NAME).click()
     want_question = "new question value"
-    question = driver.find_element(By.XPATH, TARGET_INPUTS["question_0"])
-    question.clear()
-    question.send_keys(want_question)
+    question_input = user.page.locator(TARGET_INPUTS["question_0"])
+    question_input.clear()
+    question_input.fill(want_question)
     user.submit.click()
-
-    driver.find_element(By.LINK_TEXT, TARGET_NAME).click()
-    got_question = driver.find_element(
-        By.XPATH, TARGET_INPUTS["question_0"],
-    ).get_attribute("value")
+    user.page.get_by_text(TARGET_NAME).click()
+    got_question = question_input.get_attribute("value")
     assert got_question == want_question
 
 
