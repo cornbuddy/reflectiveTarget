@@ -4,28 +4,27 @@ from base64 import b64encode
 import pytest
 from playwright.sync_api import Page, sync_playwright
 
-from dsl.dsl import DSL
-from constants import BROWSER, DEBUG, URL, USERNAME, PASSWORD
+from pages.base import Layout
+from pages.pages import SignupPage, LoginPage
+from constants import BROWSER, DEBUG, USERNAME, PASSWORD
 
 log = logging.getLogger(__name__)
 
 
-@pytest.fixture(scope="function")
-def anon(page: Page):
-    """starts anonymous user session"""
-    yield DSL(page, URL)
+@pytest.fixture
+def layout(page: Page) -> Layout:
+    layout = Layout(page)
+    yield layout.page
+    return page.close()
 
-    page.close()
 
-
-@pytest.fixture(scope="function")
-def user(page: Page):
-    """starts authorized user session"""
-    dsl = DSL(page, URL)
-    dsl.login(USERNAME, PASSWORD)
-    yield dsl
-
-    page.close()
+@pytest.fixture
+def user(page: Page) -> Page:
+    """returns authorized session for default user"""
+    login = LoginPage(page)
+    login.login(USERNAME, PASSWORD)
+    yield login.page
+    return login.page.close()
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -48,8 +47,7 @@ def pytest_sessionstart():
     with sync_playwright() as playwright:
         headless = not DEBUG
         browser = getattr(playwright, BROWSER).launch(headless=headless)
-        page = browser.new_context().new_page()
-        dsl = DSL(page, URL)
-        dsl.signup(USERNAME, PASSWORD)
+        page = SignupPage(browser.new_context().new_page())
+        page.signup(USERNAME, PASSWORD)
         log.info("created user `%s`", USERNAME)
         browser.close()
