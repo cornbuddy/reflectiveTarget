@@ -51,9 +51,8 @@ def test_user_should_be_able_to_edit_its_target(
     want_question = "new question value"
     update_page.update_target(TARGET_NAME, [want_question])
     page.get_by_text(TARGET_NAME).click()
-    expect(
-        page.locator(LOCATORS["question"](0)),
-    ).to_have_attribute("value", want_question)
+    question_input = page.locator(LOCATORS["question"](0))
+    expect(question_input).to_have_attribute("value", want_question)
 
 
 @pytest.mark.skip
