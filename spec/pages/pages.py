@@ -1,7 +1,7 @@
 from playwright.sync_api import Page
 
 from constants import URL
-from .base import _Form, _Page
+from .base import _Form, _Page, LOCATORS
 
 
 class LoginPage(_Form):
@@ -9,16 +9,25 @@ class LoginPage(_Form):
 
     def __init__(self, page: Page):
         super().__init__(page, f"{URL}/login")
-        self.username_input = self.form.locator("input#username")
-        self.password_input = self.form.locator("input#password")
+        self.username_input = page.locator(LOCATORS["username"])
+        self.password_input = page.locator(LOCATORS["password"])
 
     def login(self, username: str, password: str):
+        self.log.info("going to login as %s", username)
         self.username_input.fill(username)
         self.password_input.fill(password)
-        self.submit.click()
+        with self.page.expect_response(self.url) as response:
+            self.submit.click()
+        if response.value.ok:
+            self.log.info("user %s logged in successfully", username)
+        else:
+            self.log.warning(
+                "user %s is not logged in, status: %d, body: %s",
+                username, response.value.status, response.value.text(),
+            )
 
     def logout(self):
-        self._page.goto(f"{URL}/logout")
+        self.page.goto(f"{URL}/logout")
 
 
 class NewTargetPage(_Form):
@@ -26,6 +35,21 @@ class NewTargetPage(_Form):
 
     def __init__(self, page: Page):
         super().__init__(page, f"{URL}/targets/new")
+        self.name_input = page.locator(LOCATORS["name"])
+        self.add_question = page.locator(LOCATORS["add_question"])
+
+    def create_target(self, name: str, questions: list):
+        """creates target with given parameters"""
+        self.log.info("creating target name=%s", name)
+        self.name_input.fill(name)
+        for i, question in enumerate(questions):
+            if i > 0:
+                self.add_question.click()
+            inpt = self.page.locator(LOCATORS["question"](i))
+            inpt.fill(question)
+        with self.page.expect_response(self.url):
+            self.submit.click()
+        self.log.info("target created name=%s", name)
 
 
 class SignupPage(_Form):
@@ -33,18 +57,26 @@ class SignupPage(_Form):
 
     def __init__(self, page: Page):
         super().__init__(page, f"{URL}/signup")
-        self.username_input = self.form.locator("input#username")
-        self.password_input = self.form.locator("input#password")
-        self.confirmation_input = self.form.locator("input#confirmation")
+        self.username_input = page.locator(LOCATORS["username"])
+        self.password_input = page.locator(LOCATORS["password"])
+        self.confirmation_input = self.form.locator(LOCATORS["confirmation"])
 
     def signup(self, username: str, password: str, confirmation: str = None):
+        self.log.info("signing up as %s", username)
         if confirmation is None:
             confirmation = password
-        self.layout.ensure_navigation_opened()
         self.username_input.fill(username)
         self.password_input.fill(password)
         self.confirmation_input.fill(confirmation)
-        self.submit.click()
+        with self.page.expect_response(self.url) as response:
+            self.submit.click()
+        if response.value.ok:
+            self.log.info("user %s is signed up successfully", username)
+        else:
+            self.log.warning(
+                "user %s is not signed up, status: %d, body: %s",
+                username, response.value.status, response.value.text(),
+            )
 
 
 class TargetsListPage(_Page):
@@ -54,9 +86,32 @@ class TargetsListPage(_Page):
         super().__init__(page, f"{URL}/targets")
         self.targets_list = self.page.locator("ul")
 
+    def get_id_by_target_name(self, name: str) -> int:
+        """returns id of the target with the given name"""
+        a = self.targets_list.get_by_text(name)
+        target_id = a.get_attribute("href").split("/")[-1]
+        return int(target_id)
+
 
 class UpdateTargetPage(_Form):
     """represents form to update target"""
 
     def __init__(self, page: Page, target_id: int):
         super().__init__(page, f"{URL}/targets/{target_id}")
+        self.target_id = target_id
+        self.name_input = page.locator(LOCATORS["name"])
+        self.add_question = page.locator(LOCATORS["add_question"])
+
+    def update_target(self, name: str, questions: list):
+        self.log.info("updating target name=%s id=%d", name, self.target_id)
+        self.name_input.clear()
+        self.name_input.fill(name)
+        for i, question in enumerate(questions):
+            if i > 0:
+                self.add_question.click()
+            inpt = self.page.locator(LOCATORS["question"](i))
+            inpt.clear()
+            inpt.fill(question)
+        with self.page.expect_response(self.url):
+            self.submit.click()
+        self.log.info("target updated name=%s id=%d", name, self.target_id)
