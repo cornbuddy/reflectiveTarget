@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/builders"
@@ -13,7 +14,6 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
-	"github.com/gorilla/mux"
 )
 
 type targetsHandler struct {
