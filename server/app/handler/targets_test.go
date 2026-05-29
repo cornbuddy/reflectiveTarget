@@ -49,19 +49,19 @@ func (s *TargetsSuite) UpdateShouldBeIdempotent(t *testgroup.T) {
 }
 
 func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
-	question := vo.Question{Text: utils.MakeRandomString(5)}
+	oldQstn := "single question"
 	target := aggregations.Target{
 		Name:      utils.MakeRandomString(5),
 		Owner:     *s.owner,
-		Questions: vo.Questions{question},
+		Questions: vo.Questions{vo.Question{Text: oldQstn}},
 	}
 	t.Require.NoError(utils.InsertTarget(db, &target))
 
-	wantQuestion := utils.MakeRandomString(10)
+	newQstn := "updated question, still single"
 	url := fmt.Sprintf("/targets/%d", target.ID)
 	form := strings.NewReader(neturl.Values{
 		"name":       []string{target.Name},
-		"question_0": []string{wantQuestion},
+		"question_0": []string{newQstn},
 	}.Encode())
 
 	ct := "application/x-www-form-urlencoded"
@@ -73,8 +73,8 @@ func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 	r, body, err = utils.MakeRequest(ct, http.MethodGet, url, s.handler, form)
 	t.Require.NoError(err)
 	t.Contains(body, target.Name)
-	t.Contains(body, wantQuestion)
-	t.NotContains(body, "question_1", "should not create any new questions")
+	t.Contains(body, newQstn)
+	t.NotContains(body, oldQstn, "should update question, not create a new one")
 }
 
 func (s *TargetsSuite) ShouldRenderFormWithTarget(t *testgroup.T) {
