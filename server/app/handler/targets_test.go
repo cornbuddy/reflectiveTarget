@@ -26,6 +26,28 @@ type TargetsSuite struct {
 	foreignTargets aggregations.Targets
 }
 
+func (s *TargetsSuite) UpdateShouldBeIdempotent(t *testgroup.T) {
+	question := vo.Question{Text: utils.MakeRandomString(5)}
+	target := aggregations.Target{
+		Name:      utils.MakeRandomString(5),
+		Owner:     *s.owner,
+		Questions: vo.Questions{question},
+	}
+	t.Require.NoError(utils.InsertTarget(db, &target))
+
+	url := fmt.Sprintf("/targets/%d", target.ID)
+	form := strings.NewReader(neturl.Values{
+		"name":       []string{target.Name},
+		"question_0": []string{question.Text},
+	}.Encode())
+
+	ct := "application/x-www-form-urlencoded"
+	r, body, err := utils.MakeRequest(ct, http.MethodPut, url, s.handler, form)
+	t.Require.NoError(err)
+	t.Equal(http.StatusSeeOther, r.StatusCode)
+	t.Equal("target updated", body)
+}
+
 func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 	question := vo.Question{Text: utils.MakeRandomString(5)}
 	target := aggregations.Target{
@@ -36,20 +58,23 @@ func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 	t.Require.NoError(utils.InsertTarget(db, &target))
 
 	wantQuestion := utils.MakeRandomString(10)
-	ct := "application/x-www-form-urlencoded"
 	url := fmt.Sprintf("/targets/%d", target.ID)
 	form := strings.NewReader(neturl.Values{
 		"name":       []string{target.Name},
 		"question_0": []string{wantQuestion},
 	}.Encode())
 
+	ct := "application/x-www-form-urlencoded"
 	r, body, err := utils.MakeRequest(ct, http.MethodPut, url, s.handler, form)
 	t.Require.NoError(err)
 	t.Equal(http.StatusSeeOther, r.StatusCode)
 	t.Equal("target updated", body)
 
-	t.HTTPBodyContains(s.handler, http.MethodGet, url, nil, target.Name)
-	t.HTTPBodyContains(s.handler, http.MethodGet, url, nil, wantQuestion)
+	r, body, err = utils.MakeRequest(ct, http.MethodGet, url, s.handler, form)
+	t.Require.NoError(err)
+	t.Contains(body, target.Name)
+	t.Contains(body, wantQuestion)
+	t.NotContains(body, "question_1", "should not create any new questions")
 }
 
 func (s *TargetsSuite) ShouldRenderFormWithTarget(t *testgroup.T) {

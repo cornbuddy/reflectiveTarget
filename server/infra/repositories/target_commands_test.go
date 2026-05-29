@@ -15,12 +15,6 @@ type TargetCommandsTest struct {
 	owner *entities.User
 }
 
-func (s *TargetCommandsTest) SaveShouldUpdateQuestions(t *testgroup.T) {
-	// FIXME: when text of the question is changed, next save creates new
-	// question instead of updating existing one
-	t.Fail("fixme")
-}
-
 func (s *TargetCommandsTest) SaveShouldUpdateFieldsWhenChanged(t *testgroup.T) {
 	want := makeTarget(*s.owner)
 	t.Require.NoError(s.repo.Save(ctx, &want))
@@ -35,6 +29,7 @@ func (s *TargetCommandsTest) SaveShouldUpdateFieldsWhenChanged(t *testgroup.T) {
 	got, err := s.repo.Get(ctx, want.ID)
 	t.Require.NoError(err)
 	t.EqualValues(want, *got)
+	t.Equal(len(want.Questions), len(got.Questions))
 }
 
 func (s *TargetCommandsTest) SaveShouldBeIdempotent(t *testgroup.T) {
