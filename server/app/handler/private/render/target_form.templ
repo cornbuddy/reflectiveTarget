@@ -27,14 +27,15 @@ templ targetForm(data TargetFormData) {
 		</section>
 		if new && len(data.Questions) == 0 {
 			<section id="question_0">
-				<input name="question_0" placeholder="Question 1"/>
+				<input name="question_0" placeholder="Question 1" data-id="0"/>
 			</section>
 		} else {
 			for i, q := range data.Questions {
 				{{ name := fmt.Sprintf("question_%d", i) }}
 				<section id={ name }>
 					{{ ph := fmt.Sprintf("Question %d", i+1) }}
-					<input name={ name } placeholder={ ph } value={ q.Value }/>
+					{{ id := q.ID }}
+					<input name={ name } placeholder={ ph } data-id={ id } value={ q.Value }/>
 					@errors(q.Errors)
 				</section>
 			}
