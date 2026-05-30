@@ -3,7 +3,6 @@ package render_test
 import (
 	"errors"
 	"fmt"
-	"math/rand/v2"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -77,52 +76,15 @@ func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 			{Text: "fails there"}, {Text: "kek2?"},
 		},
 	}
-	newQuestions := make(contracts.Fields, len(target.Questions))
-	existingQuestions := make(contracts.Fields, len(target.Questions))
+	formQuestions := make(contracts.Fields, len(target.Questions))
 	for i, q := range target.Questions {
-		newQuestions[i] = contracts.Field{Value: q.Text}
-		existingQuestions[i] = contracts.Field{
-			ID:    valueobjects.ID(rand.IntN(100)),
-			Value: q.Text,
-		}
+		formQuestions[i] = contracts.Field{Value: q.Text}
 	}
-	newForm := contracts.TargetForm{
+	form := contracts.TargetForm{
 		Name:      contracts.Field{Value: target.Name},
-		Questions: newQuestions,
-	}
-	existingForm := contracts.TargetForm{
-		Name:      contracts.Field{Value: target.Name},
-		Questions: existingQuestions,
+		Questions: formQuestions,
 	}
 	testCases := []testCase{{
-		"saved questions' inputs have data-id property",
-		render.TargetFormData{existingForm, target.ID},
-		[]string{
-			fmt.Sprintf("<h2>%s</h2>", target.Name),
-			"<form",
-			fmt.Sprintf("hx-put=\"/targets/%d\"", target.ID),
-			"hx-trigger=\"submit\"",
-			"hx-target=\"main\"",
-			"<button type=\"submit\">Update</button>",
-			fmt.Sprintf(
-				`<input name="name" placeholder="Target name" value="%s"`,
-				target.Name,
-			),
-			fmt.Sprintf(
-				`<input name="%s" placeholder="Question 1" data-id="%d" value="%s">`,
-				"question_0",
-				existingQuestions[0].ID,
-				existingQuestions[0].Value,
-			),
-			fmt.Sprintf(
-				`<input name="%s" placeholder="Question 2" data-id="%d" value="%s">`,
-				"question_1",
-				existingQuestions[1].ID,
-				existingQuestions[1].Value,
-			),
-		},
-		utils.AssertContainsTokens,
-	}, {
 		"empty target",
 		render.TargetFormData{},
 		[]string{
@@ -133,13 +95,13 @@ func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 			"hx-target=\"main\"",
 			"<button type=\"submit\">Create</button>",
 			"<input name=\"name\" placeholder=\"Target name\" value=\"\"",
-			"<input name=\"question_0\" placeholder=\"Question 1\" data-id=\"0\">",
+			"<input name=\"question_0\" placeholder=\"Question 1\">",
 			addQuestion,
 		},
 		utils.AssertContainsTokens,
 	}, {
 		"non empty target contains",
-		render.TargetFormData{newForm, target.ID},
+		render.TargetFormData{form, target.ID},
 		[]string{
 			fmt.Sprintf("<h2>%s</h2>", target.Name),
 			"<form",
@@ -152,20 +114,18 @@ func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 				target.Name,
 			),
 			fmt.Sprintf(
-				"<input name=\"%s\" placeholder=\"Question 1\" data-id=\"0\" value=\"%s\">",
-				"question_0",
+				"<input name=\"question_0\" placeholder=\"Question 1\" value=\"%s\">",
 				target.Questions[0].Text,
 			),
 			fmt.Sprintf(
-				"<input name=\"%s\" placeholder=\"Question 2\" data-id=\"0\" value=\"%s\">",
-				"question_1",
+				"<input name=\"question_1\" placeholder=\"Question 2\" value=\"%s\">",
 				target.Questions[1].Text,
 			),
 		},
 		utils.AssertContainsTokens,
 	}, {
 		"non empty target doesn't contain",
-		render.TargetFormData{newForm, target.ID},
+		render.TargetFormData{form, target.ID},
 		[]string{addQuestion},
 		utils.AssertNotContainsTokens,
 	}}

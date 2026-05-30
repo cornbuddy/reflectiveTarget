@@ -2,8 +2,6 @@ package contracts
 
 import (
 	"errors"
-
-	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
 type Errors []error
@@ -11,9 +9,8 @@ type Errors []error
 type Fields []Field
 
 type Field struct {
-	valueobjects.ID
-	Errors
 	Value string
+	Errors
 }
 
 func (errs Errors) Error() string {
