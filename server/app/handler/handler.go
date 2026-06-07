@@ -30,8 +30,9 @@ func MakeHandler(config *config.Config) http.Handler {
 		mw.SetTimeout(30*time.Second),
 	)
 
+	get, post, put := http.MethodGet, http.MethodPost, http.MethodPut
 	index := indexHandler{}
-	r.HandleFunc("/", index.get).Methods(http.MethodGet)
+	r.HandleFunc("/", index.get).Methods(get)
 
 	authz := authzHandler{
 		config.UserDao,
@@ -39,11 +40,11 @@ func MakeHandler(config *config.Config) http.Handler {
 		validators.SignupFormValidator{UserDao: config.UserDao},
 		validators.LoginFormValidator{UserDao: config.UserDao},
 	}
-	r.HandleFunc("/logout", authz.getLogout).Methods(http.MethodGet)
-	r.HandleFunc("/login", authz.getLogin).Methods(http.MethodGet)
-	r.HandleFunc("/login", authz.postLogin).Methods(http.MethodPost)
-	r.HandleFunc("/signup", authz.getSignup).Methods(http.MethodGet)
-	r.HandleFunc("/signup", authz.postSignup).Methods(http.MethodPost)
+	r.HandleFunc("/logout", authz.getLogout).Methods(get)
+	r.HandleFunc("/login", authz.getLogin).Methods(get)
+	r.HandleFunc("/login", authz.postLogin).Methods(post)
+	r.HandleFunc("/signup", authz.getSignup).Methods(get)
+	r.HandleFunc("/signup", authz.postSignup).Methods(post)
 
 	targets := targetsHandler{
 		repo: config.TargetRepo,
@@ -55,22 +56,20 @@ func MakeHandler(config *config.Config) http.Handler {
 	}
 	child := r.PathPrefix("/targets").Subrouter()
 	child.Use(mw.IsAuthenticated)
-	child.HandleFunc("", targets.list).Methods(http.MethodGet)
-	child.HandleFunc("/new", targets.makeNew).Methods(http.MethodGet)
-	child.HandleFunc("/new", targets.saveNew).Methods(http.MethodPost)
-	child.HandleFunc("/{targetID:[0-9]+}", targets.update).Methods(http.MethodPut)
-	child.HandleFunc("/{targetID:[0-9]+}", targets.edit).Methods(http.MethodGet)
+	child.HandleFunc("", targets.list).Methods(get)
+	child.HandleFunc("/new", targets.getNew).Methods(get)
+	child.HandleFunc("/new", targets.postNew).Methods(post)
+	child.HandleFunc("/{targetID:[0-9]+}", targets.putExisting).Methods(put)
+	child.HandleFunc("/{targetID:[0-9]+}", targets.getExisting).Methods(get)
 
 	health := healthHandler{config.HealthDao}
 	shots := shotsHandler{
 		config.ShotsDao,
 		validators.ShotsRequestValidator{},
 	}
-	r.HandleFunc("/api/health", health.get).Methods(http.MethodGet)
-	r.HandleFunc("/api/target/{targetID:[0-9]+}/shots", shots.get).
-		Methods(http.MethodGet)
-	r.HandleFunc("/api/target/{targetID:[0-9]+}/shots", shots.post).
-		Methods(http.MethodPost)
+	r.HandleFunc("/api/health", health.get).Methods(get)
+	r.HandleFunc("/api/target/{targetID:[0-9]+}/shots", shots.get).Methods(get)
+	r.HandleFunc("/api/target/{targetID:[0-9]+}/shots", shots.post).Methods(post)
 
 	// https://stackoverflow.com/a/56937571
 	r.NotFoundHandler = r.NewRoute().HandlerFunc(http.NotFound).GetHandler()

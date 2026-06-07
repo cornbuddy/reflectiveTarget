@@ -21,7 +21,7 @@ type targetsHandler struct {
 	builder builders.TargetBuilder
 }
 
-func (h targetsHandler) update(w http.ResponseWriter, r *http.Request) {
+func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := utils.LoggerFromCtx(ctx)
 
@@ -64,7 +64,7 @@ func (h targetsHandler) update(w http.ResponseWriter, r *http.Request) {
 	utils.Redirect(w, r, "/targets", "target updated")
 }
 
-func (h targetsHandler) edit(w http.ResponseWriter, r *http.Request) {
+func (h targetsHandler) getExisting(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := utils.LoggerFromCtx(ctx)
 
@@ -105,11 +105,11 @@ func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 	layout.Targets(ctx, w, render.TargetsData{Targets: targets})
 }
 
-func (h targetsHandler) makeNew(w http.ResponseWriter, r *http.Request) {
+func (h targetsHandler) getNew(w http.ResponseWriter, r *http.Request) {
 	layout.TargetForm(r.Context(), w, render.TargetFormData{})
 }
 
-func (h targetsHandler) saveNew(w http.ResponseWriter, r *http.Request) {
+func (h targetsHandler) postNew(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := utils.LoggerFromCtx(ctx)
 
