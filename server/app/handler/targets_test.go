@@ -37,8 +37,9 @@ func (s *TargetsSuite) UpdateShouldBeIdempotent(t *testgroup.T) {
 
 	url := fmt.Sprintf("/targets/%d", target.ID)
 	form := strings.NewReader(neturl.Values{
-		"name":       []string{target.Name},
-		"question_0": []string{question.Text},
+		"name":             []string{target.Name},
+		"question_0_id":    []string{strconv.Itoa(int(question.ID))},
+		"question_0_value": []string{question.Text},
 	}.Encode())
 
 	ct := "application/x-www-form-urlencoded"
@@ -50,18 +51,20 @@ func (s *TargetsSuite) UpdateShouldBeIdempotent(t *testgroup.T) {
 
 func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 	oldQstn := "single question"
+	question := vo.Question{Text: oldQstn}
 	target := aggregations.Target{
 		Name:      utils.MakeRandomString(5),
 		Owner:     *s.owner,
-		Questions: vo.Questions{vo.Question{Text: oldQstn}},
+		Questions: vo.Questions{question},
 	}
 	t.Require.NoError(utils.InsertTarget(db, &target))
 
 	newQstn := "updated question, still single"
 	url := fmt.Sprintf("/targets/%d", target.ID)
 	form := strings.NewReader(neturl.Values{
-		"name":       []string{target.Name},
-		"question_0": []string{newQstn},
+		"name":             []string{target.Name},
+		"question_0_id":    []string{strconv.Itoa(int(question.ID))},
+		"question_0_value": []string{newQstn},
 	}.Encode())
 
 	ct := "application/x-www-form-urlencoded"
@@ -111,9 +114,9 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 	testCases := []testCase{{
 		"rejects target with existing name name",
 		neturl.Values{
-			"name":       []string{s.ownedTargets[0].Name},
-			"question_0": []string{"q1?"},
-			"question_1": []string{"q2?"},
+			"name":             []string{s.ownedTargets[0].Name},
+			"question_0_value": []string{"q1?"},
+			"question_1_value": []string{"q2?"},
 		},
 		validators.ErrTargetAlreadyExists.Error(),
 	}, {
@@ -125,9 +128,9 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 	}, {
 		"rejects target with repeated questions",
 		neturl.Values{
-			"name":       []string{"same question twice"},
-			"question_0": []string{"q1?"},
-			"question_1": []string{"q1?"},
+			"name":             []string{"same question twice"},
+			"question_0_value": []string{"q1?"},
+			"question_1_value": []string{"q1?"},
 		},
 		validators.ErrRepeatedQuestion.Error(),
 	}}
@@ -152,9 +155,9 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 func (s *TargetsSuite) ShouldAddTargetIfValid(t *testgroup.T) {
 	name := "valid target"
 	form := neturl.Values{
-		"name":       []string{name},
-		"question_0": []string{"q1?"},
-		"question_1": []string{"q2?"},
+		"name":             []string{name},
+		"question_0_value": []string{"q1?"},
+		"question_1_value": []string{"q2?"},
 	}
 	t.HTTPStatusCode(
 		s.handler, http.MethodPost, "/targets/new", form, http.StatusSeeOther,
