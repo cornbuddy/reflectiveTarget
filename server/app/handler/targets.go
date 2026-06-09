@@ -38,10 +38,15 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log = log.With(zap.Int("target-id", targetID))
-	id := valueobjects.ID(targetID)
+	form, err := contracts.NewTargetForm(r.Form)
+	if err != nil {
+		utils.BadRequest(log, w, "bad form", err)
+		return
+	}
+
 	session := sessiondata.Read(ctx)
-	form := contracts.NewTargetForm(r.Form)
-	target, err := h.builder.Target(ctx, &form, session.UserID, id)
+	id := valueobjects.ID(targetID)
+	target, err := h.builder.Target(ctx, form, session.UserID, id)
 	if err != nil {
 		utils.InternalServerError(log, w, "failed to build target", err)
 		return
@@ -49,7 +54,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 		log.Debug("form is invalid", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)
 		view.TargetForm(ctx, w, render.TargetFormData{
-			TargetForm: form,
+			TargetForm: *form,
 			ID:         id,
 		})
 		return
@@ -119,12 +124,16 @@ func (h targetsHandler) postNew(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session := sessiondata.Read(ctx)
-	form := contracts.NewTargetForm(r.Form)
-	target, err := h.builder.Target(ctx, &form, session.UserID, 0)
+	form, err := contracts.NewTargetForm(r.Form)
+	if err != nil {
+		utils.BadRequest(log, w, "bad form", err)
+	}
+
+	target, err := h.builder.Target(ctx, form, session.UserID, 0)
 	if target == nil {
 		log.Debug("form is invalid", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)
-		view.TargetForm(ctx, w, render.TargetFormData{TargetForm: form})
+		view.TargetForm(ctx, w, render.TargetFormData{TargetForm: *form})
 		return
 	} else if err != nil {
 		utils.InternalServerError(log, w, "failed to validate form", err)
