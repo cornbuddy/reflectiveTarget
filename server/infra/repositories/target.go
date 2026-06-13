@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"strings"
 
 	aggr "github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
@@ -24,7 +25,7 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 	defer tx.Rollback()
 
 	if err := r.saveTarget(ctx, tx, target); err != nil {
-		return err
+		return fmt.Errorf("target: %w [%v]", err, *target)
 	}
 
 	for i, question := range target.Questions {
@@ -45,6 +46,7 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 func (r TargetRepo) saveQuestion(
 	ctx context.Context, tx *sql.Tx, target *aggr.Target, question *vo.Question,
 ) error {
+
 	var row *sql.Row
 	if question.ID == 0 {
 		q := strings.Join([]string{
@@ -57,11 +59,17 @@ func (r TargetRepo) saveQuestion(
 		q := strings.Join([]string{
 			"INSERT INTO questions (id, text, target_id)",
 			"VALUES ($1::integer, $2, $3::integer)",
-			"ON CONFLICT (id) DO UPDATE",
-			"SET text = excluded.text, target_id = excluded.target_id",
+			"ON CONFLICT (id) DO UPDATE SET",
+			"text = EXCLUDED.text, target_id = EXCLUDED.target_id",
+			"WHERE (text, target_id)",
+			"IS DISTINCT FROM (EXCLUDED.text, EXCLUDED.target_id)",
 			"RETURNING id",
 		}, "\n")
 		row = tx.QueryRowContext(ctx, q, question.ID, question.Text, target.ID)
+		if errors.Is(row.Err(), sql.ErrNoRows) {
+			// kinda expected, entity is not changed
+			return nil
+		}
 	}
 
 	return row.Scan(&question.ID)
@@ -81,13 +89,19 @@ func (r TargetRepo) saveTarget(
 		row = tx.QueryRowContext(ctx, q, target.Name, target.Owner.ID)
 	} else {
 		q := strings.Join([]string{
-			"INSERT INTO targets (id, name, owner_id)",
+			"INSERT INTO targets AS t (id, name, owner_id)",
 			"VALUES ($1::integer, $2, $3::integer)",
-			"ON CONFLICT (id) DO UPDATE",
-			"SET name = excluded.name, owner_id = excluded.owner_id",
+			"ON CONFLICT (id) DO UPDATE SET",
+			"name = EXCLUDED.name, owner_id = EXCLUDED.owner_id",
+			"WHERE (t.name, t.owner_id)",
+			"IS DISTINCT FROM (EXCLUDED.name, EXCLUDED.owner_id)",
 			"RETURNING id",
 		}, "\n")
 		row = tx.QueryRowContext(ctx, q, target.ID, target.Name, target.Owner.ID)
+		if errors.Is(row.Err(), sql.ErrNoRows) {
+			// kinda expected, entity is not changed
+			return nil
+		}
 	}
 
 	return row.Scan(&target.ID)
