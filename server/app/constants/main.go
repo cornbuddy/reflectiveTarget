@@ -1,4 +1,4 @@
 package constants
 
-const LoggerCtx = "logger"
+const RequestIDCtx = "request-ID"
 const SessionCookieName = "session-token"

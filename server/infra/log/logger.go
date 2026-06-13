@@ -1,4 +1,4 @@
-package logger
+package log
 
 import (
 	"log"
@@ -7,7 +7,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var Log *zap.Logger
+var logger *zap.Logger
 
 var devConfig = zap.Config{
 	Level:            zap.NewAtomicLevelAt(zap.DebugLevel),
@@ -34,14 +34,14 @@ func init() {
 
 	var err error
 	if environment == "production" {
-		Log, err = prodConfig.Build()
+		logger, err = prodConfig.Build()
 	} else {
-		Log, err = devConfig.Build()
+		logger, err = devConfig.Build()
 	}
 
 	if err != nil {
 		log.Fatalf("failed to setup logger: %v", err)
 	}
 
-	Log.Info("logger is set up", zap.String("environment", environment))
+	logger.Info("logger is set up", zap.String("environment", environment))
 }

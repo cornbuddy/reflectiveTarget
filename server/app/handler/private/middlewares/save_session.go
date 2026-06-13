@@ -9,13 +9,13 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 )
 
 // saves session into store. updates request contexts with session data
 func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		log := utils.LoggerFromCtx(ctx)
 		store := mw.SessionStore
 		cookie, err := r.Cookie(constants.SessionCookieName)
 
@@ -23,10 +23,11 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// set
 		emptySession := sessiondata.SessionData{}
 		if err != nil {
-			log.Info("registering new session...")
+			log.Info(ctx, "registering new session...")
 			_, err := utils.SaveSession(ctx, store, emptySession, w)
 			if err != nil {
-				utils.InternalServerError(log, w, "failed to save session", err)
+				log.Error(ctx, "failed to save session", zap.Error(err))
+				http.Error(w, "internal server error", http.StatusInternalServerError)
 				return
 			}
 
@@ -37,11 +38,12 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// empty error means cookie exists, hence session sessionId
 		// should be validated
 		sessionId := cookie.Value
-		log = log.With(zap.String("token", sessionId))
+		log := log.Logger(ctx).With(zap.String("token", sessionId))
 		log.Debug("validating session...")
 		session, err := store.Get(ctx, sessionId)
 		if err != nil {
-			utils.InternalServerError(log, w, "failed to fetch session", err)
+			log.Error("failed to fetch session", zap.Error(err))
+			http.Error(w, "internal server error", http.StatusInternalServerError)
 			return
 		}
 
@@ -53,7 +55,8 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 			session = &emptySession
 			_, err := utils.SaveSession(ctx, store, *session, w)
 			if err != nil {
-				utils.InternalServerError(log, w, "failed to save session", err)
+				log.Error("failed to save session", zap.Error(err))
+				http.Error(w, "internal server error", http.StatusInternalServerError)
 				return
 			}
 		}

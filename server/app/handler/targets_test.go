@@ -101,7 +101,7 @@ func (s *TargetsSuite) ShouldRespondWithNotFoundIfNoTarget(t *testgroup.T) {
 	r, body, err := utils.MakeRequest("", http.MethodGet, url, s.handler, nil)
 	t.Require.NoError(err)
 	t.Equal(http.StatusNotFound, r.StatusCode)
-	t.Contains(body, "not found")
+	t.Contains(body, "Not Found")
 }
 
 func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {

@@ -12,6 +12,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 )
 
 type authzHandler struct {
@@ -23,31 +24,28 @@ type authzHandler struct {
 
 func (h authzHandler) getLogout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	log := utils.LoggerFromCtx(ctx)
-
-	store := h.SessionStore
 	data := sessiondata.SessionData{}
-	if _, err := utils.SaveSession(ctx, store, data, w); err != nil {
-		utils.InternalServerError(log, w, "failed to save session", err)
+	if _, err := utils.SaveSession(ctx, h.SessionStore, data, w); err != nil {
+		log.Error(ctx, "failed to save session")
+		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	}
 
-	log.Info("logout succeeded")
+	log.Info(ctx, "logout succeeded")
 	utils.Redirect(w, r, "/", "Logout succeeded")
 }
 
 func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	log := utils.LoggerFromCtx(ctx)
-
 	if err := r.ParseForm(); err != nil {
-		utils.BadRequest(log, w, "failed to parse form", err)
+		log.Warn(ctx, "failed to parse form", zap.Error(err))
+		utils.HttpError(w, http.StatusBadRequest)
 		return
 	}
 
 	form := contracts.NewLoginForm(r.Form)
 	if valid := h.LoginFormValidator.Validate(ctx, &form); !valid {
-		log.Debug("login failed", zap.Any("form", form))
+		log.Debug(ctx, "login failed", zap.Any("form", form))
 		w.WriteHeader(http.StatusUnauthorized)
 		render.View.Login(ctx, w, render.LoginData{LoginForm: form})
 		return
@@ -55,19 +53,20 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.UserDao.Find(ctx, form.Username.Value)
 	if err != nil {
-		utils.InternalServerError(log, w, "failed to fetch user", err)
+		log.Error(ctx, "failed to fetch user", zap.Error(err))
+		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	}
 
-	log = log.With(zap.String("username", user.Username))
+	log := log.Logger(ctx).With(zap.String("username", user.Username))
 	data := sessiondata.SessionData{
 		IsAuthenticated: true,
 		UserID:          user.ID,
 		Username:        user.Username,
 	}
-	store := h.SessionStore
-	if _, err := utils.SaveSession(ctx, store, data, w); err != nil {
-		utils.InternalServerError(log, w, "failed to register session", err)
+	if _, err := utils.SaveSession(ctx, h.SessionStore, data, w); err != nil {
+		log.Error("failed to register session", zap.Error(err))
+		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	}
 
@@ -77,33 +76,36 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 
 func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	log := utils.LoggerFromCtx(ctx)
-
 	if err := r.ParseForm(); err != nil {
-		utils.BadRequest(log, w, "failed to parse form", err)
+		log.Warn(ctx, "failed to parse form", zap.Error(err))
+		utils.HttpError(w, http.StatusBadRequest)
 		return
 	}
 
 	form := contracts.NewSignupForm(r.Form)
 	if valid, err := h.SignupFormValidator.Validate(ctx, &form); err != nil {
-		utils.InternalServerError(log, w, "failed to validate form", err)
+		log.Error(ctx, "failed to validate form", zap.Error(err))
+		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	} else if !valid {
-		log.Debug("signup failed", zap.Any("form", form))
+		log.Debug(ctx, "signup failed", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)
 		render.View.Signup(ctx, w, render.SignupData{SignupForm: form})
 		return
 	}
 
 	username := form.Username.Value
+	log := log.Logger(ctx).With(zap.String("username", username))
 	user, err := entities.NewUser(username, form.Password.Value)
 	if err != nil {
-		utils.InternalServerError(log, w, "failed to create user object", err)
+		log.Error("failed to create user object", zap.Error(err))
+		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	}
 
 	if err := h.UserDao.Save(ctx, user); err != nil {
-		utils.InternalServerError(log, w, "failed to save user object", err)
+		log.Error("failed to save user object", zap.Error(err))
+		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	}
 
@@ -114,7 +116,8 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 	}
 	store := h.SessionStore
 	if _, err := utils.SaveSession(ctx, store, data, w); err != nil {
-		utils.InternalServerError(log, w, "failed to save session", err)
+		log.Error("failed to save session", zap.Error(err))
+		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	}
 

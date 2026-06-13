@@ -5,10 +5,12 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
+	"go.uber.org/zap"
+
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 )
 
 type Render interface {
@@ -44,7 +46,7 @@ var View Render = viewRender{}
 
 func render(ctx context.Context, w http.ResponseWriter, cmp templ.Component) {
 	if err := cmp.Render(ctx, w); err != nil {
-		log := utils.LoggerFromCtx(ctx)
-		utils.InternalServerError(log, w, "failed to render response", err)
+		log.Error(ctx, "rendering failed", zap.Error(err))
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 	}
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 )
 
 type indexHandler struct{}
@@ -12,8 +13,8 @@ type indexHandler struct{}
 func (h indexHandler) get(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	if r.URL.Path != "/" {
-		log := utils.LoggerFromCtx(ctx)
-		utils.NotFound(log, w, "not found", nil)
+		log.Error(ctx, "bad url")
+		utils.HttpError(w, http.StatusNotFound)
 		return
 	}
 

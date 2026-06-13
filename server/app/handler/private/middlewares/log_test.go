@@ -8,16 +8,15 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
-	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
 )
 
 func TestLoggerMiddlewareShouldAddLoggerToContext(t *testing.T) {
 	t.Parallel()
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log := r.Context().Value(constants.LoggerCtx)
-		assert.NotNil(t, log)
-		assert.IsType(t, Log, log)
+		reqID := r.Context().Value(constants.RequestIDCtx)
+		assert.NotEmpty(t, reqID)
+		assert.IsType(t, reqID, "string")
 	})
 
 	r := httptest.NewRequest(http.MethodGet, "/", nil)

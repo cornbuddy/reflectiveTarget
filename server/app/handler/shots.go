@@ -12,10 +12,10 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 )
 
 type shotsHandler struct {
@@ -25,29 +25,32 @@ type shotsHandler struct {
 
 func (h shotsHandler) get(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	log := utils.LoggerFromCtx(ctx)
+	logger := log.Logger(ctx)
 
 	vars := mux.Vars(r)
 	targetID, err := strconv.Atoi(vars["targetID"])
 	if err != nil {
-		utils.BadRequest(log, w, "failed to parse target id", err)
+		logger.Warn("failed to parse target id")
+		http.Error(w, "bad target id", http.StatusBadRequest)
 		return
 	}
 
-	log = log.With(zap.Int("target-id", targetID))
-
+	logger = logger.With(zap.Int("target-id", targetID))
 	shots, err := h.ShotsDao.List(ctx, valueobjects.ID(targetID))
 	if errors.Is(err, sql.ErrNoRows) {
-		utils.NotFound(log, w, "target not found", err)
+		logger.Warn("target not found")
+		http.Error(w, "target not found", http.StatusNotFound)
 		return
 	} else if err != nil {
-		utils.InternalServerError(log, w, "cannot fetch shots", err)
+		logger.Error("could not fetch shots", zap.Error(err))
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
 	data, err := json.Marshal(contracts.ShotsResponse{Shots: shots})
 	if err != nil {
-		utils.InternalServerError(log, w, "cannot marshal response", err)
+		logger.Error("could unmarshal shots", zap.Error(err))
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -59,45 +62,47 @@ func (h shotsHandler) get(w http.ResponseWriter, r *http.Request) {
 
 func (h shotsHandler) post(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	log := utils.LoggerFromCtx(ctx)
+	logger := log.Logger(ctx)
 
 	vars := mux.Vars(r)
-	targetID, err := strconv.Atoi(vars["targetID"])
+	rawID := vars["targetID"]
+	targetID, err := strconv.Atoi(rawID)
 	if err != nil {
-		utils.BadRequest(log, w, "failed to parse target id", err)
+		logger.Warn("failed to parse target id", zap.String("target-id", rawID))
+		http.Error(w, "bad target id", http.StatusBadRequest)
 		return
 	}
 
-	log = log.With(zap.Int("target-id", targetID))
-
+	logger = logger.With(zap.Int("target-id", targetID))
 	var shots contracts.ShotsRequest
 	if err := json.NewDecoder(r.Body).Decode(&shots); err != nil {
-		utils.BadRequest(log, w, "failed to decode body", err)
+		logger.Warn("failed to decode body")
+		http.Error(w, "bad request body", http.StatusBadRequest)
 		return
 	}
 
 	if res := h.Validator.Validate(shots); res.IsInvalid() {
-		utils.BadRequest(log, w, "invalid payload", res.Errors)
+		logger.Warn("invalid shots", zap.Any("shots", shots))
+		http.Error(w, "bad request body", http.StatusBadRequest)
 		return
 	}
 
 	cookies := r.CookiesNamed(constants.SessionCookieName)
 	if len(cookies) != 1 {
-		utils.BadRequest(
-			log.With(zap.Any("cookies", cookies)),
-			w, "too much cookies", nil,
-		)
+		logger.Warn("too much cookies", zap.Any("cookies", cookies))
+		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
 
 	shooter := cookies[0].Value
 	id := valueobjects.ID(targetID)
 	if err := h.ShotsDao.Save(ctx, shooter, id, shots.Shots); err != nil {
-		utils.InternalServerError(log, w, "cannot save shots", err)
+		logger.Error("failed to save shots", zap.Error(err))
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	log.Info("shots saved")
+	logger.Info("shots saved")
 	// TODO: make middleware for content type
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

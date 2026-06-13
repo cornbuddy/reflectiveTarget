@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 )
 
 func (mw Middleware) SetTimeout(timeout time.Duration) mux.MiddlewareFunc {
@@ -18,12 +18,11 @@ func (mw Middleware) SetTimeout(timeout time.Duration) mux.MiddlewareFunc {
 
 func setTimeout(timeout time.Duration, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log := utils.LoggerFromCtx(r.Context())
 		ctx, cancel := context.WithTimeout(r.Context(), timeout)
 		defer func() {
 			cancel()
 			if ctx.Err() == context.DeadlineExceeded {
-				log.Error("request timed out")
+				log.Error(ctx, "request timed out")
 				w.WriteHeader(http.StatusGatewayTimeout)
 			}
 		}()

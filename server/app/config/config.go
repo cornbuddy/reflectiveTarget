@@ -12,7 +12,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
-	. "github.com/cornbuddy/reflectiveTarget/server/infra/logger"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 )
@@ -41,7 +41,7 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 	}
 
 	var cache *redis.Client
-	if err := retry("connect to cache", func() error {
+	if err := retry(ctx, "connect to cache", func() error {
 		cache = redis.NewClient(&redis.Options{
 			Addr: cfg.CacheAddr,
 		})
@@ -56,7 +56,7 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 		"postgresql://%s:%s@%s:5432/%s?sslmode=disable",
 		cfg.DbUser, cfg.DbPassword, cfg.DbHost, cfg.Db,
 	)
-	if err := retry("connect to db", func() error {
+	if err := retry(ctx, "connect to db", func() error {
 		var err error
 		db, err = sql.Open("pgx", dbConnStr)
 		if err != nil {
@@ -81,21 +81,21 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 	}, nil
 }
 
-func retry(operation string, f func() error) error {
+func retry(ctx context.Context, operation string, f func() error) error {
 	const attempts = 5
 	const delay = 3 * time.Second
 
 	var err error
 	for attempt := range attempts {
-		Log.Info(operation, zap.Int("attempt", attempt))
+		log.Info(ctx, operation, zap.Int("attempt", attempt))
 		if err = f(); err != nil {
-			Log.Warn(operation,
+			log.Warn(ctx, operation,
 				zap.String("status", "failed"),
 				zap.Duration("delay", delay),
 			)
 			time.Sleep(delay)
 		} else {
-			Log.Info(operation, zap.String("status", "success"))
+			log.Info(ctx, operation, zap.String("status", "success"))
 			break
 		}
 	}
