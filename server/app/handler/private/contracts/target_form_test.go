@@ -11,6 +11,29 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
+func TestTargetFormStringer(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		desc   string
+		form   contracts.TargetForm
+		regexp string
+	}
+
+	testCases := []testCase{{
+		"defaults",
+		contracts.TargetForm{},
+		`^Name: {.+}, Questions: \[\]$`,
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			got := tc.form.String()
+			assert.Regexp(t, tc.regexp, got)
+		})
+	}
+}
+
 func TestNewTargetFormFromTarget(t *testing.T) {
 	t.Parallel()
 

@@ -29,7 +29,7 @@ func (errs Errors) Error() string {
 func (fs Fields) String() string {
 	var res strings.Builder
 	for i, f := range fs {
-		fmt.Fprintf(&res, "{%s}", f.String())
+		fmt.Fprintf(&res, "%s", f.String())
 		if i < len(fs)-1 {
 			fmt.Fprintf(&res, ", ")
 		}
@@ -62,7 +62,7 @@ func (f *Field) String() string {
 	}
 
 	return fmt.Sprintf(
-		`ID: %d, Value: "%s", Errors: [%s]`,
+		`{ID: %d, Value: "%s", Errors: [%s]}`,
 		f.ID, f.Value, errs.String(),
 	)
 }

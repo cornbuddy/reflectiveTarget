@@ -15,15 +15,20 @@ import (
 
 var (
 	ErrInvalidFieldValue = fmt.Errorf("bad value for field")
-)
 
-var (
 	questionValue = regexp.MustCompile(`^question_(\d+)_value$`)
 )
 
 type TargetForm struct {
 	Name      Field
 	Questions Fields
+}
+
+func (f *TargetForm) String() string {
+	return fmt.Sprintf(
+		"Name: %s, Questions: %s",
+		f.Name.String(), f.Questions.String(),
+	)
 }
 
 func NewTargetFormFromTarget(target aggregations.Target) TargetForm {
