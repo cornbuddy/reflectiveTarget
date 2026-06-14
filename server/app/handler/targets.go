@@ -46,6 +46,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log = log.With(zap.Stringer("form", form))
 	session := sessiondata.Read(ctx)
 	id := valueobjects.ID(targetID)
 	target, err := h.builder.Target(ctx, form, session.UserID, id)
@@ -54,7 +55,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	} else if target == nil {
-		log.Debug("form is invalid", zap.Any("form", form))
+		log.Debug("form is invalid")
 		w.WriteHeader(http.StatusBadRequest)
 		view.TargetForm(ctx, w, render.TargetFormData{
 			TargetForm: *form,

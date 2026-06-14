@@ -55,14 +55,14 @@ func (fs Fields) AreInvalid() bool {
 func (f *Field) String() string {
 	var errs strings.Builder
 	for i, err := range f.Errors {
-		fmt.Fprintf(&errs, `"%s"`, err.Error())
+		fmt.Fprintf(&errs, "'%s'", err.Error())
 		if i < len(f.Errors)-1 {
 			fmt.Fprintf(&errs, ", ")
 		}
 	}
 
 	return fmt.Sprintf(
-		`{ID: %d, Value: "%s", Errors: [%s]}`,
+		"{ID: %d, Value: '%s', Errors: [%s]}",
 		f.ID, f.Value, errs.String(),
 	)
 }

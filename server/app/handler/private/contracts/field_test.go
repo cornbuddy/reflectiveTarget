@@ -25,14 +25,14 @@ func TestFieldsStringer(t *testing.T) {
 	}, {
 		"default field",
 		contracts.Fields{contracts.Field{}},
-		`[{ID: 0, Value: "", Errors: []}]`,
+		"[{ID: 0, Value: '', Errors: []}]",
 	}, {
 		"multiple non-default fields",
 		contracts.Fields{
 			contracts.Field{ID: 0, Value: "kek0"},
 			contracts.Field{ID: 69, Value: "kek1"},
 		},
-		`[{ID: 0, Value: "kek0", Errors: []}, {ID: 69, Value: "kek1", Errors: []}]`,
+		"[{ID: 0, Value: 'kek0', Errors: []}, {ID: 69, Value: 'kek1', Errors: []}]",
 	}}
 
 	for _, tc := range testCases {
@@ -55,7 +55,7 @@ func TestFieldStringer(t *testing.T) {
 	testCases := []testCase{{
 		"default struct",
 		contracts.Field{},
-		`{ID: 0, Value: "", Errors: []}`,
+		"{ID: 0, Value: '', Errors: []}",
 	}, {
 		"errors",
 		contracts.Field{
@@ -63,15 +63,15 @@ func TestFieldStringer(t *testing.T) {
 				errors.New("kek1"), errors.New("kek2"),
 			},
 		},
-		`{ID: 0, Value: "", Errors: ["kek1", "kek2"]}`,
+		"{ID: 0, Value: '', Errors: ['kek1', 'kek2']}",
 	}, {
 		"ID",
 		contracts.Field{ID: 69},
-		`{ID: 69, Value: "", Errors: []}`,
+		"{ID: 69, Value: '', Errors: []}",
 	}, {
 		"value",
 		contracts.Field{Value: "kek"},
-		`{ID: 0, Value: "kek", Errors: []}`,
+		"{ID: 0, Value: 'kek', Errors: []}",
 	}, {
 		"all together",
 		contracts.Field{
@@ -81,7 +81,7 @@ func TestFieldStringer(t *testing.T) {
 				errors.New("kek1"), errors.New("kek2"),
 			},
 		},
-		`{ID: 420, Value: "kekeke", Errors: ["kek1", "kek2"]}`,
+		"{ID: 420, Value: 'kekeke', Errors: ['kek1', 'kek2']}",
 	}}
 
 	for _, tc := range testCases {
