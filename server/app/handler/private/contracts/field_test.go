@@ -9,6 +9,55 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 )
 
+func TestStringer(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		desc  string
+		field contracts.Field
+		want  string
+	}
+
+	testCases := []testCase{{
+		"default struct",
+		contracts.Field{},
+		`ID: 0, Value: "", Errors: []`,
+	}, {
+		"errors",
+		contracts.Field{
+			Errors: contracts.Errors{
+				errors.New("kek1"), errors.New("kek2"),
+			},
+		},
+		`ID: 0, Value: "", Errors: ["kek1", "kek2"]`,
+	}, {
+		"ID",
+		contracts.Field{ID: 69},
+		`ID: 69, Value: "", Errors: []`,
+	}, {
+		"value",
+		contracts.Field{Value: "kek"},
+		`ID: 0, Value: "kek", Errors: []`,
+	}, {
+		"all together",
+		contracts.Field{
+			ID:    420,
+			Value: "kekeke",
+			Errors: contracts.Errors{
+				errors.New("kek1"), errors.New("kek2"),
+			},
+		},
+		`ID: 420, Value: "kekeke", Errors: ["kek1", "kek2"]`,
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			got := tc.field.String()
+			assert.Equal(t, tc.want, got)
+		})
+	}
+}
+
 func TestErrors(t *testing.T) {
 	t.Parallel()
 

@@ -2,6 +2,8 @@ package contracts
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
@@ -36,6 +38,21 @@ func (fs Fields) AreValid() bool {
 
 func (fs Fields) AreInvalid() bool {
 	return !fs.AreValid()
+}
+
+func (f *Field) String() string {
+	var errs strings.Builder
+	for i, err := range f.Errors {
+		fmt.Fprintf(&errs, `"%s"`, err.Error())
+		if i < len(f.Errors)-1 {
+			fmt.Fprintf(&errs, ", ")
+		}
+	}
+
+	return fmt.Sprintf(
+		`ID: %d, Value: "%s", Errors: [%s]`,
+		f.ID, f.Value, errs.String(),
+	)
 }
 
 func (f *Field) AddError(err error) {
