@@ -33,7 +33,8 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	targetID, err := strconv.Atoi(vars["targetID"])
 	if err != nil {
-		log.Error(ctx, "failed to parse target id", zap.Error(err))
+		log.Warn(ctx, "failed to parse target id",
+			zap.String("id", vars["targetID"]), zap.Error(err))
 		utils.HttpError(w, http.StatusBadRequest)
 		return
 	}
@@ -64,6 +65,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log = log.With(zap.Stringer("target", target))
 	target.ID = id
 	if err := h.repo.Save(ctx, target); err != nil {
 		log.Error("failed to save target", zap.Error(err))

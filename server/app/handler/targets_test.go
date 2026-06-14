@@ -38,7 +38,7 @@ func (s *TargetsSuite) UpdateShouldBeIdempotent(t *testgroup.T) {
 	url := fmt.Sprintf("/targets/%d", target.ID)
 	form := strings.NewReader(neturl.Values{
 		"name":             []string{target.Name},
-		"question_0_id":    []string{strconv.Itoa(int(question.ID))},
+		"question_0_id":    []string{strconv.Itoa(int(target.Questions[0].ID))},
 		"question_0_value": []string{question.Text},
 	}.Encode())
 

@@ -1,10 +1,12 @@
-package valueobjects
+package valueobjects_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
 func TestPasswordShouldVerify(t *testing.T) {
@@ -27,7 +29,7 @@ func TestPasswordShouldVerify(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		pwd, err := NewPassword(tc.password)
+		pwd, err := valueobjects.NewPassword(tc.password)
 		require.NoError(t, err)
 
 		got, err := pwd.Verify(tc.verify)
@@ -40,10 +42,10 @@ func TestPasswordHashingShouldNotBeDetermenistic(t *testing.T) {
 	t.Parallel()
 
 	plaintext := "kek"
-	pwd1, err := NewPassword(plaintext)
+	pwd1, err := valueobjects.NewPassword(plaintext)
 	assert.NoError(t, err)
 
-	pwd2, err := NewPassword(plaintext)
+	pwd2, err := valueobjects.NewPassword(plaintext)
 	assert.NoError(t, err)
 
 	assert.NotEqual(t, pwd1.Hash, pwd2.Hash)
