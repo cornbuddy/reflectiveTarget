@@ -26,6 +26,18 @@ func (errs Errors) Error() string {
 	return errors.Join(errs...).Error()
 }
 
+func (fs Fields) String() string {
+	var res strings.Builder
+	for i, f := range fs {
+		fmt.Fprintf(&res, "{%s}", f.String())
+		if i < len(fs)-1 {
+			fmt.Fprintf(&res, ", ")
+		}
+	}
+
+	return fmt.Sprintf("[%s]", res.String())
+}
+
 func (fs Fields) AreValid() bool {
 	if len(fs) == 0 {
 		return true
