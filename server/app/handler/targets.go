@@ -73,6 +73,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Debug("target is saved")
 	utils.Redirect(w, r, "/targets", "target updated")
 }
 

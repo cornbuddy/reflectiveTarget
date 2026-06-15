@@ -14,17 +14,18 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
-func TestTargetAssembler(t *testing.T) {
+func TestTargetBuilder(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
 		desc       string
 		form       contracts.TargetForm
+		targetID   valueobjects.ID
 		wantTarget *aggregations.Target
 		wantForm   contracts.TargetForm
 	}
 
-	ownerID, targetID := valueobjects.ID(69), valueobjects.ID(69)
+	ownerID := valueobjects.ID(69)
 	testCases := []testCase{{
 		"returns target if form is valid",
 		contracts.TargetForm{
@@ -35,6 +36,7 @@ func TestTargetAssembler(t *testing.T) {
 				Value: "kek2",
 			}},
 		},
+		0,
 		&aggregations.Target{
 			Name:  "name",
 			Owner: entities.User{ID: ownerID},
@@ -55,6 +57,7 @@ func TestTargetAssembler(t *testing.T) {
 	}, {
 		"returns nil if form is invalid and validates the form",
 		contracts.TargetForm{},
+		0,
 		nil,
 		contracts.TargetForm{
 			Name: contracts.Field{
@@ -74,6 +77,7 @@ func TestTargetAssembler(t *testing.T) {
 				Value: "kek1",
 			}},
 		},
+		0,
 		nil,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: "name"},
@@ -86,6 +90,41 @@ func TestTargetAssembler(t *testing.T) {
 				},
 			}},
 		},
+	}, {
+		"sets proper ids to entities",
+		contracts.TargetForm{
+			Name: contracts.Field{Value: "name"},
+			Questions: contracts.Fields{{
+				ID:    101,
+				Value: "kek1",
+			}, {
+				ID:    102,
+				Value: "kek2",
+			}},
+		},
+		69,
+		&aggregations.Target{
+			ID:    69,
+			Name:  "name",
+			Owner: entities.User{ID: ownerID},
+			Questions: valueobjects.Questions{{
+				ID:   101,
+				Text: "kek1",
+			}, {
+				ID:   102,
+				Text: "kek2",
+			}},
+		},
+		contracts.TargetForm{
+			Name: contracts.Field{Value: "name"},
+			Questions: contracts.Fields{{
+				ID:    101,
+				Value: "kek1",
+			}, {
+				ID:    102,
+				Value: "kek2",
+			}},
+		},
 	}}
 
 	builder := builders.TargetBuilder{
@@ -93,7 +132,7 @@ func TestTargetAssembler(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			gotTarget, err := builder.Target(ctx, &tc.form, ownerID, targetID)
+			gotTarget, err := builder.Target(ctx, &tc.form, ownerID, tc.targetID)
 			require.NoError(t, err)
 			assert.Equal(t, tc.wantTarget, gotTarget)
 			assert.EqualExportedValues(t, tc.wantForm, tc.form)

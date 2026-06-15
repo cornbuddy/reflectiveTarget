@@ -4,11 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"strings"
 
 	aggr "github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
+	"go.uber.org/zap"
 )
 
 type TargetRepo struct {
@@ -25,7 +26,7 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 	defer tx.Rollback()
 
 	if err := r.saveTarget(ctx, tx, target); err != nil {
-		return fmt.Errorf("target: %w [%v]", err, *target)
+		return err
 	}
 
 	for i, question := range target.Questions {
@@ -49,6 +50,7 @@ func (r TargetRepo) saveQuestion(
 
 	var row *sql.Row
 	if question.ID == 0 {
+		log.Debug(ctx, "going to insert question", zap.Stringer("question", question))
 		q := strings.Join([]string{
 			"INSERT INTO questions (text, target_id)",
 			"VALUES ($1, $2::integer)",
@@ -56,6 +58,7 @@ func (r TargetRepo) saveQuestion(
 		}, "\n")
 		row = tx.QueryRowContext(ctx, q, question.Text, target.ID)
 	} else {
+		log.Debug(ctx, "going to update question", zap.Stringer("question", question))
 		q := strings.Join([]string{
 			"INSERT INTO questions (id, text, target_id)",
 			"VALUES ($1::integer, $2, $3::integer)",
@@ -66,10 +69,6 @@ func (r TargetRepo) saveQuestion(
 			"RETURNING id",
 		}, "\n")
 		row = tx.QueryRowContext(ctx, q, question.ID, question.Text, target.ID)
-		if errors.Is(row.Err(), sql.ErrNoRows) {
-			// kinda expected, entity is not changed
-			return nil
-		}
 	}
 
 	return row.Scan(&question.ID)
@@ -80,13 +79,16 @@ func (r TargetRepo) saveTarget(
 ) error {
 
 	var row *sql.Row
+	log := log.Logger(ctx).With(zap.Stringer("target", target))
 	if target.ID == 0 {
 		q := strings.Join([]string{
 			"INSERT INTO targets (name, owner_id)",
 			"VALUES ($1, $2::integer)",
 			"RETURNING id",
 		}, "\n")
+		log.Debug("going to insert target")
 		row = tx.QueryRowContext(ctx, q, target.Name, target.Owner.ID)
+		log.Debug("insert query is executed")
 	} else {
 		q := strings.Join([]string{
 			"INSERT INTO targets AS t (id, name, owner_id)",
@@ -97,11 +99,9 @@ func (r TargetRepo) saveTarget(
 			"IS DISTINCT FROM (EXCLUDED.name, EXCLUDED.owner_id)",
 			"RETURNING id",
 		}, "\n")
+		log.Debug("going to update target")
 		row = tx.QueryRowContext(ctx, q, target.ID, target.Name, target.Owner.ID)
-		if errors.Is(row.Err(), sql.ErrNoRows) {
-			// kinda expected, entity is not changed
-			return nil
-		}
+		log.Debug("update query is executed")
 	}
 
 	return row.Scan(&target.ID)

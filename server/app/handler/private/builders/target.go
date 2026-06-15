@@ -29,11 +29,12 @@ func (b TargetBuilder) Target(
 
 	questions := make(valueobjects.Questions, 0, len(form.Questions))
 	for _, field := range form.Questions {
-		q := valueobjects.Question{Text: field.Value}
+		q := valueobjects.Question{ID: field.ID, Text: field.Value}
 		questions = append(questions, q)
 	}
 
 	return &aggregations.Target{
+		ID:        targetID,
 		Name:      form.Name.Value,
 		Owner:     entities.User{ID: ownerID},
 		Questions: questions,
