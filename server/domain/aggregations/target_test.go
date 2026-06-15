@@ -22,31 +22,31 @@ func TestTargetStringer(t *testing.T) {
 	testCases := []testCase{{
 		"defaults",
 		aggr.Target{},
-		"ID: 0, Name: '', " +
+		"{ID: 0, Name: '', " +
 			"Owner: {ID: 0, Username: ''}, " +
 			"Questions: [], " +
-			"Shots (count): 0",
+			"Shots (count): 0}",
 	}, {
 		"name and id",
 		aggr.Target{ID: 69, Name: "kek"},
-		"ID: 69, Name: 'kek', " +
+		"{ID: 69, Name: 'kek', " +
 			"Owner: {ID: 0, Username: ''}, " +
 			"Questions: [], " +
-			"Shots (count): 0",
+			"Shots (count): 0}",
 	}, {
 		"shots",
 		aggr.Target{Shots: vo.Shots{{X: 1, Y: 1}, {X: 2, Y: 2}}},
-		"ID: 0, Name: '', " +
+		"{ID: 0, Name: '', " +
 			"Owner: {ID: 0, Username: ''}, " +
 			"Questions: [], " +
-			"Shots (count): 2",
+			"Shots (count): 2}",
 	}, {
 		"owner",
 		aggr.Target{Owner: entities.User{ID: 69, Username: "kek"}},
-		"ID: 0, Name: '', " +
+		"{ID: 0, Name: '', " +
 			"Owner: {ID: 69, Username: 'kek'}, " +
 			"Questions: [], " +
-			"Shots (count): 0",
+			"Shots (count): 0}",
 	}, {
 		"questions",
 		aggr.Target{
@@ -56,10 +56,10 @@ func TestTargetStringer(t *testing.T) {
 				ID: 2, Text: "2",
 			}},
 		},
-		"ID: 0, Name: '', " +
+		"{ID: 0, Name: '', " +
 			"Owner: {ID: 0, Username: ''}, " +
 			"Questions: [{ID: 1, Text: '1'}, {ID: 2, Text: '2'}], " +
-			"Shots (count): 0",
+			"Shots (count): 0}",
 	}}
 
 	for _, tc := range testCases {

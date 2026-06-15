@@ -21,11 +21,11 @@ func TestUserStringer(t *testing.T) {
 	testCases := []testCase{{
 		"defaults",
 		entities.User{},
-		"ID: 0, Username: ''",
+		"{ID: 0, Username: ''}",
 	}, {
 		"non-defaults",
 		entities.User{ID: 69, Username: "kek"},
-		"ID: 69, Username: 'kek'",
+		"{ID: 69, Username: 'kek'}",
 	}}
 
 	for _, tc := range testCases {

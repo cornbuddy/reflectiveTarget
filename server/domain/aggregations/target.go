@@ -20,10 +20,10 @@ type Targets []Target
 
 func (t *Target) String() string {
 	return fmt.Sprintf(strings.Join([]string{
-		"ID: %d, Name: '%s',",
-		"Owner: {%s},",
-		"Questions: [],",
-		"Shots (count): %d"}, " "),
-		t.ID, t.Name, t.Owner.String(), len(t.Shots),
+		"{ID: %d, Name: '%s',",
+		"Owner: %s,",
+		"Questions: %s,",
+		"Shots (count): %d}"}, " "),
+		t.ID, t.Name, t.Owner.String(), t.Questions.String(), len(t.Shots),
 	)
 }
