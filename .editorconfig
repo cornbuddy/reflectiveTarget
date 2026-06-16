@@ -27,10 +27,8 @@ indent_style = tab
 [*.{yml,yaml}]
 indent_size = 2
 
-[*.json]
-max_line_length = 240
-
 # 3rd party
-[{Makefile.venv,*_templ.go}]
+[{Makefile.venv,*_templ.go,bun.lock}]
 max_line_length = unset
 indent_size = unset
+max_line_length = unset

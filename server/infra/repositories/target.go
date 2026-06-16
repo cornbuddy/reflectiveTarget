@@ -1,15 +1,18 @@
 package repositories
 
 import (
+	"cmp"
 	"context"
 	"database/sql"
 	"errors"
+	"slices"
 	"strings"
+
+	"go.uber.org/zap"
 
 	aggr "github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
-	"go.uber.org/zap"
 )
 
 type TargetRepo struct {
@@ -18,6 +21,9 @@ type TargetRepo struct {
 
 // creates or updates the target
 func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
+	log := log.Logger(ctx).With(zap.Stringer("target", target))
+
+	log.Debug("going to start transaction")
 	tx, err := r.DB.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -25,86 +31,116 @@ func (r TargetRepo) Save(ctx context.Context, target *aggr.Target) error {
 
 	defer tx.Rollback()
 
+	log.Debug("transaction started, going to save target")
 	if err := r.saveTarget(ctx, tx, target); err != nil {
 		return err
 	}
 
+	log.Debug("target saved, going to save questions")
 	for i, question := range target.Questions {
+		log := log.With(zap.Stringer("question", &question))
+		log.Debug("going to save question")
 		if err := r.saveQuestion(ctx, tx, target, &question); err != nil {
 			return err
 		}
 
+		log.Debug("question is saved")
 		target.Questions[i] = question
 	}
 
+	log.Debug("questions are saved, going to commit transaction")
 	if err := tx.Commit(); err != nil {
 		return err
 	}
 
+	log.Debug("target is commited, sorting questions")
+	slices.SortFunc(target.Questions, func(a, b vo.Question) int {
+		return cmp.Compare(a.ID, b.ID)
+	})
+
+	log.Debug("questions are sorted")
 	return nil
 }
 
-func (r TargetRepo) saveQuestion(
-	ctx context.Context, tx *sql.Tx, target *aggr.Target, question *vo.Question,
-) error {
+const insertTarget = `
+INSERT INTO targets (name, owner_id)
+VALUES ($1, $2::integer)
+RETURNING id`
 
-	var row *sql.Row
-	if question.ID == 0 {
-		log.Debug(ctx, "going to insert question", zap.Stringer("question", question))
-		q := strings.Join([]string{
-			"INSERT INTO questions (text, target_id)",
-			"VALUES ($1, $2::integer)",
-			"RETURNING id",
-		}, "\n")
-		row = tx.QueryRowContext(ctx, q, question.Text, target.ID)
-	} else {
-		log.Debug(ctx, "going to update question", zap.Stringer("question", question))
-		q := strings.Join([]string{
-			"INSERT INTO questions (id, text, target_id)",
-			"VALUES ($1::integer, $2, $3::integer)",
-			"ON CONFLICT (id) DO UPDATE SET",
-			"text = EXCLUDED.text, target_id = EXCLUDED.target_id",
-			"WHERE (text, target_id)",
-			"IS DISTINCT FROM (EXCLUDED.text, EXCLUDED.target_id)",
-			"RETURNING id",
-		}, "\n")
-		row = tx.QueryRowContext(ctx, q, question.ID, question.Text, target.ID)
-	}
-
-	return row.Scan(&question.ID)
-}
+const updateTarget = `
+INSERT INTO targets AS t (id, name, owner_id)
+VALUES ($1::integer, $2, $3::integer)
+ON CONFLICT (id) DO UPDATE SET
+name = EXCLUDED.name, owner_id = EXCLUDED.owner_id
+WHERE (t.name, t.owner_id)
+IS DISTINCT FROM (EXCLUDED.name, EXCLUDED.owner_id)
+RETURNING id`
 
 func (r TargetRepo) saveTarget(
 	ctx context.Context, tx *sql.Tx, target *aggr.Target,
 ) error {
+	log := log.Logger(ctx).With(zap.Stringer("target", target))
 
 	var row *sql.Row
-	log := log.Logger(ctx).With(zap.Stringer("target", target))
+	name := target.Name
+	ownerID := target.Owner.ID
 	if target.ID == 0 {
-		q := strings.Join([]string{
-			"INSERT INTO targets (name, owner_id)",
-			"VALUES ($1, $2::integer)",
-			"RETURNING id",
-		}, "\n")
 		log.Debug("going to insert target")
-		row = tx.QueryRowContext(ctx, q, target.Name, target.Owner.ID)
-		log.Debug("insert query is executed")
+		row = tx.QueryRowContext(ctx, insertTarget, name, ownerID)
+		log.Debug("insert target query is executed")
 	} else {
-		q := strings.Join([]string{
-			"INSERT INTO targets AS t (id, name, owner_id)",
-			"VALUES ($1::integer, $2, $3::integer)",
-			"ON CONFLICT (id) DO UPDATE SET",
-			"name = EXCLUDED.name, owner_id = EXCLUDED.owner_id",
-			"WHERE (t.name, t.owner_id)",
-			"IS DISTINCT FROM (EXCLUDED.name, EXCLUDED.owner_id)",
-			"RETURNING id",
-		}, "\n")
 		log.Debug("going to update target")
-		row = tx.QueryRowContext(ctx, q, target.ID, target.Name, target.Owner.ID)
-		log.Debug("update query is executed")
+		row = tx.QueryRowContext(ctx, updateTarget, target.ID, name, ownerID)
+		log.Debug("update target query is executed")
 	}
 
-	return row.Scan(&target.ID)
+	if err := row.Scan(&target.ID); errors.Is(err, sql.ErrNoRows) {
+		// kinda expected, this means update request did not update
+		// anything
+		return nil
+	} else {
+		return err
+	}
+}
+
+const insertQuestion = `
+INSERT INTO questions (text, target_id)
+VALUES ($1, $2::integer)
+RETURNING id`
+
+const updateQuestion = `
+INSERT INTO questions AS q (id, text, target_id)
+VALUES ($1::integer, $2, $3::integer)
+ON CONFLICT (id) DO UPDATE SET
+text = EXCLUDED.text, target_id = EXCLUDED.target_id
+WHERE (q.text, q.target_id)
+IS DISTINCT FROM (EXCLUDED.text, EXCLUDED.target_id)
+RETURNING id`
+
+func (r TargetRepo) saveQuestion(
+	ctx context.Context, tx *sql.Tx, target *aggr.Target, question *vo.Question,
+) error {
+	log := log.Logger(ctx).With(zap.Stringer("question", question))
+
+	var row *sql.Row
+	text := question.Text
+	if question.ID == 0 {
+		log.Debug("going to insert question")
+		row = tx.QueryRowContext(ctx, insertQuestion, text, target.ID)
+		log.Debug("insert question query is executed")
+	} else {
+		log.Debug("going to update question")
+		row = tx.QueryRowContext(ctx, updateQuestion, question.ID, text, target.ID)
+		log.Debug("update question query is executed")
+	}
+
+	if err := row.Scan(&question.ID); errors.Is(err, sql.ErrNoRows) {
+		// kinda expected, this means update request did not update
+		// anything
+		return nil
+	} else {
+		return err
+	}
 }
 
 // returns list of hollow (without nested fields) targets
@@ -190,6 +226,7 @@ func (r TargetRepo) getQuestions(
 		"SELECT q.id, q.text",
 		"FROM questions AS q",
 		"WHERE q.target_id = $1",
+		"ORDER BY q.id",
 	}, "\n")
 	rows, err := r.QueryContext(ctx, q, targetId)
 	if err != nil {

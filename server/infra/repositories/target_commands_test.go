@@ -28,8 +28,7 @@ func (s *TargetCommandsTest) SaveShouldUpdateFieldsWhenChanged(t *testgroup.T) {
 
 	got, err := s.repo.Get(ctx, want.ID)
 	t.Require.NoError(err)
-	t.EqualValues(want, *got)
-	t.Equal(len(want.Questions), len(got.Questions))
+	t.Equal(want, *got)
 }
 
 func (s *TargetCommandsTest) SaveShouldBeIdempotent(t *testgroup.T) {

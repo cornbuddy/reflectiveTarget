@@ -59,6 +59,7 @@ func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 	}
 	t.Require.NoError(utils.InsertTarget(db, &target))
 
+	question = target.Questions[0]
 	newQstn := "updated question, still single"
 	url := fmt.Sprintf("/targets/%d", target.ID)
 	form := strings.NewReader(neturl.Values{

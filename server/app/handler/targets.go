@@ -24,22 +24,25 @@ type targetsHandler struct {
 
 func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	log := log.Logger(ctx)
+	log.Debug("going to parse form")
 	if err := r.ParseForm(); err != nil {
-		log.Error(ctx, "failed to parse form")
+		log.Error("failed to parse form")
 		utils.HttpError(w, http.StatusBadRequest)
 		return
 	}
 
-	vars := mux.Vars(r)
-	targetID, err := strconv.Atoi(vars["targetID"])
+	rawID := mux.Vars(r)["targetID"]
+	log.Debug("form parsed, going to parse id from url", zap.String("id", rawID))
+	targetID, err := strconv.Atoi(rawID)
 	if err != nil {
-		log.Warn(ctx, "failed to parse target id",
-			zap.String("id", vars["targetID"]), zap.Error(err))
+		log.Warn("failed to parse target id", zap.String("id", rawID), zap.Error(err))
 		utils.HttpError(w, http.StatusBadRequest)
 		return
 	}
 
-	log := log.Logger(ctx).With(zap.Int("target-id", targetID))
+	log = log.With(zap.Int("target-id", targetID))
+	log.Debug("id parsed, going to parse form", zap.Any("form", r.Form))
 	form, err := contracts.NewTargetForm(r.Form)
 	if err != nil {
 		log.Error("bad form", zap.Error(err))
@@ -47,9 +50,10 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log = log.With(zap.Stringer("form", form))
 	session := sessiondata.Read(ctx)
 	id := valueobjects.ID(targetID)
+	log = log.With(zap.Stringer("form", form))
+	log.Debug("form parsed, going to build target")
 	target, err := h.builder.Target(ctx, form, session.UserID, id)
 	if err != nil {
 		log.Error("failed to build target", zap.Error(err))
@@ -67,6 +71,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 
 	log = log.With(zap.Stringer("target", target))
 	target.ID = id
+	log.Debug("target built, going to save it")
 	if err := h.repo.Save(ctx, target); err != nil {
 		log.Error("failed to save target", zap.Error(err))
 		utils.HttpError(w, http.StatusInternalServerError)

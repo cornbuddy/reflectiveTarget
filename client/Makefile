@@ -2,23 +2,23 @@
 all: test build
 
 .PHONY: build
-build: deps lint clean
-	npx webpack
+build: clean deps lint
+	bun build.js
 
 .PHONY: clean
 clean:
-	- rm -rf dist
+	- rm -rf dist node_modules
 
 .PHONY: deps
 deps:
-	npm audit fix --force
-	npm install
+	bun install
+	bun update --latest
+	bun audit fix --force
 
 .PHONY: lint
 lint: deps
-	npx eslint js/**
+	bunx eslint js/**
 
 .PHONY: test
 test: deps lint
-	NODE_OPTIONS="--experimental-vm-modules" \
-		npx jest --detectOpenHandles $(ARGS)
+	bun test $(ARGS)

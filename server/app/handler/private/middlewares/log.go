@@ -18,6 +18,7 @@ func (mw Middleware) Logger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
 		reqId := xid.New().String()
+		// TODO: move logger back to context
 		ctx := context.WithValue(r.Context(), constants.RequestIDCtx, reqId)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
