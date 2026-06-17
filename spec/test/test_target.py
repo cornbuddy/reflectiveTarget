@@ -26,15 +26,17 @@ def test_canvas_is_properly_sized(new_target_page: NewTargetPage):
     assert abs(size["height"] - size["width"]) < 1
 
 
-def test_question_can_be_added(new_target_page: NewTargetPage):
-    new_target_page.page.locator(LOCATORS["add_question"]).click()
-    expect(
-        new_target_page.page.locator(LOCATORS["questions"]),
-    ).to_have_count(2)
-    raise NotImplementedError("ensure that new questions are added after save")
+def test_target_can_have_many_questions(new_target_page: NewTargetPage):
+    name, questions = "kek?", ["kek1", "kek2", "kek3"]
+    target_id = new_target_page.create_target(name, questions)
+    update_page = UpdateTargetPage(new_target_page.page, target_id)
+    inputs = update_page.page.locator(LOCATORS["questions"])
+    expect(inputs).to_have_count(len(questions))
+    expect(update_page.name_input).to_have_attribute("value", name)
+    for i, qstn_input in enumerate(inputs.all()):
+        expect(qstn_input).to_have_attribute("value", questions[i])
 
 
-@pytest.mark.problem
 def test_user_should_be_able_to_create_target(new_target_page: NewTargetPage):
     new_target_page.create_target(TARGET_NAME, ["kek"])
     page = new_target_page.page
@@ -42,7 +44,6 @@ def test_user_should_be_able_to_create_target(new_target_page: NewTargetPage):
     expect(page.get_by_text(TARGET_NAME)).to_have_count(1)
 
 
-@pytest.mark.problem
 @pytest.mark.order(after=test_user_should_be_able_to_create_target.__name__)
 def test_user_should_be_able_to_edit_its_target(
         targets_list_page: TargetsListPage,
