@@ -30,34 +30,6 @@ class LoginPage(_Form):
         self.page.goto(f"{URL}/logout")
 
 
-class NewTargetPage(_Form):
-    """represents new target form"""
-
-    def __init__(self, page: Page):
-        super().__init__(page, f"{URL}/targets/new")
-        self.name_input = page.locator(LOCATORS["name"])
-        self.add_question = page.locator(LOCATORS["add_question"])
-
-    def create_target(self, name: str, questions: list):
-        """creates target with given parameters"""
-        self.log.info("creating target name=%s", name)
-        self.name_input.fill(name)
-        for i, question in enumerate(questions):
-            self.log.debug("creating question i=%d text=%s", i, question)
-            if i > 0:
-                self.log.debug("adding question input")
-                self.add_question.click()
-            self.log.debug("looking for input question locator")
-            inpt = self.page.locator(LOCATORS["question"](i))
-            self.log.debug("filling question input")
-            inpt.fill(question)
-        with self.page.expect_response(self.url):
-            self.log.debug("submitting target")
-            self.submit.click()
-            self.log.debug("target submitted")
-        self.log.info("target created name=%s", name)
-
-
 class SignupPage(_Form):
     """represents user signup page"""
 
@@ -99,6 +71,34 @@ class TargetsListPage(_Page):
         return int(target_id)
 
 
+class NewTargetPage(_Form):
+    """represents new target form"""
+
+    def __init__(self, page: Page):
+        super().__init__(page, f"{URL}/targets/new")
+        self.name_input = page.locator(LOCATORS["name"])
+        self.add_question = page.locator(LOCATORS["add_question"])
+
+    def create_target(self, name: str, questions: list):
+        """creates target with given parameters"""
+        self.log.info("creating target name=%s", name)
+        self.name_input.fill(name)
+        for i, question in enumerate(questions):
+            self.log.debug("creating question i=%d text=%s", i, question)
+            if i > 0:
+                self.log.debug("adding question input")
+                self.add_question.click()
+            self.log.debug("looking for input question locator")
+            inpt = self.page.locator(LOCATORS["question"](i))
+            self.log.debug("filling question input")
+            inpt.fill(question)
+        with self.page.expect_response(self.url):
+            self.log.debug("submitting target")
+            self.submit.click()
+            self.log.debug("target submitted")
+        self.log.info("target created name=%s", name)
+
+
 class UpdateTargetPage(_Form):
     """represents form to update target"""
 
@@ -113,11 +113,13 @@ class UpdateTargetPage(_Form):
         self.name_input.clear()
         self.name_input.fill(name)
         for i, question in enumerate(questions):
-            if i > 0:
-                self.add_question.click()
+            self.log.debug("creating question i=%d text=%s", i, question)
             inpt = self.page.locator(LOCATORS["question"](i))
+            self.log.debug("filling question input")
             inpt.clear()
             inpt.fill(question)
         with self.page.expect_response(self.url):
+            self.log.debug("submitting target")
             self.submit.click()
+            self.log.debug("target submitted")
         self.log.info("target updated name=%s id=%d", name, self.target_id)

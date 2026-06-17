@@ -4,6 +4,8 @@ export function addQuestion() {
     const inputs = document.querySelectorAll("input[name^='question_']");
     const amountOfQuestions = inputs.length;
     const questionInput = document.createElement("input");
+    // FIXME: fix name
+    // FIXME: add hidden input with id?
     questionInput.name = `question_${amountOfQuestions}`;
     questionInput.placeholder = `Question ${amountOfQuestions + 1}`;
     inputs[amountOfQuestions - 1].after(questionInput);

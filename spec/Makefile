@@ -1,17 +1,14 @@
 BROWSER = firefox
 REPORT = report.html
 
-define PYTEST
+.PHONY: spec
+spec: venv playwright
 	$(VENV)/pytest \
+		--dist=loadfile \
 		--browser=$(BROWSER) \
 		--html=$(REPORT) \
 		$(if $(DEBUG),--headed --numprocesses=1,--numprocesses=auto) \
 		$(ARGS)
-endef
-
-.PHONY: spec
-spec: venv playwright
-	$(PYTEST)
 	- xdg-open $(REPORT)
 
 .PHONY: playwright

@@ -8,16 +8,17 @@ from pages.pages import NewTargetPage, TargetsListPage, UpdateTargetPage
 TARGET_NAME = "totally unique target"
 
 
-@pytest.mark.parametrize("locator", [
-    (LOCATORS["form"]),
-    (LOCATORS["canvas"]),
-    (LOCATORS["submit"]),
-    (LOCATORS["add_question"]),
-    (LOCATORS["name"]),
-    (LOCATORS["question"](0)),
-])
-def test_has_proper_components(new_target_page: NewTargetPage, locator: str):
-    expect(new_target_page.page.locator(locator)).to_have_count(1)
+def test_has_proper_components(new_target_page: NewTargetPage):
+    locators = [
+        (LOCATORS["form"]),
+        (LOCATORS["canvas"]),
+        (LOCATORS["submit"]),
+        (LOCATORS["add_question"]),
+        (LOCATORS["name"]),
+        (LOCATORS["question"](0)),
+    ]
+    for locator in locators:
+        expect(new_target_page.page.locator(locator)).to_have_count(1)
 
 
 def test_canvas_is_properly_sized(new_target_page: NewTargetPage):
@@ -25,14 +26,15 @@ def test_canvas_is_properly_sized(new_target_page: NewTargetPage):
     assert abs(size["height"] - size["width"]) < 1
 
 
-@pytest.mark.problem
 def test_question_can_be_added(new_target_page: NewTargetPage):
     new_target_page.page.locator(LOCATORS["add_question"]).click()
     expect(
         new_target_page.page.locator(LOCATORS["questions"]),
     ).to_have_count(2)
+    raise NotImplementedError("ensure that new questions are added after save")
 
 
+@pytest.mark.problem
 def test_user_should_be_able_to_create_target(new_target_page: NewTargetPage):
     new_target_page.create_target(TARGET_NAME, ["kek"])
     page = new_target_page.page
@@ -40,6 +42,7 @@ def test_user_should_be_able_to_create_target(new_target_page: NewTargetPage):
     expect(page.get_by_text(TARGET_NAME)).to_have_count(1)
 
 
+@pytest.mark.problem
 @pytest.mark.order(after=test_user_should_be_able_to_create_target.__name__)
 def test_user_should_be_able_to_edit_its_target(
         targets_list_page: TargetsListPage,
