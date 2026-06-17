@@ -18,13 +18,12 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           update-environment: false
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24.x
+      - uses: oven-sh/setup-bun@v2
       - uses: pre-commit/action@v3.0.1
 
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
       - run: make test
