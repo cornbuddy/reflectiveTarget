@@ -1,5 +1,6 @@
 ---
 name: commit checks
+
 on:
   push:
     branches:
