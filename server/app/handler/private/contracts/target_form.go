@@ -34,7 +34,7 @@ func (f *TargetForm) String() string {
 func NewTargetFormFromTarget(target aggregations.Target) TargetForm {
 	questions := make(Fields, 0, len(target.Questions))
 	for _, question := range target.Questions {
-		field := Field{Value: question.Text}
+		field := Field{ID: question.ID, Value: question.Text}
 		questions = append(questions, field)
 	}
 

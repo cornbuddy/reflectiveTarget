@@ -46,16 +46,20 @@ func TestNewTargetFormFromTarget(t *testing.T) {
 		aggregations.Target{
 			Name: "kek",
 			Questions: valueobjects.Questions{{
+				ID:   1,
 				Text: "kek1",
 			}, {
+				ID:   2,
 				Text: "kek2",
 			}},
 		},
 		contracts.TargetForm{
 			Name: contracts.Field{Value: "kek"},
 			Questions: contracts.Fields{{
+				ID:    1,
 				Value: "kek1",
 			}, {
+				ID:    2,
 				Value: "kek2",
 			}},
 		},

@@ -43,12 +43,18 @@ class NewTargetPage(_Form):
         self.log.info("creating target name=%s", name)
         self.name_input.fill(name)
         for i, question in enumerate(questions):
+            self.log.debug("creating question i=%d text=%s", i, question)
             if i > 0:
+                self.log.debug("adding question input")
                 self.add_question.click()
+            self.log.debug("looking for input question locator")
             inpt = self.page.locator(LOCATORS["question"](i))
+            self.log.debug("filling question input")
             inpt.fill(question)
         with self.page.expect_response(self.url):
+            self.log.debug("submitting target")
             self.submit.click()
+            self.log.debug("target submitted")
         self.log.info("target created name=%s", name)
 
 

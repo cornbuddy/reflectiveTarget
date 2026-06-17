@@ -95,7 +95,7 @@ func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 			"hx-target=\"main\"",
 			"<button type=\"submit\">Create</button>",
 			"<input name=\"name\" placeholder=\"Target name\" value=\"\"",
-			"<input name=\"question_0\" placeholder=\"Question 1\">",
+			"<input name=\"question_0_value\" placeholder=\"Question 1\">",
 			addQuestion,
 		},
 		utils.AssertContainsTokens,
@@ -114,11 +114,11 @@ func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 				target.Name,
 			),
 			fmt.Sprintf(
-				"<input name=\"question_0\" placeholder=\"Question 1\" value=\"%s\">",
+				"<input name=\"question_0_value\" placeholder=\"Question 1\" value=\"%s\">",
 				target.Questions[0].Text,
 			),
 			fmt.Sprintf(
-				"<input name=\"question_1\" placeholder=\"Question 2\" value=\"%s\">",
+				"<input name=\"question_1_value\" placeholder=\"Question 2\" value=\"%s\">",
 				target.Questions[1].Text,
 			),
 		},

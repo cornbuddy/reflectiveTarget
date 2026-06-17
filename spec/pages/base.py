@@ -1,4 +1,4 @@
-from logging import getLogger, Logger
+import logging
 
 from playwright.sync_api import Page, Locator
 
@@ -14,8 +14,8 @@ LOCATORS = {
     "canvas": "canvas",
     "name": "//input[@name='name']",
     "add_question": "//button[text()='Add question']",
-    "questions": "//input[starts-with(@name, 'question_')]",
-    "question": lambda i: f"//input[@name='question_{i}']",
+    "questions": "//input[starts-with(@placeholder, 'Question')]",
+    "question": lambda i: f"//input[@name='question_{i}_value']",
     # authz form
     "username": "input#username",
     "password": "input#password",
@@ -28,10 +28,11 @@ class _Model:
 
     def __init__(self, page: Page):
         self._page = page
-        self._log = getLogger(type(self).__name__)
+        self._log = logging.getLogger(type(self).__name__)
+        self.log.setLevel(logging.DEBUG)
 
     @property
-    def log(self) -> Logger:
+    def log(self) -> logging.Logger:
         """class logger"""
         return self._log
 
@@ -52,7 +53,7 @@ class Layout(_Model):
     @property
     def sidebar(self):
         """sidebar with navigation"""
-        return self.page.locator(LOCATORS["nav"])
+        return self.page.locator(LOCATORS["sidebar"])
 
     def ensure_navigation_opened(self):
         """opens navigation bar if not opened"""

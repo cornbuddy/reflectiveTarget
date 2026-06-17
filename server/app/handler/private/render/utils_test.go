@@ -33,10 +33,11 @@ type (
 
 var (
 	layoutMakrers = []string{
-		"<!doctype html>", "</html>",
+		"<!doctype html>",
+		"</html>",
 		`<meta charset="UTF-8">`,
-		`<link rel="stylesheet" href="/static/main.css">`,
-		`<script src="/static/main.js"></script>`,
+		`<link rel="stylesheet" href="/static/index.css">`,
+		`<script src="/static/index.js"></script>`,
 	}
 	layoutTestCases = layoutMarkersTestCases{{
 		"layout render",

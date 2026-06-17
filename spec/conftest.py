@@ -46,6 +46,7 @@ def signup_page(page: Page) -> SignupPage:
 def layout(page: Page) -> Layout:
     """returns layout POM"""
     layout = Layout(page)
+    layout.page.goto(URL)
     yield layout
     return layout.page.close()
 

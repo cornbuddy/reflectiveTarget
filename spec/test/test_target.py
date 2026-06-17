@@ -25,6 +25,7 @@ def test_canvas_is_properly_sized(new_target_page: NewTargetPage):
     assert abs(size["height"] - size["width"]) < 1
 
 
+@pytest.mark.problem
 def test_question_can_be_added(new_target_page: NewTargetPage):
     new_target_page.page.locator(LOCATORS["add_question"]).click()
     expect(
@@ -32,15 +33,13 @@ def test_question_can_be_added(new_target_page: NewTargetPage):
     ).to_have_count(2)
 
 
-@pytest.mark.problem
 def test_user_should_be_able_to_create_target(new_target_page: NewTargetPage):
-    page = new_target_page.page
     new_target_page.create_target(TARGET_NAME, ["kek"])
+    page = new_target_page.page
     expect(page).to_have_url(f"{URL}/targets")
     expect(page.get_by_text(TARGET_NAME)).to_have_count(1)
 
 
-@pytest.mark.problem
 @pytest.mark.order(after=test_user_should_be_able_to_create_target.__name__)
 def test_user_should_be_able_to_edit_its_target(
         targets_list_page: TargetsListPage,

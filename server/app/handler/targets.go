@@ -129,37 +129,45 @@ func (h targetsHandler) getNew(w http.ResponseWriter, r *http.Request) {
 
 func (h targetsHandler) postNew(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	log := log.Logger(ctx)
+	log.Debug("going to parse form")
 	if err := r.ParseForm(); err != nil {
-		log.Error(ctx, "failed to parse form", zap.Error(err))
+		log.Error("failed to parse form", zap.Error(err))
 		utils.HttpError(w, http.StatusBadRequest)
 		return
 	}
 
 	session := sessiondata.Read(ctx)
+	log.Debug("form parsed, going to create form DTO", zap.Any("form", r.Form))
 	form, err := contracts.NewTargetForm(r.Form)
 	if err != nil {
-		log.Error(ctx, "bad form", zap.Error(err))
+		log.Error("bad form", zap.Any("form", r.Form), zap.Error(err))
 		utils.HttpError(w, http.StatusBadRequest)
 		return
 	}
 
+	log = log.With(zap.Stringer("form", form))
+	log.Debug("DTO created, building target object")
 	target, err := h.builder.Target(ctx, form, session.UserID, 0)
 	if target == nil {
-		log.Debug(ctx, "form is invalid", zap.Any("form", form))
+		log.Debug("failed to create target object, form is invalid")
 		w.WriteHeader(http.StatusBadRequest)
 		view.TargetForm(ctx, w, render.TargetFormData{TargetForm: *form})
 		return
 	} else if err != nil {
-		log.Error(ctx, "failed to validate form", zap.Error(err))
+		log.Error("failed to build target object", zap.Error(err))
 		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	}
 
+	log = log.With(zap.Stringer("target", target))
+	log.Debug("target is created, saving")
 	if err := h.repo.Save(ctx, target); err != nil {
-		log.Error(ctx, "failed to save target", zap.Error(err))
+		log.Error("failed to save target", zap.Error(err))
 		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	}
 
+	log.Info("target saved")
 	utils.Redirect(w, r, "/targets", "target created")
 }
