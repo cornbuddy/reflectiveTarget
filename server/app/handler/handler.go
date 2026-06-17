@@ -26,7 +26,6 @@ func MakeHandler(config *config.Config) http.Handler {
 	r.Use(
 		mw.Logger,
 		mw.SaveSession,
-		// TODO: move timeout to configuration block
 		mw.SetTimeout(30*time.Second),
 	)
 
