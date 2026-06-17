@@ -3,7 +3,7 @@ all: test build
 
 .PHONY: build
 build: clean deps lint
-	bun build.js
+	bun run build
 
 .PHONY: clean
 clean:

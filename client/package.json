@@ -5,7 +5,7 @@
     "main": "js/main.js",
     "type": "module",
     "scripts": {
-        "build": "npx webpack"
+        "build": "bun build.js"
     },
     "repository": {
         "type": "git",
@@ -20,13 +20,7 @@
     "devDependencies": {
         "@eslint/eslintrc": "^3.3.5",
         "@eslint/js": "^10.0.1",
-        "css-loader": "^7.1.4",
-        "css-minimizer-webpack-plugin": "^8.0.0",
-        "eslint": "^10.5.0",
-        "mini-css-extract-plugin": "^2.10.2",
-        "terser-webpack-plugin": "^5.6.1",
-        "webpack": "^5.107.2",
-        "webpack-cli": "^7.0.3"
+        "eslint": "^10.5.0"
     },
     "dependencies": {
         "htmx.org": "^2.0.10"
