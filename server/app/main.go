@@ -21,7 +21,6 @@ func main() {
 
 	log.Info(ctx, "starting http server")
 	router := handler.MakeHandler(config)
-	// TODO: provide port as a config
 	if err := http.ListenAndServe(":8080", router); err != nil {
 		log.Fatal(ctx, "failed to start http server", zap.Error(err))
 	}
