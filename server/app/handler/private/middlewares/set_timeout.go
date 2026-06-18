@@ -2,12 +2,14 @@ package middlewares
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 )
 
@@ -22,10 +24,11 @@ func setTimeout(timeout time.Duration, next http.Handler) http.Handler {
 		ctx, cancel := context.WithTimeout(r.Context(), timeout)
 		log := log.Logger(ctx)
 		defer func() {
+			err := ctx.Err()
 			cancel()
-			if ctx.Err() == context.DeadlineExceeded {
+			if errors.Is(err, context.DeadlineExceeded) {
 				log.Error("request timed out")
-				w.WriteHeader(http.StatusGatewayTimeout)
+				utils.HttpError(w, http.StatusGatewayTimeout)
 			}
 		}()
 

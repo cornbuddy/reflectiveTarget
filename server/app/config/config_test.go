@@ -1,27 +1,77 @@
-package config
+package config_test
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/app/config"
 )
 
 // those tests are not prarallel because os.Setenv sets env var globally, across
 // all goroutines, which messess up test cases when I don't expect env vars to
 // be set
 
+func TestInitSetsTimeout(t *testing.T) {
+	setRequiredEnvVars(t)
+
+	type testCase struct {
+		desc        string
+		envTimeout  *string
+		wantTimeout time.Duration
+	}
+
+	testCases := []testCase{{
+		"should have proper defaults",
+		nil,
+		config.DefaultTimeout,
+	}, {
+		"should respect if set",
+		new("30"),
+		30 * time.Second,
+	}, {
+		"should ignore crap",
+		new("kek"),
+		config.DefaultTimeout,
+	}, {
+		"should switch to default if 0",
+		new("0"),
+		config.DefaultTimeout,
+	}, {
+		"should switch to default value is negative",
+		new("-69"),
+		config.DefaultTimeout,
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			defer require.NoError(t, os.Unsetenv("TIMEOUT_SECONDS"))
+
+			if tc.envTimeout != nil {
+				t.Setenv("TIMEOUT_SECONDS", *tc.envTimeout)
+			}
+
+			got, err := config.MakeConfig(ctx)
+			require.NoError(t, err)
+			assert.Equal(t, tc.wantTimeout, got.Timeout)
+		})
+	}
+}
+
 func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
-	setEnvVars(t)
+	setRequiredEnvVars(t)
 
-	config, err := MakeConfig(ctx)
+	cfg, err := config.MakeConfig(ctx)
 	require.NoError(t, err)
-	require.NotEmpty(t, config)
+	require.NotEmpty(t, cfg)
 
-	val := reflect.ValueOf(*config)
-	typ := reflect.TypeFor[Config]()
+	val := reflect.ValueOf(*cfg)
+	typ := reflect.TypeFor[config.Config]()
 	for i := 0; i < val.NumField(); i++ {
 		field := typ.Field(i)
 		if field.PkgPath == "" {
@@ -30,8 +80,8 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 		}
 	}
 
-	db := config.HealthDao.DB
-	cache := config.HealthDao.Cache
+	db := cfg.HealthDao.DB
+	cache := cfg.HealthDao.Cache
 
 	t.Cleanup(func() {
 		assert.NoError(t, db.Close())
@@ -54,11 +104,11 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 }
 
 func TestInitShouldReturnErrorWhenRequiredEnvVarsAreNotSet(t *testing.T) {
-	_, err := MakeConfig(ctx)
+	_, err := config.MakeConfig(ctx)
 	require.ErrorContains(t, err, "is not set")
 }
 
-func setEnvVars(t *testing.T) {
+func setRequiredEnvVars(t *testing.T) {
 	type environmentVariable struct {
 		key   string
 		value string

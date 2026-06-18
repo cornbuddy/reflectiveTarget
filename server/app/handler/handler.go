@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 
@@ -26,7 +25,7 @@ func MakeHandler(config *config.Config) http.Handler {
 	r.Use(
 		mw.Logger,
 		mw.SaveSession,
-		mw.SetTimeout(30*time.Second),
+		mw.SetTimeout(config.Timeout),
 	)
 
 	get, post, put := http.MethodGet, http.MethodPost, http.MethodPut
