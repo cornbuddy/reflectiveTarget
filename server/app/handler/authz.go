@@ -24,28 +24,30 @@ type authzHandler struct {
 
 func (h authzHandler) getLogout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	log := log.Logger(ctx)
 	data := sessiondata.SessionData{}
 	if _, err := utils.SaveSession(ctx, h.SessionStore, data, w); err != nil {
-		log.Error(ctx, "failed to save session")
+		log.Error("failed to save session")
 		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	}
 
-	log.Info(ctx, "logout succeeded")
+	log.Info("logout succeeded")
 	utils.Redirect(w, r, "/", "Logout succeeded")
 }
 
 func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	log := log.Logger(ctx)
 	if err := r.ParseForm(); err != nil {
-		log.Warn(ctx, "failed to parse form", zap.Error(err))
+		log.Warn("failed to parse form", zap.Error(err))
 		utils.HttpError(w, http.StatusBadRequest)
 		return
 	}
 
 	form := contracts.NewLoginForm(r.Form)
 	if valid := h.LoginFormValidator.Validate(ctx, &form); !valid {
-		log.Debug(ctx, "login failed", zap.Any("form", form))
+		log.Debug("login failed", zap.Any("form", form))
 		w.WriteHeader(http.StatusUnauthorized)
 		render.View.Login(ctx, w, render.LoginData{LoginForm: form})
 		return
@@ -53,12 +55,12 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.UserDao.Find(ctx, form.Username.Value)
 	if err != nil {
-		log.Error(ctx, "failed to fetch user", zap.Error(err))
+		log.Error("failed to fetch user", zap.Error(err))
 		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	}
 
-	log := log.Logger(ctx).With(zap.String("username", user.Username))
+	log = log.With(zap.String("username", user.Username))
 	data := sessiondata.SessionData{
 		IsAuthenticated: true,
 		UserID:          user.ID,
@@ -76,26 +78,27 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 
 func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	log := log.Logger(ctx)
 	if err := r.ParseForm(); err != nil {
-		log.Warn(ctx, "failed to parse form", zap.Error(err))
+		log.Warn("failed to parse form", zap.Error(err))
 		utils.HttpError(w, http.StatusBadRequest)
 		return
 	}
 
 	form := contracts.NewSignupForm(r.Form)
 	if valid, err := h.SignupFormValidator.Validate(ctx, &form); err != nil {
-		log.Error(ctx, "failed to validate form", zap.Error(err))
+		log.Error("failed to validate form", zap.Error(err))
 		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	} else if !valid {
-		log.Debug(ctx, "signup failed", zap.Any("form", form))
+		log.Debug("signup failed", zap.Any("form", form))
 		w.WriteHeader(http.StatusBadRequest)
 		render.View.Signup(ctx, w, render.SignupData{SignupForm: form})
 		return
 	}
 
 	username := form.Username.Value
-	log := log.Logger(ctx).With(zap.String("username", username))
+	log = log.With(zap.String("username", username))
 	user, err := entities.NewUser(username, form.Password.Value)
 	if err != nil {
 		log.Error("failed to create user object", zap.Error(err))

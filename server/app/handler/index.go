@@ -13,7 +13,8 @@ type indexHandler struct{}
 func (h indexHandler) get(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	if r.URL.Path != "/" {
-		log.Error(ctx, "bad url")
+		log := log.Logger(ctx)
+		log.Error("bad url")
 		utils.HttpError(w, http.StatusNotFound)
 		return
 	}

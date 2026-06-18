@@ -84,15 +84,16 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 
 func (h targetsHandler) getExisting(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	log := log.Logger(ctx)
 	vars := mux.Vars(r)
 	targetID, err := strconv.Atoi(vars["targetID"])
 	if err != nil {
-		log.Warn(ctx, "failed to parse target id", zap.Error(err))
+		log.Warn("failed to parse target id", zap.Error(err))
 		utils.HttpError(w, http.StatusBadRequest)
 		return
 	}
 
-	log := log.Logger(ctx).With(zap.Int("target-id", targetID))
+	log = log.With(zap.Int("target-id", targetID))
 	target, err := h.repo.Get(ctx, valueobjects.ID(targetID))
 	if err != nil {
 		log.Error("failed to fetch target", zap.Error(err))
@@ -112,10 +113,11 @@ func (h targetsHandler) getExisting(w http.ResponseWriter, r *http.Request) {
 
 func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	log := log.Logger(ctx)
 	session := sessiondata.Read(ctx)
 	targets, err := h.repo.ListTargetsOfUser(ctx, session.UserID)
 	if err != nil {
-		log.Error(ctx, "failed to fetch targets", zap.Error(err))
+		log.Error("failed to fetch targets", zap.Error(err))
 		utils.HttpError(w, http.StatusInternalServerError)
 		return
 	}
