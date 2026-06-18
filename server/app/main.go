@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"go.uber.org/zap"
 
@@ -20,9 +21,16 @@ func main() {
 		log.Fatal("failed to make configuration", zap.Error(err))
 	}
 
+	handler := handler.MakeHandler(config)
+	server := &http.Server{
+		Addr:         ":8080",
+		Handler:      handler,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: config.Timeout * 2,
+		IdleTimeout:  config.Timeout * 3,
+	}
 	log.Info("starting http server")
-	router := handler.MakeHandler(config)
-	if err := http.ListenAndServe(":8080", router); err != nil {
+	if err := server.ListenAndServe(); err != nil {
 		log.Fatal("failed to start http server", zap.Error(err))
 	}
 }
