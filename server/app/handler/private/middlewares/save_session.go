@@ -16,6 +16,7 @@ import (
 func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
+		log := log.Logger(ctx)
 		store := mw.SessionStore
 		cookie, err := r.Cookie(constants.SessionCookieName)
 
@@ -23,10 +24,10 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// set
 		emptySession := sessiondata.SessionData{}
 		if err != nil {
-			log.Info(ctx, "registering new session...")
+			log.Info("registering new session...")
 			_, err := utils.SaveSession(ctx, store, emptySession, w)
 			if err != nil {
-				log.Error(ctx, "failed to save session", zap.Error(err))
+				log.Error("failed to save session", zap.Error(err))
 				http.Error(w, "internal server error", http.StatusInternalServerError)
 				return
 			}
@@ -38,7 +39,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// empty error means cookie exists, hence session sessionId
 		// should be validated
 		sessionId := cookie.Value
-		log := log.Logger(ctx).With(zap.String("token", sessionId))
+		log = log.With(zap.String("token", sessionId))
 		log.Debug("validating session...")
 		session, err := store.Get(ctx, sessionId)
 		if err != nil {

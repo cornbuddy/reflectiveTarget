@@ -86,15 +86,15 @@ func retry(ctx context.Context, operation string, f func() error) error {
 
 	var err error
 	for attempt := range attempts {
-		log.Info(ctx, operation, zap.Int("attempt", attempt))
+		log := log.Logger(ctx, zap.Int("attempt", attempt))
 		if err = f(); err != nil {
-			log.Warn(ctx, operation,
+			log.Warn(operation,
 				zap.String("status", "failed"),
 				zap.Duration("delay", delay),
 			)
 			time.Sleep(delay)
 		} else {
-			log.Info(ctx, operation, zap.String("status", "success"))
+			log.Info(operation, zap.String("status", "success"))
 			break
 		}
 	}

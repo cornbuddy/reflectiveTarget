@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
@@ -46,7 +47,8 @@ var View Render = viewRender{}
 
 func render(ctx context.Context, w http.ResponseWriter, cmp templ.Component) {
 	if err := cmp.Render(ctx, w); err != nil {
-		log.Error(ctx, "rendering failed", zap.Error(err))
-		http.Error(w, "internal server error", http.StatusInternalServerError)
+		log := log.Logger(ctx, zap.Error(err))
+		log.Error("rendering failed")
+		utils.HttpError(w, http.StatusInternalServerError)
 	}
 }

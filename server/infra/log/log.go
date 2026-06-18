@@ -21,7 +21,7 @@ func Logger(ctx context.Context, fields ...zap.Field) *zap.Logger {
 			"failed to extract logger from context, using default one",
 			zap.Any("context", ctx),
 		)
-		return logger
+		return logger.With(fields...)
 	}
 
 	return log.With(fields...)

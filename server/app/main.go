@@ -13,15 +13,16 @@ import (
 
 func main() {
 	ctx := context.Background()
-	log.Info(ctx, "initializing application")
+	log := log.Logger(ctx)
+	log.Info("initializing application")
 	config, err := config.MakeConfig(ctx)
 	if err != nil {
-		log.Fatal(ctx, "failed to make configuration", zap.Error(err))
+		log.Fatal("failed to make configuration", zap.Error(err))
 	}
 
-	log.Info(ctx, "starting http server")
+	log.Info("starting http server")
 	router := handler.MakeHandler(config)
 	if err := http.ListenAndServe(":8080", router); err != nil {
-		log.Fatal(ctx, "failed to start http server", zap.Error(err))
+		log.Fatal("failed to start http server", zap.Error(err))
 	}
 }

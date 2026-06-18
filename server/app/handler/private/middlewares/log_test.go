@@ -6,17 +6,18 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 )
 
 func TestLoggerMiddlewareShouldAddLoggerToContext(t *testing.T) {
 	t.Parallel()
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		reqID := r.Context().Value(constants.RequestIDCtx)
-		assert.NotEmpty(t, reqID)
-		assert.IsType(t, reqID, "string")
+		logger, ok := r.Context().Value(log.LoggerCtx).(*zap.Logger)
+		assert.True(t, ok)
+		assert.NotEmpty(t, logger)
 	})
 
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
