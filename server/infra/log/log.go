@@ -4,37 +4,25 @@ import (
 	"context"
 
 	"go.uber.org/zap"
-
-	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 )
 
-func Debug(ctx context.Context, msg string, fields ...zap.Field) {
-	Logger(ctx).Debug(msg, fields...)
+const LoggerCtx = "logger-ctx"
+
+// returns child context with zap logger in it
+func Context(ctx context.Context, fields ...zap.Field) context.Context {
+	return context.WithValue(ctx, LoggerCtx, logger.With(fields...))
 }
 
-func Info(ctx context.Context, msg string, fields ...zap.Field) {
-	Logger(ctx).Info(msg, fields...)
-}
-
-func Warn(ctx context.Context, msg string, fields ...zap.Field) {
-	Logger(ctx).Warn(msg, fields...)
-}
-
-func Error(ctx context.Context, msg string, fields ...zap.Field) {
-	Logger(ctx).Error(msg, fields...)
-}
-
-func Fatal(ctx context.Context, msg string, fields ...zap.Field) {
-	Logger(ctx).Fatal(msg, fields...)
-}
-
-// builds logger instance from context
-func Logger(ctx context.Context) *zap.Logger {
-	reqID, ok := ctx.Value(constants.RequestIDCtx).(string)
+// returns logger from context if defined, else returns default logger
+func Logger(ctx context.Context, fields ...zap.Field) *zap.Logger {
+	log, ok := ctx.Value(LoggerCtx).(*zap.Logger)
 	if !ok {
-		logger.Warn("missing request ID in context", zap.Any("context", ctx))
+		logger.Warn(
+			"failed to extract logger from context, using default one",
+			zap.Any("context", ctx),
+		)
 		return logger
-	} else {
-		return logger.With(zap.String("request-id", reqID))
 	}
+
+	return log.With(fields...)
 }

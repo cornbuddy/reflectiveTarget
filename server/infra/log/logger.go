@@ -44,4 +44,6 @@ func init() {
 	}
 
 	logger.Info("logger is set up", zap.String("environment", environment))
+	logger.Debug("syncing default logger")
+	logger.Sync()
 }
