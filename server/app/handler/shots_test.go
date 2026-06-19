@@ -33,6 +33,7 @@ func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 	resp, body, err := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	assert.Equal(t, ctAppJson, resp.Header.Get("Content-Type"))
 
 	var shots contracts.ShotsResponse
 	require.NoError(t, json.Unmarshal([]byte(body), &shots))
@@ -75,6 +76,7 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 	)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
+	assert.Equal(t, ctAppJson, resp.Header.Get("Content-Type"))
 	assert.Equal(t, "ok", body, "should save shots")
 
 	res, err := db.Query(

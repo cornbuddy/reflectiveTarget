@@ -15,6 +15,11 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+const (
+	ctAppJson = "application/json; charset=utf-8"
+	ctForm    = "application/x-www-form-urlencoded"
+)
+
 var (
 	ctx = context.TODO()
 

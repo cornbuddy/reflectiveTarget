@@ -1,4 +1,4 @@
-package middlewares
+package middlewares_test
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/middlewares"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -18,7 +19,7 @@ var (
 	)
 
 	store daos.SessionStore
-	mw    Middleware
+	mw    middlewares.Middleware
 )
 
 func TestMain(m *testing.M) {
@@ -34,7 +35,7 @@ func TestMain(m *testing.M) {
 	}()
 
 	store = daos.SessionStore{Cache: cache}
-	mw = Middleware{SessionStore: store}
+	mw = middlewares.Middleware{SessionStore: store}
 
 	os.Exit(m.Run())
 }

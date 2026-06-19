@@ -52,22 +52,24 @@ func MakeHandler(config *config.Config) http.Handler {
 			},
 		},
 	}
-	child := r.PathPrefix("/targets").Subrouter()
-	child.Use(mw.IsAuthenticated)
-	child.HandleFunc("", targets.list).Methods(get)
-	child.HandleFunc("/new", targets.getNew).Methods(get)
-	child.HandleFunc("/new", targets.postNew).Methods(post)
-	child.HandleFunc("/{targetID:[0-9]+}", targets.putExisting).Methods(put)
-	child.HandleFunc("/{targetID:[0-9]+}", targets.getExisting).Methods(get)
+	t := r.PathPrefix("/targets").Subrouter()
+	t.Use(mw.IsAuthenticated)
+	t.HandleFunc("", targets.list).Methods(get)
+	t.HandleFunc("/new", targets.getNew).Methods(get)
+	t.HandleFunc("/new", targets.postNew).Methods(post)
+	t.HandleFunc("/{targetID:[0-9]+}", targets.putExisting).Methods(put)
+	t.HandleFunc("/{targetID:[0-9]+}", targets.getExisting).Methods(get)
 
 	health := healthHandler{config.HealthDao}
 	shots := shotsHandler{
 		config.ShotsDao,
 		validators.ShotsRequestValidator{},
 	}
-	r.HandleFunc("/api/health", health.get).Methods(get)
-	r.HandleFunc("/api/target/{targetID:[0-9]+}/shots", shots.get).Methods(get)
-	r.HandleFunc("/api/target/{targetID:[0-9]+}/shots", shots.post).Methods(post)
+	api := r.PathPrefix("/api").Subrouter()
+	api.Use(mw.SetHeader("Content-Type", "application/json; charset=utf-8"))
+	api.HandleFunc("/health", health.get).Methods(get)
+	api.HandleFunc("/target/{targetID:[0-9]+}/shots", shots.get).Methods(get)
+	api.HandleFunc("/target/{targetID:[0-9]+}/shots", shots.post).Methods(post)
 
 	// https://stackoverflow.com/a/56937571
 	r.NotFoundHandler = r.NewRoute().HandlerFunc(http.NotFound).GetHandler()

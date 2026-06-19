@@ -42,8 +42,7 @@ func (s *TargetsSuite) UpdateShouldBeIdempotent(t *testgroup.T) {
 		"question_0_value": []string{question.Text},
 	}.Encode())
 
-	ct := "application/x-www-form-urlencoded"
-	r, body, err := utils.MakeRequest(ct, http.MethodPut, url, s.handler, form)
+	r, body, err := utils.MakeRequest(ctForm, http.MethodPut, url, s.handler, form)
 	t.Require.NoError(err)
 	t.Equal(http.StatusSeeOther, r.StatusCode)
 	t.Equal("target updated", body)
