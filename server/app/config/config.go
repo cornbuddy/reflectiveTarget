@@ -18,10 +18,17 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 )
 
-const DefaultTimeout = 15 * time.Second
+const (
+	DefaultTimeout = 15 * time.Second
+	DefaultPort    = 8080
+
+	minPort = 1024
+	maxPort = 65535
+)
 
 type Config struct {
 	Timeout time.Duration
+	Port    int
 	daos.HealthDao
 	daos.SessionStore
 	daos.ShotsDao
@@ -32,6 +39,7 @@ type Config struct {
 func MakeConfig(ctx context.Context) (*Config, error) {
 	type config struct {
 		TimeoutSecs string `env:"TIMEOUT_SECONDS" envDefault:"15"`
+		Port        string `env:"PORT" envDefault:"8080"`
 		CacheAddr   string `env:"CACHE_ADDRESS,notEmpty,required"`
 		DbPassword  string `env:"PGPASSWORD,notEmpty,required"`
 		DbUser      string `env:"PGUSER,notEmpty,required"`
@@ -62,6 +70,21 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 	}
 
 	log.Debug("timeout is set", zap.Duration("timeout", timeout))
+
+	var port int
+	p, err := strconv.Atoi(cfg.Port)
+	if err != nil {
+		log.Warn(
+			"failed to parse port environment variable",
+			zap.String("value", cfg.Port), zap.Error(err),
+		)
+		port = DefaultPort
+	} else if p < minPort || p > maxPort {
+		log.Warn("bad port", zap.Int("port", p))
+		port = DefaultPort
+	} else {
+		port = p
+	}
 
 	var cache *redis.Client
 	if err := retry(log, "connect to cache", func() error {
@@ -97,6 +120,7 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 
 	return &Config{
 		Timeout:      timeout,
+		Port:         port,
 		HealthDao:    daos.HealthDao{DB: db, Cache: cache},
 		SessionStore: daos.SessionStore{Cache: cache},
 		ShotsDao:     daos.ShotsDao{DB: db},
