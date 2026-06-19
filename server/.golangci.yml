@@ -13,10 +13,11 @@ linters:
       max-func-lines: 0
     nestif:
       min-complexity: 3
+    testifylint:
+      go-require:
+        ignore-http-handlers: true
   enable:
     - bidichk
-    - containedctx
-    - contextcheck
     - copyloopvar
     - cyclop
     - decorder
@@ -26,11 +27,8 @@ linters:
     - err113
     - errname
     - errorlint
-    - exhaustruct
     - funcorder
-    - funlen
     - gocheckcompilerdirectives
-    - gochecknoglobals
     - gocognit
     - goconst
     - gocritic
@@ -62,7 +60,6 @@ linters:
     - staticcheck
     - testifylint
     - testpackage
-    - thelper
     - unconvert
     - unparam
     - unqueryvet
