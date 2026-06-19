@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
+	"go.uber.org/zap"
 )
 
 type HealthResponse struct {
@@ -12,19 +15,27 @@ type HealthResponse struct {
 }
 
 type healthHandler struct {
-	daos.HealthDao
+	dao daos.HealthDao
 }
 
 func (h healthHandler) get(w http.ResponseWriter, r *http.Request) {
-	status := h.HealthDao.CheckHealth(r.Context())
+	status := h.dao.CheckHealth(r.Context())
 	code := http.StatusInternalServerError
 	if status.CacheConnected && status.DbConnected {
 		code = http.StatusOK
 	}
 
-	hr, _ := json.Marshal(HealthResponse{
+	log := log.Logger(r.Context())
+	hr, err := json.Marshal(HealthResponse{
 		HealthStatus: status,
 	})
+	if err != nil {
+		log.Error("failed to marshal health status", zap.Error(err))
+		utils.HttpError(w, http.StatusInternalServerError)
+
+		return
+	}
+
 	w.WriteHeader(code)
-	w.Write(hr)
+	logBadWrites(log)(w.Write(hr))
 }

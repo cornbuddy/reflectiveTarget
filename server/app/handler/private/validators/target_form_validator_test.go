@@ -264,7 +264,6 @@ func TestTargetFormValidator(t *testing.T) {
 func insertTestTarget(db *sql.DB) (
 	*aggregations.Target, *entities.User, error,
 ) {
-
 	user, err := entities.NewUser(utils.MakeRandomString(5), "kek")
 	if err != nil {
 		return nil, nil, err

@@ -140,7 +140,7 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 
 	tables := []string{"users", "targets", "questions", "shots"}
 	for _, table := range tables {
-		query := fmt.Sprintf("SELECT * FROM %s", table)
+		query := "SELECT * FROM " + table
 		rows, err := db.Query(query)
 		require.NoError(t, err)
 

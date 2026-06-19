@@ -19,7 +19,7 @@ func TestHealthRouteShouldHaveProperContentType(t *testing.T) {
 		ctAppJson, http.MethodGet, healthUrl, router, nil,
 	)
 	require.NoError(t, err)
-	assert.Equal(t, ctAppJson, resp.Header.Get("Content-Type"))
+	assert.JSONEq(t, ctAppJson, resp.Header.Get("Content-Type"))
 }
 
 func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {

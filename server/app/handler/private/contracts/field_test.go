@@ -106,7 +106,7 @@ func TestErrors(t *testing.T) {
 		contracts.Errors{errors.New("kek")},
 		"kek",
 	}, {
-		"mutliple items",
+		"multiple items",
 		contracts.Errors{errors.New("kek1"), errors.New("kek2")},
 		"kek1\nkek2",
 	}, {

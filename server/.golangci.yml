@@ -1,0 +1,73 @@
+---
+version: "2"
+linters:
+  settings:
+    gocognit:
+      min-complexity: 10
+    goconst:
+      numbers: true
+      find-duplicates: true
+    gocyclo:
+      min-complexity: 10
+    nakedret:
+      max-func-lines: 0
+    nestif:
+      min-complexity: 3
+  enable:
+    - bidichk
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - decorder
+    - dupl
+    - durationcheck
+    - embeddedstructfieldcheck
+    - err113
+    - errname
+    - errorlint
+    - exhaustruct
+    - funcorder
+    - funlen
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - gosec
+    - gosmopolitan
+    - govet
+    - iface
+    - interfacebloat
+    - intrange
+    - iotamixing
+    - misspell
+    - mnd
+    - modernize
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nlreturn
+    - noctx
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - reassign
+    - rowserrcheck
+    - sqlclosecheck
+    - staticcheck
+    - testifylint
+    - testpackage
+    - thelper
+    - unconvert
+    - unparam
+    - unqueryvet
+    - unused
+    - usestdlibvars
+    - usetesting
+    - wastedassign
+    - whitespace

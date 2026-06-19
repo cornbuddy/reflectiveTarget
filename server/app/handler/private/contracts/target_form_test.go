@@ -67,7 +67,7 @@ func TestNewTargetFormFromTarget(t *testing.T) {
 
 	for _, tc := range testCases {
 		got := contracts.NewTargetFormFromTarget(tc.target)
-		assert.EqualValues(t, tc.form, got)
+		assert.Equal(t, tc.form, got)
 	}
 }
 

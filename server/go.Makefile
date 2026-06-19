@@ -1,8 +1,15 @@
+PACKAGES = ./...
+
 .PHONY: all
 all: lint test
 
+MAKEFILE_DIR = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+LINTER_CONFIG = $(MAKEFILE_DIR).golangci.yml
+
 .PHONY: lint
 lint: fmt vet tidy
+	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
+	golangci-lint run --fix --config $(LINTER_CONFIG) $(PACKAGES)
 
 .PHONY: fmt
 fmt:
@@ -18,7 +25,6 @@ tidy:
 
 COVERPROFILE = cover.out
 COVERREPORT = cover.html
-PACKAGES = ./...
 TESTS = ^.+\$
 GO_TEST_CMD = go test -vet=all -count=1 \
 -run $(TESTS) \

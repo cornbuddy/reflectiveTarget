@@ -73,7 +73,7 @@ func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 	t.Equal(http.StatusSeeOther, r.StatusCode)
 	t.Equal("target updated", body)
 
-	r, body, err = utils.MakeRequest(ct, http.MethodGet, url, s.handler, form)
+	_, body, err = utils.MakeRequest(ct, http.MethodGet, url, s.handler, form)
 	t.Require.NoError(err)
 	t.Contains(body, target.Name)
 	t.Contains(body, newQstn)
@@ -183,7 +183,6 @@ func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
 	for _, ot := range s.ownedTargets {
 		tokens := []string{strconv.Itoa(int(ot.ID)), ot.Name}
 		utils.AssertContainsTokens(t.T, r, tokens)
-
 	}
 
 	for _, ft := range s.foreignTargets {
