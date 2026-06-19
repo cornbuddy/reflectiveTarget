@@ -17,48 +17,95 @@ import (
 // all goroutines, which messess up test cases when I don't expect env vars to
 // be set
 
-func TestInitSetsTimeout(t *testing.T) {
+func TestOptionalConfiguration(t *testing.T) {
 	setRequiredEnvVars(t)
 
+	type extractor func(config.Config) any
 	type testCase struct {
-		desc        string
-		envTimeout  *string
-		wantTimeout time.Duration
+		desc     string
+		envKey   string
+		envValue *string
+		want     any
+		extractor
 	}
 
+	const timeout = "TIMEOUT_SECONDS"
+	const port = "PORT"
+	timeoutExtractor := func(c config.Config) any { return c.Timeout }
+	portExtractor := func(c config.Config) any { return c.Port }
 	testCases := []testCase{{
 		"should have proper defaults",
+		timeout,
 		nil,
 		config.DefaultTimeout,
+		timeoutExtractor,
 	}, {
 		"should respect if set",
+		timeout,
 		new("30"),
 		30 * time.Second,
+		timeoutExtractor,
 	}, {
 		"should ignore crap",
+		timeout,
 		new("kek"),
 		config.DefaultTimeout,
+		timeoutExtractor,
 	}, {
 		"should switch to default if 0",
+		timeout,
 		new("0"),
 		config.DefaultTimeout,
+		timeoutExtractor,
 	}, {
 		"should switch to default value is negative",
+		timeout,
 		new("-69"),
 		config.DefaultTimeout,
+		timeoutExtractor,
+	}, {
+		"should have proper defaults",
+		port,
+		nil,
+		config.DefaultPort,
+		portExtractor,
+	}, {
+		"should ignore crap",
+		port,
+		new("crap"),
+		config.DefaultPort,
+		portExtractor,
+	}, {
+		"should fallback to default if < 1024",
+		port,
+		new("80"),
+		config.DefaultPort,
+		portExtractor,
+	}, {
+		"should fallback to default if > 65535",
+		port,
+		new("65536"),
+		config.DefaultPort,
+		portExtractor,
+	}, {
+		"should respect if set",
+		port,
+		new("42069"),
+		42069,
+		portExtractor,
 	}}
 
 	for _, tc := range testCases {
-		t.Run(tc.desc, func(t *testing.T) {
-			defer require.NoError(t, os.Unsetenv("TIMEOUT_SECONDS"))
+		t.Run(fmt.Sprintf("[%s] %s", tc.envKey, tc.desc), func(t *testing.T) {
+			defer require.NoError(t, os.Unsetenv(tc.envKey))
 
-			if tc.envTimeout != nil {
-				t.Setenv("TIMEOUT_SECONDS", *tc.envTimeout)
+			if tc.envValue != nil {
+				t.Setenv(tc.envKey, *tc.envValue)
 			}
 
 			got, err := config.MakeConfig(ctx)
 			require.NoError(t, err)
-			assert.Equal(t, tc.wantTimeout, got.Timeout)
+			assert.Equal(t, tc.want, tc.extractor(*got))
 		})
 	}
 }

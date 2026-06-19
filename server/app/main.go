@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -23,7 +24,7 @@ func main() {
 
 	handler := handler.MakeHandler(config)
 	server := &http.Server{
-		Addr:         ":8080",
+		Addr:         fmt.Sprintf(":%d", config.Port),
 		Handler:      handler,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: config.Timeout * 2,
