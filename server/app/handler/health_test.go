@@ -12,6 +12,16 @@ import (
 
 const healthUrl = "/api/health"
 
+func TestHealthRouteShouldHaveProperContentType(t *testing.T) {
+	t.Parallel()
+
+	resp, _, err := utils.MakeRequest(
+		ctAppJson, http.MethodGet, healthUrl, router, nil,
+	)
+	require.NoError(t, err)
+	assert.Equal(t, ctAppJson, resp.Header.Get("Content-Type"))
+}
+
 func TestHealthHandlerShouldSucceedWhenDbWorks(t *testing.T) {
 	t.Parallel()
 
