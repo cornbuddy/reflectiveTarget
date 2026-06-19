@@ -63,6 +63,7 @@ func makeTestConfig(db *sql.DB, cache *redis.Client) *config.Config {
 	targetRepo := repositories.TargetRepo{DB: db}
 
 	return &config.Config{
+		Timeout:      config.DefaultTimeout,
 		HealthDao:    health,
 		SessionStore: sessionStore,
 		ShotsDao:     shots,
