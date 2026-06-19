@@ -51,6 +51,7 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response, msg string) {
 	for _, cookie := range cookies {
 		if cookie.Name == constants.SessionCookieName {
 			sessionCookie = cookie
+
 			break
 		}
 	}
@@ -59,7 +60,7 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response, msg string) {
 
 	duration := time.Now().
 		Add(sessiondata.SessionDuration).
-		// substracting few seconds because actual tests can happen
+		// subtracting few seconds because actual tests can happen
 		// after time.Now()
 		Add(-10 * time.Second)
 	assert.True(t, sessionCookie.Expires.After(duration), msg)
@@ -69,7 +70,6 @@ func assertSessionCookieIsSet(t *testing.T, resp *http.Response, msg string) {
 func assertAuthenticationStatusIsChanged(
 	t *testing.T, resp *http.Response, msg string,
 ) {
-
 	assertSessionCookieIsSet(t, resp, msg)
 
 	url := resp.Header.Get("Location")

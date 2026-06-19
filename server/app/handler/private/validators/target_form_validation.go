@@ -22,8 +22,7 @@ func (v *TargetFormValidator) Validate(
 	ctx context.Context, form *contracts.TargetForm, ownerID valueobjects.ID,
 	targetID valueobjects.ID,
 ) (bool, error) {
-
-	targets, err := v.TargetRepo.ListTargetsOfUser(ctx, ownerID)
+	targets, err := v.ListTargetsOfUser(ctx, ownerID)
 	if err != nil {
 		return false, err
 	}
@@ -32,6 +31,7 @@ func (v *TargetFormValidator) Validate(
 		nameAlreadyTaken := form.Name.Value == target.Name && target.ID != targetID
 		if nameAlreadyTaken {
 			form.Name.AddError(ErrTargetAlreadyExists)
+
 			break
 		}
 	}

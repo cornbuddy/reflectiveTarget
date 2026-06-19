@@ -16,7 +16,6 @@ func SaveSession(
 	ctx context.Context, store daos.SessionStore,
 	data sessiondata.SessionData, w http.ResponseWriter,
 ) (string, error) {
-
 	raw, err := uuid.NewRandom()
 	if err != nil {
 		return "", err

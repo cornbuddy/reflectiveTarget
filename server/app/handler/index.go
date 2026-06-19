@@ -16,6 +16,7 @@ func (h indexHandler) get(w http.ResponseWriter, r *http.Request) {
 		log := log.Logger(ctx)
 		log.Error("bad url")
 		utils.HttpError(w, http.StatusNotFound)
+
 		return
 	}
 

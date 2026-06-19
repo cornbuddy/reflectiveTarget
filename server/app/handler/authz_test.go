@@ -126,7 +126,7 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 		message:    "password should be at least 8 characters long",
 		statusCode: http.StatusBadRequest,
 		body: strings.NewReader(
-			fmt.Sprintf("username=%s", "kek"),
+			"username=" + "kek",
 		),
 	}}
 

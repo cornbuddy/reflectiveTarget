@@ -144,6 +144,7 @@ func retry(log *zap.Logger, operation string, f func() error) error {
 			time.Sleep(delay)
 		} else {
 			log.Info(operation, zap.String("status", "success"))
+
 			break
 		}
 	}

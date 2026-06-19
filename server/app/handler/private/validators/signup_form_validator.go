@@ -26,8 +26,7 @@ var hasDigits = regexp.MustCompile(`\d`)
 func (v SignupFormValidator) Validate(
 	ctx context.Context, form *contracts.SignupForm,
 ) (bool, error) {
-
-	user, err := v.UserDao.Find(ctx, form.Username.Value)
+	user, err := v.Find(ctx, form.Username.Value)
 	if err != nil {
 		return false, err
 	} else if user != nil {

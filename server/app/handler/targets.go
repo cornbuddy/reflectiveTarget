@@ -29,6 +29,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		log.Error("failed to parse form")
 		utils.HttpError(w, http.StatusBadRequest)
+
 		return
 	}
 
@@ -38,6 +39,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Warn("failed to parse target id", zap.String("id", rawID), zap.Error(err))
 		utils.HttpError(w, http.StatusBadRequest)
+
 		return
 	}
 
@@ -47,6 +49,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error("bad form", zap.Error(err))
 		utils.HttpError(w, http.StatusBadRequest)
+
 		return
 	}
 
@@ -58,6 +61,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error("failed to build target", zap.Error(err))
 		utils.HttpError(w, http.StatusInternalServerError)
+
 		return
 	} else if target == nil {
 		log.Debug("form is invalid")
@@ -66,6 +70,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 			TargetForm: *form,
 			ID:         id,
 		})
+
 		return
 	}
 
@@ -75,6 +80,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 	if err := h.repo.Save(ctx, target); err != nil {
 		log.Error("failed to save target", zap.Error(err))
 		utils.HttpError(w, http.StatusInternalServerError)
+
 		return
 	}
 
@@ -90,6 +96,7 @@ func (h targetsHandler) getExisting(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Warn("failed to parse target id", zap.Error(err))
 		utils.HttpError(w, http.StatusBadRequest)
+
 		return
 	}
 
@@ -98,10 +105,12 @@ func (h targetsHandler) getExisting(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error("failed to fetch target", zap.Error(err))
 		utils.HttpError(w, http.StatusInternalServerError)
+
 		return
 	} else if target == nil {
 		log.Error("target not found", zap.Error(err))
 		utils.HttpError(w, http.StatusNotFound)
+
 		return
 	}
 
@@ -119,6 +128,7 @@ func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error("failed to fetch targets", zap.Error(err))
 		utils.HttpError(w, http.StatusInternalServerError)
+
 		return
 	}
 
@@ -136,6 +146,7 @@ func (h targetsHandler) postNew(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		log.Error("failed to parse form", zap.Error(err))
 		utils.HttpError(w, http.StatusBadRequest)
+
 		return
 	}
 
@@ -145,6 +156,7 @@ func (h targetsHandler) postNew(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Error("bad form", zap.Any("form", r.Form), zap.Error(err))
 		utils.HttpError(w, http.StatusBadRequest)
+
 		return
 	}
 
@@ -155,10 +167,12 @@ func (h targetsHandler) postNew(w http.ResponseWriter, r *http.Request) {
 		log.Debug("failed to create target object, form is invalid")
 		w.WriteHeader(http.StatusBadRequest)
 		view.TargetForm(ctx, w, render.TargetFormData{TargetForm: *form})
+
 		return
 	} else if err != nil {
 		log.Error("failed to build target object", zap.Error(err))
 		utils.HttpError(w, http.StatusInternalServerError)
+
 		return
 	}
 
@@ -167,6 +181,7 @@ func (h targetsHandler) postNew(w http.ResponseWriter, r *http.Request) {
 	if err := h.repo.Save(ctx, target); err != nil {
 		log.Error("failed to save target", zap.Error(err))
 		utils.HttpError(w, http.StatusInternalServerError)
+
 		return
 	}
 

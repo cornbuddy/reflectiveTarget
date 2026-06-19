@@ -53,9 +53,10 @@ func TestSaveSessionShouldPutSessionDataToCtx(t *testing.T) {
 			assert.EqualExportedValues(t, tc.want, got, tc.desc)
 		})
 		handler := mw.SaveSession(stub).ServeHTTP
-		utils.MakeRequestWithCookies(
+		_, _, err := utils.MakeRequestWithCookies(
 			"", http.MethodGet, "/", handler, nil, cookies...,
 		)
+		require.NoError(t, err)
 	}
 }
 
@@ -77,9 +78,10 @@ func TestSaveSessionShouldResetRequestCookieWhenItsNotInStore(t *testing.T) {
 		Name:  constants.SessionCookieName,
 		Value: token,
 	}}
-	utils.MakeRequestWithCookies(
+	_, _, err := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/", handler, nil, cookies...,
 	)
+	require.NoError(t, err)
 }
 
 func TestSaveSessionShouldAddSessionCookieIfNotPresent(t *testing.T) {
@@ -94,7 +96,8 @@ func TestSaveSessionShouldAddSessionCookieIfNotPresent(t *testing.T) {
 	})
 
 	handler := mw.SaveSession(stub).ServeHTTP
-	utils.MakeRequest("", http.MethodGet, "/", handler, nil)
+	_, _, err := utils.MakeRequest("", http.MethodGet, "/", handler, nil)
+	require.NoError(t, err)
 }
 
 func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
@@ -113,7 +116,8 @@ func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
 		Name:  constants.SessionCookieName,
 		Value: token,
 	}}
-	utils.MakeRequestWithCookies(
+	_, _, err := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/", handler, nil, cookies...,
 	)
+	require.NoError(t, err)
 }

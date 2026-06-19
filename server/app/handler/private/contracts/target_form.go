@@ -2,6 +2,7 @@ package contracts
 
 import (
 	"cmp"
+	"errors"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -14,7 +15,7 @@ import (
 )
 
 var (
-	ErrInvalidFieldValue = fmt.Errorf("bad value for field")
+	ErrInvalidFieldValue = errors.New("bad value for field")
 
 	questionValue = regexp.MustCompile(`^question_(\d+)_value$`)
 )
@@ -65,11 +66,13 @@ func parseQuestions(form url.Values) (Fields, error) {
 			// ignoring errors since all attributes already
 			// validated above
 			ind, _ := strconv.Atoi(strings.Split(attr, "_")[1])
+
 			return ind
 		}
 
 		ai := extractIndex(a)
 		bi := extractIndex(b)
+
 		return cmp.Compare(ai, bi)
 	})
 

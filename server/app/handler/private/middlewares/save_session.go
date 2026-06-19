@@ -29,10 +29,12 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 			if err != nil {
 				log.Error("failed to save session", zap.Error(err))
 				http.Error(w, "internal server error", http.StatusInternalServerError)
+
 				return
 			}
 
 			next.ServeHTTP(w, r)
+
 			return
 		}
 
@@ -45,6 +47,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		if err != nil {
 			log.Error("failed to fetch session", zap.Error(err))
 			http.Error(w, "internal server error", http.StatusInternalServerError)
+
 			return
 		}
 
@@ -58,6 +61,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 			if err != nil {
 				log.Error("failed to save session", zap.Error(err))
 				http.Error(w, "internal server error", http.StatusInternalServerError)
+
 				return
 			}
 		}

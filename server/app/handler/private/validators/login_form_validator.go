@@ -14,7 +14,6 @@ type LoginFormValidator struct {
 func (v LoginFormValidator) Validate(
 	ctx context.Context, form *contracts.LoginForm,
 ) bool {
-
 	emptyUsername := len(form.Username.Value) == 0
 	if emptyUsername {
 		form.Username.AddError(ErrEmpty)
@@ -29,9 +28,10 @@ func (v LoginFormValidator) Validate(
 		return false
 	}
 
-	user, err := v.UserDao.Find(ctx, form.Username.Value)
+	user, err := v.Find(ctx, form.Username.Value)
 	if err != nil {
 		form.Username.AddError(err)
+
 		return false
 	} else if user == nil {
 		form.Username.AddError(ErrUserDoesNotExists)
@@ -41,9 +41,10 @@ func (v LoginFormValidator) Validate(
 		return false
 	}
 
-	valid, err := user.Password.Verify(form.Password.Value)
+	valid, err := user.Verify(form.Password.Value)
 	if err != nil {
 		form.Password.AddError(err)
+
 		return false
 	} else if !valid {
 		form.Password.AddError(ErrWrongPassword)
