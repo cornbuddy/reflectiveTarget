@@ -19,6 +19,18 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
+const (
+	newTargetUrl = "/targets/new"
+	q1           = "q1?"
+	q2           = "q2?"
+	formName     = "name"
+	// TODO: encapsulate logic to build values below into methods of new
+	// structure QuestionField{Field}
+	formQ0ID  = "question_0_id"
+	formQ0Val = "question_0_value"
+	formQ1Val = "question_1_value"
+)
+
 type TargetsSuite struct {
 	handler        http.HandlerFunc
 	owner          *entities.User
@@ -37,9 +49,9 @@ func (s *TargetsSuite) UpdateShouldBeIdempotent(t *testgroup.T) {
 
 	url := fmt.Sprintf("/targets/%d", target.ID)
 	form := strings.NewReader(neturl.Values{
-		"name":             []string{target.Name},
-		"question_0_id":    []string{strconv.Itoa(int(target.Questions[0].ID))},
-		"question_0_value": []string{question.Text},
+		formName:  []string{target.Name},
+		formQ0ID:  []string{strconv.Itoa(int(target.Questions[0].ID))},
+		formQ0Val: []string{question.Text},
 	}.Encode())
 
 	r, body, err := utils.MakeRequest(ctForm, http.MethodPut, url, s.handler, form)
@@ -62,18 +74,17 @@ func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 	newQstn := "updated question, still single"
 	url := fmt.Sprintf("/targets/%d", target.ID)
 	form := strings.NewReader(neturl.Values{
-		"name":             []string{target.Name},
-		"question_0_id":    []string{strconv.Itoa(int(question.ID))},
-		"question_0_value": []string{newQstn},
+		formName:  []string{target.Name},
+		formQ0ID:  []string{strconv.Itoa(int(question.ID))},
+		formQ0Val: []string{newQstn},
 	}.Encode())
 
-	ct := "application/x-www-form-urlencoded"
-	r, body, err := utils.MakeRequest(ct, http.MethodPut, url, s.handler, form)
+	r, body, err := utils.MakeRequest(ctForm, http.MethodPut, url, s.handler, form)
 	t.Require.NoError(err)
 	t.Equal(http.StatusSeeOther, r.StatusCode)
 	t.Equal("target updated", body)
 
-	_, body, err = utils.MakeRequest(ct, http.MethodGet, url, s.handler, form)
+	_, body, err = utils.MakeRequest(ctForm, http.MethodGet, url, s.handler, form)
 	t.Require.NoError(err)
 	t.Contains(body, target.Name)
 	t.Contains(body, newQstn)
@@ -114,9 +125,9 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 	testCases := []testCase{{
 		"rejects target with existing name name",
 		neturl.Values{
-			"name":             []string{s.ownedTargets[0].Name},
-			"question_0_value": []string{"q1?"},
-			"question_1_value": []string{"q2?"},
+			"name":    []string{s.ownedTargets[0].Name},
+			formQ0Val: []string{q1},
+			formQ1Val: []string{q2},
 		},
 		validators.ErrTargetAlreadyExists.Error(),
 	}, {
@@ -128,23 +139,23 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 	}, {
 		"rejects target with repeated questions",
 		neturl.Values{
-			"name":             []string{"same question twice"},
-			"question_0_value": []string{"q1?"},
-			"question_1_value": []string{"q1?"},
+			formName:  []string{"same question twice"},
+			formQ0Val: []string{q1},
+			formQ1Val: []string{q2},
 		},
 		validators.ErrRepeatedQuestion.Error(),
 	}}
 
 	status := http.StatusBadRequest
 	method := http.MethodPost
-	url := "/targets/new"
-	ct := "application/x-www-form-urlencoded"
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testgroup.T) {
 			t.Parallel()
 
 			form := strings.NewReader(tc.form.Encode())
-			r, body, err := utils.MakeRequest(ct, method, url, s.handler, form)
+			r, body, err := utils.MakeRequest(
+				ctForm, method, newTargetUrl, s.handler, form,
+			)
 			t.Require.NoError(err)
 			t.Equal(status, r.StatusCode)
 			t.Contains(body, tc.contains)
@@ -155,19 +166,19 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 func (s *TargetsSuite) ShouldAddTargetIfValid(t *testgroup.T) {
 	name := "valid target"
 	form := neturl.Values{
-		"name":             []string{name},
-		"question_0_value": []string{"q1?"},
-		"question_1_value": []string{"q2?"},
+		formName:  []string{name},
+		formQ0Val: []string{q1},
+		formQ1Val: []string{q2},
 	}
 	t.HTTPStatusCode(
-		s.handler, http.MethodPost, "/targets/new", form, http.StatusSeeOther,
+		s.handler, http.MethodPost, newTargetUrl, form, http.StatusSeeOther,
 	)
 	t.HTTPBodyContains(s.handler, http.MethodGet, "/targets", nil, name)
 }
 
 func (s *TargetsSuite) ShouldRespondOnValidCreds(t *testgroup.T) {
 	r, _, err := utils.MakeRequest(
-		"", http.MethodGet, "/targets/new", s.handler, nil,
+		"", http.MethodGet, newTargetUrl, s.handler, nil,
 	)
 	t.Require.NoError(err)
 	t.Equal(http.StatusOK, r.StatusCode)
