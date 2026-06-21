@@ -39,42 +39,45 @@ func TestMain(m *testing.M) {
 
 	dbCont, err := postgres.Run(ctx, utils.DbImage, opts...)
 	if err != nil {
-		log.Fatalf("failed to run db: %v", err)
+		log.Panicf("failed to run db: %v", err)
 	}
 
 	defer func() {
 		if err := dbCont.Terminate(ctx); err != nil {
-			log.Fatalf("failed to stop db: %v", err)
+			log.Panicf("failed to stop db: %v", err)
 		}
 	}()
 
 	dbHost, err = dbCont.ContainerIP(ctx)
 	if err != nil {
-		log.Fatalf("failed to fetch db ip: %v", err)
+		log.Panicf("failed to fetch db ip: %v", err)
 	}
 
 	cacheCont, err := tcredis.Run(ctx, utils.CacheImage)
 	if err != nil {
-		log.Fatalf("failed to run cache: %v", err)
+		log.Panicf("failed to run cache: %v", err)
 	}
 
 	defer func() {
 		if err := cacheCont.Terminate(ctx); err != nil {
-			log.Fatalf("failed to stop cache: %v", err)
+			log.Panicf("failed to stop cache: %v", err)
 		}
 	}()
 
 	uri, err := cacheCont.ConnectionString(ctx)
 	if err != nil {
-		log.Fatalf("failed to fetch uri for cache: %v", err)
+		log.Panicf("failed to fetch uri for cache: %v", err)
 	}
 
 	cacheOpts, err := redis.ParseURL(uri)
 	if err != nil {
-		log.Fatalf("failed to parse cache uri: %v", err)
+		log.Panicf("failed to parse cache uri: %v", err)
 	}
 
 	cacheAddr = cacheOpts.Addr
 
-	os.Exit(m.Run())
+	code := m.Run()
+	if code != 0 {
+		os.Exit(code)
+	}
 }

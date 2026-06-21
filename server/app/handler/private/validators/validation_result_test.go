@@ -1,7 +1,6 @@
 package validators_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
@@ -27,7 +26,7 @@ func TestValidationResult(t *testing.T) {
 		true,
 	}, {
 		"should not be valid when errors are not empty",
-		validators.ValidationResult{[]error{errors.New("kek")}},
+		validators.ValidationResult{[]error{validators.ErrEmpty}},
 		false,
 	}}
 

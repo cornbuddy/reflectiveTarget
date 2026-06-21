@@ -37,5 +37,5 @@ func (h healthHandler) get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(code)
-	logBadWrites(log)(w.Write(hr))
+	utils.LogBadWrites(log)(w.Write(hr))
 }

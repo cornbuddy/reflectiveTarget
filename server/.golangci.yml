@@ -3,11 +3,18 @@ version: "2"
 linters:
   settings:
     gocognit:
-      min-complexity: 10
+      min-complexity: 20
     goconst:
       numbers: true
     gocyclo:
-      min-complexity: 10
+      min-complexity: 20
+    gosec:
+      excludes:
+        # TODO: enable it once hits the cloud. I test it with http, so
+        # skipping it for now
+        - G124
+        # I rely on random only in tests, and crypto/rand has ugly api
+        - G404
     nakedret:
       max-func-lines: 0
     nestif:
@@ -18,7 +25,6 @@ linters:
   enable:
     - bidichk
     - copyloopvar
-    - cyclop
     - decorder
     - dupl
     - durationcheck

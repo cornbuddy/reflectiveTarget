@@ -1,7 +1,6 @@
 package render_test
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,22 +13,21 @@ import (
 )
 
 type RenderSignupTest struct {
-	errors      contracts.Errors
 	erroredData render.SignupData
 }
 
 func (r *RenderSignupTest) RendersValidationErrors(t *testgroup.T) {
 	testCases := fieldErrorsTestCases{{
 		"section#username ul.errors",
-		r.errors,
+		errs,
 	}, {
 
 		"section#password ul.errors",
-		r.errors,
+		errs,
 	}, {
 
 		"section#confirmation ul.errors",
-		r.errors,
+		errs,
 	}}
 
 	w := httptest.NewRecorder()
@@ -53,14 +51,12 @@ func (r *RenderSignupTest) HasProperLayoutMarkers(t *testgroup.T) {
 }
 
 func (r *RenderSignupTest) PreGroup(t *testgroup.T) {
-	errs := contracts.Errors{errors.New("kek-1"), errors.New("kek-2")}
 	form := contracts.SignupForm{
 		Username:     contracts.Field{Errors: errs},
 		Password:     contracts.Field{Errors: errs},
 		Confirmation: contracts.Field{Errors: errs},
 	}
 
-	r.errors = errs
 	r.erroredData = render.SignupData{form}
 }
 

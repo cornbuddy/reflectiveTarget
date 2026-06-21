@@ -57,33 +57,33 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 
 	var timeout time.Duration
 	secs, err := strconv.ParseInt(cfg.TimeoutSecs, 10, 64)
-	if err != nil {
+	switch {
+	case err != nil:
 		log.Warn(
 			"failed to parse timeout environment variable",
 			zap.String("value", cfg.TimeoutSecs), zap.Error(err),
 		)
 		timeout = DefaultTimeout
-	} else if secs <= 0 {
+	case secs <= 0:
 		log.Warn("timeout value should be positive", zap.Int64("value", secs))
 		timeout = DefaultTimeout
-	} else {
+	default:
 		timeout = time.Duration(secs) * time.Second
 	}
 
-	log.Debug("timeout is set", zap.Duration("timeout", timeout))
-
 	var port int
 	p, err := strconv.Atoi(cfg.Port)
-	if err != nil {
+	switch {
+	case err != nil:
 		log.Warn(
 			"failed to parse port environment variable",
 			zap.String("value", cfg.Port), zap.Error(err),
 		)
 		port = DefaultPort
-	} else if p < minPort || p > maxPort {
+	case p < minPort || p > maxPort:
 		log.Warn("bad port", zap.Int("port", p))
 		port = DefaultPort
-	} else {
+	default:
 		port = p
 	}
 
@@ -118,6 +118,8 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 	if err := utils.InitDatabase(db); err != nil {
 		return nil, err
 	}
+
+	log.Info("config is created")
 
 	return &Config{
 		Timeout:      timeout,

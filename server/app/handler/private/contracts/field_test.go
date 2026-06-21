@@ -1,7 +1,6 @@
 package contracts_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,10 +28,10 @@ func TestFieldsStringer(t *testing.T) {
 	}, {
 		"multiple non-default fields",
 		contracts.Fields{
-			contracts.Field{ID: 0, Value: "kek0"},
-			contracts.Field{ID: 69, Value: "kek1"},
+			contracts.Field{ID: 0, Value: kek1},
+			contracts.Field{ID: 69, Value: kek2},
 		},
-		"[{ID: 0, Value: 'kek0', Errors: []}, {ID: 69, Value: 'kek1', Errors: []}]",
+		"[{ID: 0, Value: 'kek1', Errors: []}, {ID: 69, Value: 'kek2', Errors: []}]",
 	}}
 
 	for _, tc := range testCases {
@@ -59,9 +58,7 @@ func TestFieldStringer(t *testing.T) {
 	}, {
 		"errors",
 		contracts.Field{
-			Errors: contracts.Errors{
-				errors.New("kek1"), errors.New("kek2"),
-			},
+			Errors: contracts.Errors{err1, err2},
 		},
 		"{ID: 0, Value: '', Errors: ['kek1', 'kek2']}",
 	}, {
@@ -75,11 +72,9 @@ func TestFieldStringer(t *testing.T) {
 	}, {
 		"all together",
 		contracts.Field{
-			ID:    420,
-			Value: "kekeke",
-			Errors: contracts.Errors{
-				errors.New("kek1"), errors.New("kek2"),
-			},
+			ID:     420,
+			Value:  "kekeke",
+			Errors: contracts.Errors{err1, err2},
 		},
 		"{ID: 420, Value: 'kekeke', Errors: ['kek1', 'kek2']}",
 	}}
@@ -103,11 +98,11 @@ func TestErrors(t *testing.T) {
 
 	testCases := []testCase{{
 		"single item",
-		contracts.Errors{errors.New(kek)},
+		contracts.Errors{err},
 		kek,
 	}, {
 		"multiple items",
-		contracts.Errors{errors.New("kek1"), errors.New("kek2")},
+		contracts.Errors{err1, err2},
 		"kek1\nkek2",
 	}, {
 		"empty list",
@@ -135,7 +130,6 @@ func TestFieldsMethods(t *testing.T) {
 		valid  bool
 	}
 
-	err := errors.New(kek)
 	testCases := []testCase{{
 		"empty fields are valid",
 		contracts.Fields{},
@@ -198,7 +192,6 @@ func TestFieldMethods(t *testing.T) {
 	assert.True(t, field.IsValid())
 	assert.False(t, field.IsInvalid())
 
-	err := errors.New(kek)
 	field.AddError(err)
 	assert.Contains(t, field.Errors, err)
 	assert.Len(t, field.Errors, 1)

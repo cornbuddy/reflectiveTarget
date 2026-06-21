@@ -12,6 +12,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
@@ -59,7 +60,7 @@ func (h shotsHandler) get(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	logBadWrites(log)(w.Write(data))
+	utils.LogBadWrites(log)(w.Write(data))
 }
 
 func (h shotsHandler) post(w http.ResponseWriter, r *http.Request) {
@@ -111,5 +112,4 @@ func (h shotsHandler) post(w http.ResponseWriter, r *http.Request) {
 
 	log.Info("shots saved")
 	w.WriteHeader(http.StatusCreated)
-	logBadWrites(log)(w.Write([]byte("ok")))
 }

@@ -1,7 +1,6 @@
 package render_test
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -21,8 +20,6 @@ type TargetFormTest struct{}
 func (u *TargetFormTest) RendersErrorsProperly(t *testgroup.T) {
 	t.Skip()
 
-	err1 := errors.New("error 1")
-	err2 := errors.New("error 2")
 	data := render.TargetFormData{
 		TargetForm: contracts.TargetForm{
 			Name: contracts.Field{
@@ -49,7 +46,7 @@ func (u *TargetFormTest) RendersErrorsProperly(t *testgroup.T) {
 		contracts.Errors{err2},
 	}, {
 		"section#question_1 ul.errors",
-		contracts.Errors{err1, err2},
+		errs,
 	}, {
 		"section#question_2 ul.errors",
 		contracts.Errors{},
