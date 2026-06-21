@@ -18,6 +18,9 @@ import (
 const (
 	ctAppJson = "application/json; charset=utf-8"
 	ctForm    = "application/x-www-form-urlencoded"
+	get       = http.MethodGet
+	post      = http.MethodPost
+	put       = http.MethodPut
 )
 
 var (

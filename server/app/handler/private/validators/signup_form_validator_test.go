@@ -1,4 +1,4 @@
-package validators
+package validators_test
 
 import (
 	"testing"
@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -14,9 +15,7 @@ import (
 func TestSignupFormValidator(t *testing.T) {
 	t.Parallel()
 
-	username := "yet another username"
-	password := "default-password123@"
-	user, err := entities.NewUser(username, password)
+	user, err := entities.NewUser("yet another username", validPassword)
 	require.NoError(t, err)
 	require.NoError(t, utils.InsertUser(db, user))
 
@@ -35,14 +34,14 @@ func TestSignupFormValidator(t *testing.T) {
 		contracts.SignupForm{
 			Username: contracts.Field{
 				Value:  "",
-				Errors: contracts.Errors{ErrEmpty},
+				Errors: contracts.Errors{validators.ErrEmpty},
 			},
 			Password: contracts.Field{
 				Value: "",
 				Errors: contracts.Errors{
-					ErrPasswordTooShort,
-					ErrPasswordDoesntContainDigits,
-					ErrPasswordDoesntContainSpecialChars,
+					validators.ErrPasswordTooShort,
+					validators.ErrPasswordDoesntContainDigits,
+					validators.ErrPasswordDoesntContainSpecialChars,
 				},
 			},
 			Confirmation: contracts.Field{
@@ -59,7 +58,7 @@ func TestSignupFormValidator(t *testing.T) {
 		contracts.SignupForm{
 			Username: contracts.Field{
 				Value:  user.Username,
-				Errors: contracts.Errors{ErrUserAlreadyExists},
+				Errors: contracts.Errors{validators.ErrUserAlreadyExists},
 			},
 			Password: contracts.Field{
 				Value: user.Hash,
@@ -71,66 +70,66 @@ func TestSignupFormValidator(t *testing.T) {
 		false,
 	}, {
 		contracts.SignupForm{
-			Username:     contracts.Field{Value: "keker"},
-			Password:     contracts.Field{Value: "kekekeke"},
+			Username:     contracts.Field{Value: freeUsesrname},
+			Password:     contracts.Field{Value: weakPassword},
 			Confirmation: contracts.Field{Value: "not kek"},
 		},
 		contracts.SignupForm{
 			Username: contracts.Field{
-				Value: "keker",
+				Value: freeUsesrname,
 			},
 			Password: contracts.Field{
-				Value: "kekekeke",
+				Value: weakPassword,
 				Errors: contracts.Errors{
-					ErrPasswordDoesntContainDigits,
-					ErrPasswordDoesntContainSpecialChars,
+					validators.ErrPasswordDoesntContainDigits,
+					validators.ErrPasswordDoesntContainSpecialChars,
 				},
 			},
 			Confirmation: contracts.Field{
 				Value:  "not kek",
-				Errors: contracts.Errors{ErrPasswordsShouldMatch},
+				Errors: contracts.Errors{validators.ErrPasswordsShouldMatch},
 			},
 		},
 		false,
 	}, {
 		contracts.SignupForm{
-			Username:     contracts.Field{Value: "keker"},
-			Password:     contracts.Field{Value: "kekeke1@"},
-			Confirmation: contracts.Field{Value: "kekeke1@"},
+			Username:     contracts.Field{Value: freeUsesrname},
+			Password:     contracts.Field{Value: validPassword},
+			Confirmation: contracts.Field{Value: validPassword},
 		},
 		contracts.SignupForm{
 			Username: contracts.Field{
-				Value: "keker",
+				Value: freeUsesrname,
 			},
 			Password: contracts.Field{
-				Value: "kekeke1@",
+				Value: validPassword,
 			},
 			Confirmation: contracts.Field{
-				Value: "kekeke1@",
+				Value: validPassword,
 			},
 		},
 		true,
 	}, {
 		contracts.SignupForm{
-			Username:     contracts.Field{Value: "keker"},
-			Password:     contracts.Field{Value: "kekeke@1"},
-			Confirmation: contracts.Field{Value: "kekeke@1"},
+			Username:     contracts.Field{Value: freeUsesrname},
+			Password:     contracts.Field{Value: validPassword},
+			Confirmation: contracts.Field{Value: validPassword},
 		},
 		contracts.SignupForm{
 			Username: contracts.Field{
-				Value: "keker",
+				Value: freeUsesrname,
 			},
 			Password: contracts.Field{
-				Value: "kekeke@1",
+				Value: validPassword,
 			},
 			Confirmation: contracts.Field{
-				Value: "kekeke@1",
+				Value: validPassword,
 			},
 		},
 		true,
 	}}
 
-	validator := SignupFormValidator{UserDao: userDao}
+	validator := validators.SignupFormValidator{UserDao: userDao}
 	for _, tc := range testCases {
 		valid, err := validator.Validate(ctx, &tc.form)
 		require.NoError(t, err)

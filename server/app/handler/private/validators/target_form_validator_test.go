@@ -1,4 +1,4 @@
-package validators
+package validators_test
 
 import (
 	"database/sql"
@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
@@ -31,15 +32,15 @@ func TestTargetFormValidator(t *testing.T) {
 		wantRes  bool
 	}
 
-	longTargetName := utils.MakeRandomString(MaxTargetNameLen + 1)
-	longQuestion := utils.MakeRandomString(MaxQuestionLen + 1)
-	allowedAmountOfQuestions := makeRandomFields(MaxNumOfQuestions)
-	notSoLongTargetName := utils.MakeRandomString(MaxTargetNameLen)
-	notSoLongQuestion := utils.MakeRandomString(MaxQuestionLen)
-	aLotOfQuestions := makeRandomFields(MaxNumOfQuestions + 1)
+	longTargetName := utils.MakeRandomString(validators.MaxTargetNameLen + 1)
+	longQuestion := utils.MakeRandomString(validators.MaxQuestionLen + 1)
+	allowedAmountOfQuestions := makeRandomFields(validators.MaxNumOfQuestions)
+	notSoLongTargetName := utils.MakeRandomString(validators.MaxTargetNameLen)
+	notSoLongQuestion := utils.MakeRandomString(validators.MaxQuestionLen)
+	aLotOfQuestions := makeRandomFields(validators.MaxNumOfQuestions + 1)
 	aLotOfQuestionsWithError := slices.Clone(aLotOfQuestions)
 	aLotOfQuestionsWithError[len(aLotOfQuestionsWithError)-1].
-		AddError(ErrExcessiveQuestion)
+		AddError(validators.ErrExcessiveQuestion)
 
 	newTargetID := valueobjects.ID(0)
 	testCases := []testCase{{
@@ -49,10 +50,10 @@ func TestTargetFormValidator(t *testing.T) {
 		contracts.TargetForm{},
 		contracts.TargetForm{
 			Name: contracts.Field{
-				Errors: contracts.Errors{ErrEmpty},
+				Errors: contracts.Errors{validators.ErrEmpty},
 			},
 			Questions: []contracts.Field{{
-				Errors: contracts.Errors{ErrEmpty},
+				Errors: contracts.Errors{validators.ErrEmpty},
 			}},
 		},
 		false,
@@ -70,7 +71,7 @@ func TestTargetFormValidator(t *testing.T) {
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: []contracts.Field{{
 				Value:  "",
-				Errors: contracts.Errors{ErrEmpty},
+				Errors: contracts.Errors{validators.ErrEmpty},
 			}},
 		},
 		false,
@@ -98,7 +99,7 @@ func TestTargetFormValidator(t *testing.T) {
 		contracts.TargetForm{
 			Name: contracts.Field{
 				Value:  longTargetName,
-				Errors: contracts.Errors{ErrTooLongTargetName},
+				Errors: contracts.Errors{validators.ErrTooLongTargetName},
 			},
 			Questions: allowedAmountOfQuestions,
 		},
@@ -118,7 +119,7 @@ func TestTargetFormValidator(t *testing.T) {
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: contracts.Fields{{
 				Value:  longQuestion,
-				Errors: contracts.Errors{ErrTooLongQuestion},
+				Errors: contracts.Errors{validators.ErrTooLongQuestion},
 			}},
 		},
 		false,
@@ -136,7 +137,7 @@ func TestTargetFormValidator(t *testing.T) {
 			Name: contracts.Field{Value: notSoLongTargetName},
 			Questions: contracts.Fields{{
 				Value:  longQuestion,
-				Errors: contracts.Errors{ErrTooLongQuestion},
+				Errors: contracts.Errors{validators.ErrTooLongQuestion},
 			}},
 		},
 		false,
@@ -158,7 +159,7 @@ func TestTargetFormValidator(t *testing.T) {
 				Value: notSoLongQuestion,
 			}, {
 				Value:  notSoLongQuestion,
-				Errors: contracts.Errors{ErrRepeatedQuestion},
+				Errors: contracts.Errors{validators.ErrRepeatedQuestion},
 			}},
 		},
 		false,
@@ -176,7 +177,7 @@ func TestTargetFormValidator(t *testing.T) {
 			Name: contracts.Field{
 				Value: target.Name,
 				Errors: contracts.Errors{
-					ErrTargetAlreadyExists,
+					validators.ErrTargetAlreadyExists,
 				},
 			},
 			Questions: contracts.Fields{{
@@ -250,7 +251,7 @@ func TestTargetFormValidator(t *testing.T) {
 		true,
 	}}
 
-	v := TargetFormValidator{repositories.TargetRepo{DB: db}}
+	v := validators.TargetFormValidator{repositories.TargetRepo{DB: db}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			got, err := v.Validate(ctx, &tc.form, tc.ownerID, tc.targetID)

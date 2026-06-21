@@ -28,9 +28,8 @@ func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 	targetID, err := makeTestTarget(db, int(user.ID))
 	require.NoError(t, err)
 
-	ct := "application/json"
 	url := fmt.Sprintf("/api/target/%v/shots", targetID)
-	resp, body, err := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
+	resp, body, err := utils.MakeRequest(ctAppJson, get, url, router, nil)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 	assert.JSONEq(t, ctAppJson, resp.Header.Get("Content-Type"))
@@ -43,9 +42,8 @@ func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 func TestShotsShould404TargetDoesNotExist(t *testing.T) {
 	t.Parallel()
 
-	ct := "application/json"
 	url := "/api/target/69/shots"
-	resp, _, err := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
+	resp, _, err := utils.MakeRequest(ctAppJson, get, url, router, nil)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusNotFound, resp.StatusCode)
 }
@@ -71,7 +69,7 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 
 	url := fmt.Sprintf("/api/target/%v/shots", targetID)
 	resp, body, err := utils.MakeRequestWithCookies(
-		"application/json", http.MethodPost, url, router, &shots,
+		ctAppJson, post, url, router, &shots,
 		&http.Cookie{Name: constants.SessionCookieName, Value: "kek"},
 	)
 	require.NoError(t, err)
@@ -111,9 +109,7 @@ func TestShotsShouldBeValidated(t *testing.T) {
 		var body bytes.Buffer
 		require.NoError(t, json.NewEncoder(&body).Encode(tc.body))
 
-		ct := "application/json"
-		method := http.MethodPost
-		resp, _, err := utils.MakeRequest(ct, method, shotsUrl, router, &body)
+		resp, _, err := utils.MakeRequest(ctAppJson, post, shotsUrl, router, &body)
 		require.NoError(t, err)
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode, tc.desc)
 	}
@@ -126,9 +122,7 @@ func TestShotsShouldFailIfRequestIsMalformed(t *testing.T) {
 	_, err := body.Write([]byte("kek"))
 	require.NoError(t, err)
 
-	ct := "application/json"
-	method := http.MethodPost
-	resp, _, err := utils.MakeRequest(ct, method, shotsUrl, router, &body)
+	resp, _, err := utils.MakeRequest(ctAppJson, post, shotsUrl, router, &body)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 }

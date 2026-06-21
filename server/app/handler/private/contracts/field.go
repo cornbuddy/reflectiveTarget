@@ -13,7 +13,7 @@ type Errors []error
 type Fields []Field
 
 type Field struct {
-	valueobjects.ID
+	ID    valueobjects.ID
 	Value string
 	Errors
 }
