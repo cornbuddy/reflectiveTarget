@@ -1,4 +1,4 @@
-package validators
+package validators_test
 
 import (
 	"testing"
@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
@@ -21,10 +22,8 @@ func TestLoginFormValidation(t *testing.T) {
 		result bool
 	}
 
-	absentUsername := "do not exist"
-	username := "completely random username"
-	password := "default-password123@"
-	user, err := entities.NewUser(username, password)
+	const absentUsername = "do not exist"
+	user, err := entities.NewUser("completely random username", validPassword)
 	require.NoError(t, err)
 	require.NoError(t, utils.InsertUser(db, user))
 
@@ -32,8 +31,8 @@ func TestLoginFormValidation(t *testing.T) {
 		"empty fields",
 		contracts.LoginForm{},
 		contracts.LoginForm{
-			Username: contracts.Field{Errors: contracts.Errors{ErrEmpty}},
-			Password: contracts.Field{Errors: contracts.Errors{ErrEmpty}},
+			Username: contracts.Field{Errors: contracts.Errors{validators.ErrEmpty}},
+			Password: contracts.Field{Errors: contracts.Errors{validators.ErrEmpty}},
 		},
 		false,
 	}, {
@@ -45,10 +44,10 @@ func TestLoginFormValidation(t *testing.T) {
 		contracts.LoginForm{
 			Username: contracts.Field{
 				Value:  absentUsername,
-				Errors: contracts.Errors{ErrUserDoesNotExists},
+				Errors: contracts.Errors{validators.ErrUserDoesNotExists},
 			},
 			Password: contracts.Field{
-				Errors: contracts.Errors{ErrEmpty},
+				Errors: contracts.Errors{validators.ErrEmpty},
 			},
 		},
 		false,
@@ -56,29 +55,29 @@ func TestLoginFormValidation(t *testing.T) {
 		"absent user with password",
 		contracts.LoginForm{
 			Username: contracts.Field{Value: absentUsername},
-			Password: contracts.Field{Value: "kek"},
+			Password: contracts.Field{Value: weakPassword},
 		},
 		contracts.LoginForm{
 			Username: contracts.Field{
 				Value:  absentUsername,
-				Errors: contracts.Errors{ErrUserDoesNotExists},
+				Errors: contracts.Errors{validators.ErrUserDoesNotExists},
 			},
-			Password: contracts.Field{Value: "kek"},
+			Password: contracts.Field{Value: weakPassword},
 		},
 		false,
 	}, {
 		"user with bad password",
 		contracts.LoginForm{
 			Username: contracts.Field{Value: user.Username},
-			Password: contracts.Field{Value: "kek"},
+			Password: contracts.Field{Value: weakPassword},
 		},
 		contracts.LoginForm{
 			Username: contracts.Field{
 				Value: user.Username,
 			},
 			Password: contracts.Field{
-				Value:  "kek",
-				Errors: contracts.Errors{ErrWrongPassword},
+				Value:  weakPassword,
+				Errors: contracts.Errors{validators.ErrWrongPassword},
 			},
 		},
 		false,
@@ -86,16 +85,16 @@ func TestLoginFormValidation(t *testing.T) {
 		"all good",
 		contracts.LoginForm{
 			Username: contracts.Field{Value: user.Username},
-			Password: contracts.Field{Value: password},
+			Password: contracts.Field{Value: validPassword},
 		},
 		contracts.LoginForm{
 			Username: contracts.Field{Value: user.Username},
-			Password: contracts.Field{Value: password},
+			Password: contracts.Field{Value: validPassword},
 		},
 		true,
 	}}
 
-	validator := LoginFormValidator{userDao}
+	validator := validators.LoginFormValidator{userDao}
 	for _, tc := range testCases {
 		got := validator.Validate(ctx, &tc.form)
 		assert.Equal(t, tc.want, tc.form, tc.msg)

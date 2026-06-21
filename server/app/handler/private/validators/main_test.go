@@ -1,4 +1,4 @@
-package validators
+package validators_test
 
 import (
 	"context"
@@ -9,6 +9,12 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
+)
+
+const (
+	freeUsesrname = "username"
+	validPassword = "default-password123@"
+	weakPassword  = "kekeke"
 )
 
 var (

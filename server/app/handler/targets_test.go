@@ -11,6 +11,7 @@ import (
 	"github.com/bloomberg/go-testgroup"
 
 	appconst "github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
@@ -20,15 +21,19 @@ import (
 )
 
 const (
-	newTargetUrl = "/targets/new"
-	q1           = "q1?"
-	q2           = "q2?"
-	formName     = "name"
-	// TODO: encapsulate logic to build values below into methods of new
-	// structure QuestionField{Field}
-	formQ0ID  = "question_0_id"
-	formQ0Val = "question_0_value"
-	formQ1Val = "question_1_value"
+	newTargetUrl   = "/targets/new"
+	targetsListUrl = "/targets"
+	q1             = "q1?"
+	q2             = "q2?"
+	formName       = "name"
+)
+
+var (
+	_q1       = contracts.QuestionField{Field: contracts.Field{ID: 1}}
+	_q2       = contracts.QuestionField{Field: contracts.Field{ID: 2}}
+	formQ0ID  = _q1.NameID()
+	formQ0Val = _q1.NameValue()
+	formQ1Val = _q2.NameValue()
 )
 
 type TargetsSuite struct {
@@ -54,7 +59,7 @@ func (s *TargetsSuite) UpdateShouldBeIdempotent(t *testgroup.T) {
 		formQ0Val: []string{question.Text},
 	}.Encode())
 
-	r, body, err := utils.MakeRequest(ctForm, http.MethodPut, url, s.handler, form)
+	r, body, err := utils.MakeRequest(ctForm, put, url, s.handler, form)
 	t.Require.NoError(err)
 	t.Equal(http.StatusSeeOther, r.StatusCode)
 	t.Equal("target updated", body)
@@ -79,12 +84,12 @@ func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 		formQ0Val: []string{newQstn},
 	}.Encode())
 
-	r, body, err := utils.MakeRequest(ctForm, http.MethodPut, url, s.handler, form)
+	r, body, err := utils.MakeRequest(ctForm, post, url, s.handler, form)
 	t.Require.NoError(err)
 	t.Equal(http.StatusSeeOther, r.StatusCode)
 	t.Equal("target updated", body)
 
-	_, body, err = utils.MakeRequest(ctForm, http.MethodGet, url, s.handler, form)
+	_, body, err = utils.MakeRequest(ctForm, get, url, s.handler, form)
 	t.Require.NoError(err)
 	t.Contains(body, target.Name)
 	t.Contains(body, newQstn)
@@ -94,7 +99,7 @@ func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 func (s *TargetsSuite) ShouldRenderFormWithTarget(t *testgroup.T) {
 	target := s.ownedTargets[0]
 	url := fmt.Sprintf("/targets/%d", target.ID)
-	r, _, err := utils.MakeRequest("", http.MethodGet, url, s.handler, nil)
+	r, _, err := utils.MakeRequest("", get, url, s.handler, nil)
 	t.Require.NoError(err)
 	t.Equal(http.StatusOK, r.StatusCode)
 
@@ -109,7 +114,7 @@ func (s *TargetsSuite) ShouldRenderFormWithTarget(t *testgroup.T) {
 
 func (s *TargetsSuite) ShouldRespondWithNotFoundIfNoTarget(t *testgroup.T) {
 	url := "/targets/69"
-	r, body, err := utils.MakeRequest("", http.MethodGet, url, s.handler, nil)
+	r, body, err := utils.MakeRequest("", get, url, s.handler, nil)
 	t.Require.NoError(err)
 	t.Equal(http.StatusNotFound, r.StatusCode)
 	t.Contains(body, "Not Found")
@@ -147,14 +152,13 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 	}}
 
 	status := http.StatusBadRequest
-	method := http.MethodPost
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testgroup.T) {
 			t.Parallel()
 
 			form := strings.NewReader(tc.form.Encode())
 			r, body, err := utils.MakeRequest(
-				ctForm, method, newTargetUrl, s.handler, form,
+				ctForm, post, newTargetUrl, s.handler, form,
 			)
 			t.Require.NoError(err)
 			t.Equal(status, r.StatusCode)
@@ -171,23 +175,19 @@ func (s *TargetsSuite) ShouldAddTargetIfValid(t *testgroup.T) {
 		formQ1Val: []string{q2},
 	}
 	t.HTTPStatusCode(
-		s.handler, http.MethodPost, newTargetUrl, form, http.StatusSeeOther,
+		s.handler, post, newTargetUrl, form, http.StatusSeeOther,
 	)
-	t.HTTPBodyContains(s.handler, http.MethodGet, "/targets", nil, name)
+	t.HTTPBodyContains(s.handler, get, targetsListUrl, nil, name)
 }
 
 func (s *TargetsSuite) ShouldRespondOnValidCreds(t *testgroup.T) {
-	r, _, err := utils.MakeRequest(
-		"", http.MethodGet, newTargetUrl, s.handler, nil,
-	)
+	r, _, err := utils.MakeRequest("", get, newTargetUrl, s.handler, nil)
 	t.Require.NoError(err)
 	t.Equal(http.StatusOK, r.StatusCode)
 }
 
 func (s *TargetsSuite) ShouldListTargetsForOwner(t *testgroup.T) {
-	r, _, err := utils.MakeRequest(
-		"", http.MethodGet, "/targets", s.handler, nil,
-	)
+	r, _, err := utils.MakeRequest("", get, targetsListUrl, s.handler, nil)
 	t.Require.NoError(err)
 	t.Equal(http.StatusOK, r.StatusCode)
 

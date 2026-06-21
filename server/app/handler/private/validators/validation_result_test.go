@@ -1,9 +1,10 @@
-package validators
+package validators_test
 
 import (
 	"errors"
 	"testing"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,21 +13,21 @@ func TestValidationResult(t *testing.T) {
 
 	type testCase struct {
 		msg    string
-		result ValidationResult
+		result validators.ValidationResult
 		valid  bool
 	}
 
 	testCases := []testCase{{
 		"should be valid by default",
-		ValidationResult{},
+		validators.ValidationResult{},
 		true,
 	}, {
 		"should be valid when errors are empty",
-		ValidationResult{[]error{}},
+		validators.ValidationResult{[]error{}},
 		true,
 	}, {
 		"should not be valid when errors are not empty",
-		ValidationResult{[]error{errors.New("kek")}},
+		validators.ValidationResult{[]error{errors.New("kek")}},
 		false,
 	}}
 
