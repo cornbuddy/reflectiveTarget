@@ -13,9 +13,9 @@ type Errors []error
 type Fields []Field
 
 type Field struct {
-	ID    valueobjects.ID
-	Value string
-	Errors
+	ID     valueobjects.ID
+	Value  string
+	Errors Errors
 }
 
 func (errs Errors) Error() string {

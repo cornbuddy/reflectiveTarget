@@ -22,11 +22,12 @@ func TestOptionalConfiguration(t *testing.T) {
 
 	type extractor func(config.Config) any
 	type testCase struct {
+		extractor
+
 		desc     string
 		envKey   string
 		envValue *string
 		want     any
-		extractor
 	}
 
 	const timeout = "TIMEOUT_SECONDS"
@@ -34,65 +35,65 @@ func TestOptionalConfiguration(t *testing.T) {
 	timeoutExtractor := func(c config.Config) any { return c.Timeout }
 	portExtractor := func(c config.Config) any { return c.Port }
 	testCases := []testCase{{
+		timeoutExtractor,
 		"should have proper defaults",
 		timeout,
 		nil,
 		config.DefaultTimeout,
-		timeoutExtractor,
 	}, {
+		timeoutExtractor,
 		"should respect if set",
 		timeout,
 		new("30"),
 		30 * time.Second,
-		timeoutExtractor,
 	}, {
+		timeoutExtractor,
 		"should ignore crap",
 		timeout,
 		new("kek"),
 		config.DefaultTimeout,
-		timeoutExtractor,
 	}, {
+		timeoutExtractor,
 		"should switch to default if 0",
 		timeout,
 		new("0"),
 		config.DefaultTimeout,
-		timeoutExtractor,
 	}, {
+		timeoutExtractor,
 		"should switch to default value is negative",
 		timeout,
 		new("-69"),
 		config.DefaultTimeout,
-		timeoutExtractor,
 	}, {
+		portExtractor,
 		"should have proper defaults",
 		port,
 		nil,
 		config.DefaultPort,
-		portExtractor,
 	}, {
+		portExtractor,
 		"should ignore crap",
 		port,
 		new("crap"),
 		config.DefaultPort,
-		portExtractor,
 	}, {
+		portExtractor,
 		"should fallback to default if < 1024",
 		port,
 		new("80"),
 		config.DefaultPort,
-		portExtractor,
 	}, {
+		portExtractor,
 		"should fallback to default if > 65535",
 		port,
 		new("65536"),
 		config.DefaultPort,
-		portExtractor,
 	}, {
+		portExtractor,
 		"should respect if set",
 		port,
 		new("42069"),
 		42069,
-		portExtractor,
 	}}
 
 	for _, tc := range testCases {
