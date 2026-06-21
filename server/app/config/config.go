@@ -27,13 +27,14 @@ const (
 )
 
 type Config struct {
-	Timeout time.Duration
-	Port    int
 	daos.HealthDao
 	daos.SessionStore
 	daos.ShotsDao
 	daos.UserDao
 	repositories.TargetRepo
+
+	Timeout time.Duration
+	Port    int
 }
 
 func MakeConfig(ctx context.Context) (*Config, error) {
