@@ -25,13 +25,6 @@ type TargetForm struct {
 	Questions Fields
 }
 
-func (f *TargetForm) String() string {
-	return fmt.Sprintf(
-		"Name: %s, Questions: %s",
-		f.Name.String(), f.Questions.String(),
-	)
-}
-
 func NewTargetFormFromTarget(target aggregations.Target) TargetForm {
 	questions := make(Fields, 0, len(target.Questions))
 	for _, question := range target.Questions {
@@ -55,6 +48,13 @@ func NewTargetForm(form url.Values) (*TargetForm, error) {
 		Name:      Field{Value: form.Get("name")},
 		Questions: questions,
 	}, nil
+}
+
+func (f *TargetForm) String() string {
+	return fmt.Sprintf(
+		"Name: %s, Questions: %s",
+		f.Name.String(), f.Questions.String(),
+	)
 }
 
 func parseQuestions(form url.Values) (Fields, error) {

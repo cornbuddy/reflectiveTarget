@@ -19,16 +19,19 @@ var (
 func TestMain(m *testing.M) {
 	cleanup, db, err := utils.SetupDB(ctx)
 	if err != nil {
-		log.Fatalf("failed to setup db: %v", err)
+		log.Panicf("failed to setup db: %v", err)
 	}
 
 	defer func() {
 		if err := cleanup(); err != nil {
-			log.Fatalf("failed to cleanup db: %v", err)
+			log.Panicf("failed to cleanup db: %v", err)
 		}
 	}()
 
 	targetRepo = repositories.TargetRepo{DB: db}
 
-	os.Exit(m.Run())
+	code := m.Run()
+	if code != 0 {
+		os.Exit(code)
+	}
 }

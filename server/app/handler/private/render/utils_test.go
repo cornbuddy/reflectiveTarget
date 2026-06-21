@@ -72,6 +72,7 @@ func (tcs *fieldErrorsTestCases) assert(t *testing.T, body io.Reader) {
 			wantLen := 0
 			ul.Children().Each(func(_ int, li *goquery.Selection) {
 				wantLen++
+				//nolint:err113
 				err := errors.New(li.Text())
 				assert.Contains(t, tc.errors, err)
 			})

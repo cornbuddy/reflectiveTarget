@@ -4,6 +4,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 )
 
+//nolint:errname
 type ValidationResult struct {
 	contracts.Errors
 }

@@ -141,6 +141,8 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 
 	tables := []string{"users", "targets", "questions", "shots"}
 	for _, table := range tables {
+		// I don't care about sql injections in tests
+		//nolint:gosec
 		query := "SELECT * FROM " + table
 		rows, err := db.Query(query)
 		require.NoError(t, err)

@@ -2,6 +2,8 @@ package utils
 
 import (
 	"net/http"
+
+	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 )
 
 var (
@@ -19,5 +21,7 @@ func Redirect(w http.ResponseWriter, r *http.Request, url, body string) {
 	} else {
 		http.Redirect(w, r, url, http.StatusSeeOther)
 	}
-	w.Write([]byte(body))
+
+	log := log.Logger(r.Context())
+	LogBadWrites(log)(w.Write([]byte(body)))
 }

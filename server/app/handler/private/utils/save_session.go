@@ -27,9 +27,11 @@ func SaveSession(
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:    appconst.SessionCookieName,
-		Value:   token,
-		Expires: time.Now().Add(sessiondata.SessionDuration),
+		Name:     appconst.SessionCookieName,
+		Value:    token,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Expires:  time.Now().Add(sessiondata.SessionDuration),
 	})
 
 	return token, nil

@@ -35,23 +35,23 @@ var (
 func TestMain(m *testing.M) {
 	cleanupDb, testDb, err := utils.SetupDB(ctx)
 	if err != nil {
-		log.Fatalf("failed to setup db: %v", err)
+		log.Panicf("failed to setup db: %v", err)
 	}
 
 	defer func() {
 		if err := cleanupDb(); err != nil {
-			log.Fatalf("failed to cleanup db: %v", err)
+			log.Panicf("failed to cleanup db: %v", err)
 		}
 	}()
 
 	cleanUpCache, testCache, err := utils.SetupCache(ctx)
 	if err != nil {
-		log.Fatalf("failed to setup db: %v", err)
+		log.Panicf("failed to setup db: %v", err)
 	}
 
 	defer func() {
 		if err := cleanUpCache(); err != nil {
-			log.Fatalf("failed to clean up cache: %v", err)
+			log.Panicf("failed to clean up cache: %v", err)
 		}
 	}()
 
@@ -60,7 +60,10 @@ func TestMain(m *testing.M) {
 	sessionStore = daos.SessionStore{Cache: testCache}
 	userDao = daos.UserDao{DB: testDb}
 
-	os.Exit(m.Run())
+	code := m.Run()
+	if code != 0 {
+		os.Exit(code)
+	}
 }
 
 func makeTestConfig(db *sql.DB, cache *redis.Client) *config.Config {
