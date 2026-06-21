@@ -70,7 +70,7 @@ func TestFieldStringer(t *testing.T) {
 		"{ID: 69, Value: '', Errors: []}",
 	}, {
 		"value",
-		contracts.Field{Value: "kek"},
+		contracts.Field{Value: kek},
 		"{ID: 0, Value: 'kek', Errors: []}",
 	}, {
 		"all together",
@@ -103,8 +103,8 @@ func TestErrors(t *testing.T) {
 
 	testCases := []testCase{{
 		"single item",
-		contracts.Errors{errors.New("kek")},
-		"kek",
+		contracts.Errors{errors.New(kek)},
+		kek,
 	}, {
 		"multiple items",
 		contracts.Errors{errors.New("kek1"), errors.New("kek2")},
@@ -135,7 +135,7 @@ func TestFieldsMethods(t *testing.T) {
 		valid  bool
 	}
 
-	err := errors.New("kek")
+	err := errors.New(kek)
 	testCases := []testCase{{
 		"empty fields are valid",
 		contracts.Fields{},
@@ -157,7 +157,7 @@ func TestFieldsMethods(t *testing.T) {
 	}, {
 		"errored field in the end makes fields invalid",
 		contracts.Fields{{
-			Value: "kek",
+			Value: kek,
 		}, {
 			Errors: contracts.Errors{err},
 		}},
@@ -167,17 +167,17 @@ func TestFieldsMethods(t *testing.T) {
 		contracts.Fields{{
 			Errors: contracts.Errors{err},
 		}, {
-			Value: "kek",
+			Value: kek,
 		}},
 		false,
 	}, {
 		"errored field in the middle makes fields invalid",
 		contracts.Fields{{
-			Value: "kek",
+			Value: kek,
 		}, {
 			Errors: contracts.Errors{err},
 		}, {
-			Value: "kek",
+			Value: kek,
 		}},
 		false,
 	}}
@@ -198,7 +198,7 @@ func TestFieldMethods(t *testing.T) {
 	assert.True(t, field.IsValid())
 	assert.False(t, field.IsInvalid())
 
-	err := errors.New("kek")
+	err := errors.New(kek)
 	field.AddError(err)
 	assert.Contains(t, field.Errors, err)
 	assert.Len(t, field.Errors, 1)

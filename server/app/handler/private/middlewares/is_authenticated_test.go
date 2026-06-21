@@ -58,7 +58,7 @@ func (s *IsAuthenticatedSuite) PreGroup(t *testgroup.T) {
 	data := sessiondata.SessionData{
 		IsAuthenticated: true,
 		UserID:          69,
-		Username:        "kek",
+		Username:        username,
 	}
 	t.Require.NoError(store.Update(ctx, token, data))
 

@@ -12,6 +12,10 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
+const (
+	username = "username"
+)
+
 var (
 	ctx       = context.TODO()
 	emptyStub = http.HandlerFunc(

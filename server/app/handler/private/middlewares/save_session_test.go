@@ -26,7 +26,7 @@ func TestSaveSessionShouldPutSessionDataToCtx(t *testing.T) {
 	want := sessiondata.SessionData{
 		IsAuthenticated: true,
 		UserID:          69,
-		Username:        "kek",
+		Username:        username,
 	}
 	require.NoError(t, store.Update(ctx, sessionId, want))
 

@@ -11,6 +11,15 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
+var (
+	_q0       = contracts.QuestionField{Field: contracts.Field{ID: 1}}
+	_q1       = contracts.QuestionField{Field: contracts.Field{ID: 2}}
+	formQ0ID  = _q0.NameID()
+	formQ0Val = _q0.NameValue()
+	formQ1ID  = _q1.NameID()
+	formQ1Val = _q1.NameValue()
+)
+
 func TestTargetFormStringer(t *testing.T) {
 	t.Parallel()
 
@@ -44,23 +53,23 @@ func TestNewTargetFormFromTarget(t *testing.T) {
 
 	testCases := []testCase{{
 		aggregations.Target{
-			Name: "kek",
+			Name: kek,
 			Questions: valueobjects.Questions{{
 				ID:   1,
-				Text: "kek1",
+				Text: kek1,
 			}, {
 				ID:   2,
-				Text: "kek2",
+				Text: kek2,
 			}},
 		},
 		contracts.TargetForm{
-			Name: contracts.Field{Value: "kek"},
+			Name: contracts.Field{Value: kek},
 			Questions: contracts.Fields{{
 				ID:    1,
-				Value: "kek1",
+				Value: kek1,
 			}, {
 				ID:    2,
-				Value: "kek2",
+				Value: kek2,
 			}},
 		},
 	}}
@@ -90,42 +99,42 @@ func TestNewTargetForm(t *testing.T) {
 		nil,
 	}, {
 		"should handle name only",
-		url.Values{"name": []string{"kek"}},
+		url.Values{formName: []string{kek}},
 		&contracts.TargetForm{
-			Name: contracts.Field{Value: "kek"},
+			Name: contracts.Field{Value: kek},
 		},
 		nil,
 		nil,
 	}, {
 		"should handle question value only",
-		url.Values{"question_0_value": []string{"kek"}},
+		url.Values{formQ0Val: []string{kek}},
 		&contracts.TargetForm{
-			Questions: []contracts.Field{{Value: "kek"}},
+			Questions: []contracts.Field{{Value: kek}},
 		},
 		nil,
 		nil,
 	}, {
 		"should error if question id is filled with crap",
 		url.Values{
-			"name":             []string{"kek?"},
-			"question_0_id":    []string{"not a number"},
-			"question_0_value": []string{"kek1"},
+			formName:  []string{qek},
+			formQ0ID:  []string{"not a number"},
+			formQ0Val: []string{kek1},
 		},
 		nil,
 		contracts.ErrInvalidFieldValue,
-		[]string{"question_0_id"},
+		[]string{formQ0ID},
 	}, {
 		"should handle full form",
 		url.Values{
-			"name":             []string{"kek?"},
-			"question_0_value": []string{"kek1"},
-			"question_1_value": []string{"kek2"},
+			formName:  []string{qek},
+			formQ0Val: []string{kek1},
+			formQ1Val: []string{kek2},
 		},
 		&contracts.TargetForm{
-			Name: contracts.Field{Value: "kek?"},
+			Name: contracts.Field{Value: qek},
 			Questions: []contracts.Field{
-				{Value: "kek1"},
-				{Value: "kek2"},
+				{Value: kek1},
+				{Value: kek2},
 			},
 		},
 		nil,
@@ -133,14 +142,14 @@ func TestNewTargetForm(t *testing.T) {
 	}, {
 		"should handle question id",
 		url.Values{
-			"name":             []string{"kek?"},
-			"question_0_id":    []string{"69"},
-			"question_0_value": []string{"kek1"},
+			formName:  []string{qek},
+			formQ0ID:  []string{"69"},
+			formQ0Val: []string{kek1},
 		},
 		&contracts.TargetForm{
-			Name: contracts.Field{Value: "kek?"},
+			Name: contracts.Field{Value: qek},
 			Questions: []contracts.Field{
-				{ID: 69, Value: "kek1"},
+				{ID: 69, Value: kek1},
 			},
 		},
 		nil,
@@ -148,17 +157,17 @@ func TestNewTargetForm(t *testing.T) {
 	}, {
 		"should handle multiple questions ids",
 		url.Values{
-			"name":             []string{"kek?"},
-			"question_0_id":    []string{"69"},
-			"question_0_value": []string{"kek1"},
-			"question_1_id":    []string{"420"},
-			"question_1_value": []string{"kek2"},
+			formName:  []string{qek},
+			formQ0ID:  []string{"69"},
+			formQ0Val: []string{kek1},
+			formQ1ID:  []string{"420"},
+			formQ1Val: []string{kek2},
 		},
 		&contracts.TargetForm{
-			Name: contracts.Field{Value: "kek?"},
+			Name: contracts.Field{Value: qek},
 			Questions: []contracts.Field{
-				{ID: 69, Value: "kek1"},
-				{ID: 420, Value: "kek2"},
+				{ID: 69, Value: kek1},
+				{ID: 420, Value: kek2},
 			},
 		},
 		nil,
@@ -166,16 +175,16 @@ func TestNewTargetForm(t *testing.T) {
 	}, {
 		"should handle new and existing questions",
 		url.Values{
-			"name":             []string{"kek?"},
-			"question_0_id":    []string{"69"},
-			"question_0_value": []string{"kek1"},
-			"question_1_value": []string{"kek2"},
+			formName:  []string{qek},
+			formQ0ID:  []string{"69"},
+			formQ0Val: []string{kek1},
+			formQ1Val: []string{kek2},
 		},
 		&contracts.TargetForm{
-			Name: contracts.Field{Value: "kek?"},
+			Name: contracts.Field{Value: qek},
 			Questions: []contracts.Field{
-				{ID: 69, Value: "kek1"},
-				{Value: "kek2"},
+				{ID: 69, Value: kek1},
+				{Value: kek2},
 			},
 		},
 		nil,
@@ -183,11 +192,11 @@ func TestNewTargetForm(t *testing.T) {
 	}, {
 		"should handle a lot of questions",
 		url.Values{
-			"name":              []string{"kek?"},
-			"question_0_id":     []string{"1"},
-			"question_0_value":  []string{"1"},
-			"question_1_id":     []string{"2"},
-			"question_1_value":  []string{"2"},
+			formName:            []string{qek},
+			formQ0ID:            []string{"1"},
+			formQ0Val:           []string{"1"},
+			formQ1ID:            []string{"2"},
+			formQ1Val:           []string{"2"},
 			"question_2_id":     []string{"3"},
 			"question_2_value":  []string{"3"},
 			"question_3_id":     []string{"4"},
@@ -208,7 +217,7 @@ func TestNewTargetForm(t *testing.T) {
 			"question_10_value": []string{"11"},
 		},
 		&contracts.TargetForm{
-			Name: contracts.Field{Value: "kek?"},
+			Name: contracts.Field{Value: qek},
 			Questions: []contracts.Field{
 				{ID: 1, Value: "1"},
 				{ID: 2, Value: "2"},

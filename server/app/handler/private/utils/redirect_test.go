@@ -13,6 +13,8 @@ import (
 func TestRedirect(t *testing.T) {
 	t.Parallel()
 
+	const body = "kek"
+
 	type testCase struct {
 		desc               string
 		requestHeaders     http.Header
@@ -26,21 +28,21 @@ func TestRedirect(t *testing.T) {
 		"should return http redirect on malformed htmx header",
 		http.Header{htmxRequestKey: []string{"false"}},
 		"/",
-		"kek",
+		body,
 		http.Header{"Location": []string{"/"}},
 		http.StatusSeeOther,
 	}, {
 		"should return htmx redirect on htmx header",
 		http.Header{htmxRequestKey: []string{"true"}},
 		"/",
-		"kek",
+		body,
 		http.Header{"Hx-Redirect": []string{"/"}},
 		http.StatusOK,
 	}, {
 		"should return http redirect on empty header",
 		http.Header{},
 		"/",
-		"kek",
+		body,
 		http.Header{"Location": []string{"/"}},
 		http.StatusSeeOther,
 	}}
