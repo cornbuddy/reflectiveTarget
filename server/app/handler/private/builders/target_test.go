@@ -14,6 +14,12 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
+const (
+	name = "kek"
+	q1   = "kek1"
+	q2   = "kek2"
+)
+
 func TestTargetBuilder(t *testing.T) {
 	t.Parallel()
 
@@ -29,29 +35,29 @@ func TestTargetBuilder(t *testing.T) {
 	testCases := []testCase{{
 		"returns target if form is valid",
 		contracts.TargetForm{
-			Name: contracts.Field{Value: "name"},
+			Name: contracts.Field{Value: name},
 			Questions: contracts.Fields{{
-				Value: "kek1",
+				Value: q1,
 			}, {
-				Value: "kek2",
+				Value: q2,
 			}},
 		},
 		0,
 		&aggregations.Target{
-			Name:  "name",
+			Name:  name,
 			Owner: entities.User{ID: ownerID},
 			Questions: valueobjects.Questions{{
-				Text: "kek1",
+				Text: q1,
 			}, {
-				Text: "kek2",
+				Text: q2,
 			}},
 		},
 		contracts.TargetForm{
-			Name: contracts.Field{Value: "name"},
+			Name: contracts.Field{Value: name},
 			Questions: contracts.Fields{{
-				Value: "kek1",
+				Value: q1,
 			}, {
-				Value: "kek2",
+				Value: q2,
 			}},
 		},
 	}, {
@@ -70,21 +76,21 @@ func TestTargetBuilder(t *testing.T) {
 	}, {
 		"returns nil if questions are wrong",
 		contracts.TargetForm{
-			Name: contracts.Field{Value: "name"},
+			Name: contracts.Field{Value: name},
 			Questions: contracts.Fields{{
-				Value: "kek1",
+				Value: q1,
 			}, {
-				Value: "kek1",
+				Value: q1,
 			}},
 		},
 		0,
 		nil,
 		contracts.TargetForm{
-			Name: contracts.Field{Value: "name"},
+			Name: contracts.Field{Value: name},
 			Questions: contracts.Fields{{
-				Value: "kek1",
+				Value: q1,
 			}, {
-				Value: "kek1",
+				Value: q1,
 				Errors: contracts.Errors{
 					validators.ErrRepeatedQuestion,
 				},
@@ -93,36 +99,36 @@ func TestTargetBuilder(t *testing.T) {
 	}, {
 		"sets proper ids to entities",
 		contracts.TargetForm{
-			Name: contracts.Field{Value: "name"},
+			Name: contracts.Field{Value: name},
 			Questions: contracts.Fields{{
 				ID:    101,
-				Value: "kek1",
+				Value: q1,
 			}, {
 				ID:    102,
-				Value: "kek2",
+				Value: q2,
 			}},
 		},
 		69,
 		&aggregations.Target{
 			ID:    69,
-			Name:  "name",
+			Name:  name,
 			Owner: entities.User{ID: ownerID},
 			Questions: valueobjects.Questions{{
 				ID:   101,
-				Text: "kek1",
+				Text: q1,
 			}, {
 				ID:   102,
-				Text: "kek2",
+				Text: q2,
 			}},
 		},
 		contracts.TargetForm{
-			Name: contracts.Field{Value: "name"},
+			Name: contracts.Field{Value: name},
 			Questions: contracts.Fields{{
 				ID:    101,
-				Value: "kek1",
+				Value: q1,
 			}, {
 				ID:    102,
-				Value: "kek2",
+				Value: q2,
 			}},
 		},
 	}}

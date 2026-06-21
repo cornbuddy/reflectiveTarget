@@ -18,8 +18,7 @@ func TestLogoutShouldUpdateSessionCookie(t *testing.T) {
 
 	const url = "/logout"
 
-	ct := "application/x-www-form-urlencoded"
-	res, body, err := utils.MakeRequest(ct, http.MethodGet, url, router, nil)
+	res, body, err := utils.MakeRequest(ctForm, get, url, router, nil)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusSeeOther, res.StatusCode)
 	assert.Equal(t, "/", res.Header.Get("Location"))
@@ -61,9 +60,8 @@ func TestLoginShouldFailWhenSomethingIsWrong(t *testing.T) {
 		),
 	}}
 
-	ct := "application/x-www-form-urlencoded"
 	for _, tc := range testCases {
-		res, body, err := utils.MakeRequest(ct, http.MethodPost, url, router, tc.body)
+		res, body, err := utils.MakeRequest(ctForm, post, url, router, tc.body)
 		require.NoError(t, err)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
 		assert.Contains(t, body, tc.message)
@@ -78,14 +76,13 @@ func TestLoginShouldSetSessionCookieOnSuccess(t *testing.T) {
 	user, err := makeTestUser(db)
 	require.NoError(t, err)
 
-	ct := "application/x-www-form-urlencoded"
 	b := strings.NewReader(
 		fmt.Sprintf(
 			"username=%s&password=%s",
 			user.Username, defaultPassword,
 		),
 	)
-	res, body, err := utils.MakeRequest(ct, http.MethodPost, url, router, b)
+	res, body, err := utils.MakeRequest(ctForm, post, url, router, b)
 	require.NoError(t, err)
 	assertAuthenticationStatusIsChanged(t, res,
 		"login should set session cookie",
@@ -130,9 +127,8 @@ func TestShouldRegisterNewUserWhenCredentialsAreValid(t *testing.T) {
 		),
 	}}
 
-	ct := "application/x-www-form-urlencoded"
 	for _, tc := range testCases {
-		res, body, err := utils.MakeRequest(ct, http.MethodPost, url, router, tc.body)
+		res, body, err := utils.MakeRequest(ctForm, post, url, router, tc.body)
 		require.NoError(t, err)
 		assert.Equal(t, tc.statusCode, res.StatusCode)
 		assert.Contains(t, body, tc.message)

@@ -9,6 +9,8 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 )
 
+const formConfirmation = "confirmation"
+
 func TestSignupForm(t *testing.T) {
 	t.Parallel()
 
@@ -21,30 +23,30 @@ func TestSignupForm(t *testing.T) {
 		url.Values{},
 		contracts.SignupForm{},
 	}, {
-		url.Values{"username": []string{"kek"}},
+		url.Values{formUsername: []string{username}},
 		contracts.SignupForm{
-			Username: contracts.Field{Value: "kek"},
+			Username: contracts.Field{Value: username},
 		},
 	}, {
-		url.Values{"password": []string{"pass"}},
+		url.Values{formPassword: []string{password}},
 		contracts.SignupForm{
-			Password: contracts.Field{Value: "pass"},
+			Password: contracts.Field{Value: password},
 		},
 	}, {
-		url.Values{"confirmation": []string{"pass"}},
+		url.Values{formConfirmation: []string{password}},
 		contracts.SignupForm{
-			Confirmation: contracts.Field{Value: "pass"},
+			Confirmation: contracts.Field{Value: password},
 		},
 	}, {
 		url.Values{
-			"username":     []string{"kek"},
-			"password":     []string{"pass"},
-			"confirmation": []string{"pass"},
+			formUsername:     []string{username},
+			formPassword:     []string{password},
+			formConfirmation: []string{password},
 		},
 		contracts.SignupForm{
-			Username:     contracts.Field{Value: "kek"},
-			Password:     contracts.Field{Value: "pass"},
-			Confirmation: contracts.Field{Value: "pass"},
+			Username:     contracts.Field{Value: username},
+			Password:     contracts.Field{Value: password},
+			Confirmation: contracts.Field{Value: password},
 		},
 	}}
 
