@@ -19,8 +19,11 @@ import (
 )
 
 const (
-	DefaultTimeout = 15 * time.Second
-	DefaultPort    = 8080
+	DefaultTimeout         = 15 * time.Second
+	DefaultPort            = 8080
+	ReadTimeout            = 5 * time.Second
+	WriteTimeoutMultiplier = 2
+	IdleTiemoutMultiplier  = 3
 
 	minPort = 1024
 	maxPort = 65535
