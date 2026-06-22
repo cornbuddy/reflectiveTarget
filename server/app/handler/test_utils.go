@@ -30,7 +30,8 @@ func makeTestTarget(db *sql.DB, userID int) (int, error) {
 }
 
 func makeTestUser(db *sql.DB) (*entities.User, error) {
-	username := utils.MakeRandomString(10)
+	const usernameLen = 10
+	username := utils.MakeRandomString(usernameLen)
 	user, err := entities.NewUser(username, defaultPassword)
 	if err != nil {
 		return nil, err

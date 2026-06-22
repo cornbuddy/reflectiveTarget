@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"go.uber.org/zap"
 
@@ -17,18 +16,18 @@ func main() {
 	ctx := context.Background()
 	log := log.Logger(ctx)
 	log.Info("initializing application")
-	config, err := config.MakeConfig(ctx)
+	cfg, err := config.MakeConfig(ctx)
 	if err != nil {
 		log.Fatal("failed to make configuration", zap.Error(err))
 	}
 
-	handler := handler.MakeHandler(config)
+	handler := handler.MakeHandler(cfg)
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", config.Port),
+		Addr:         fmt.Sprintf(":%d", cfg.Port),
 		Handler:      handler,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: config.Timeout * 2,
-		IdleTimeout:  config.Timeout * 3,
+		ReadTimeout:  config.ReadTimeout,
+		WriteTimeout: cfg.Timeout * config.WriteTimeoutMultiplier,
+		IdleTimeout:  cfg.Timeout * config.IdleTiemoutMultiplier,
 	}
 	log.Info("starting http server")
 	if err := server.ListenAndServe(); err != nil {

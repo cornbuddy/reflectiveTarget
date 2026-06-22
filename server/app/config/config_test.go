@@ -30,70 +30,71 @@ func TestOptionalConfiguration(t *testing.T) {
 		want     any
 	}
 
-	const timeout = "TIMEOUT_SECONDS"
 	const port = "PORT"
-	timeoutExtractor := func(c config.Config) any { return c.Timeout }
-	portExtractor := func(c config.Config) any { return c.Port }
+	const timeout = "TIMEOUT_SECONDS"
+
+	portExtr := func(c config.Config) any { return c.Port }
+	tiemoutExtr := func(c config.Config) any { return c.Timeout }
 	testCases := []testCase{{
-		timeoutExtractor,
-		"should have proper defaults",
-		timeout,
-		nil,
-		config.DefaultTimeout,
-	}, {
-		timeoutExtractor,
-		"should respect if set",
-		timeout,
-		new("30"),
-		30 * time.Second,
-	}, {
-		timeoutExtractor,
-		"should ignore crap",
-		timeout,
-		new("kek"),
-		config.DefaultTimeout,
-	}, {
-		timeoutExtractor,
-		"should switch to default if 0",
-		timeout,
-		new("0"),
-		config.DefaultTimeout,
-	}, {
-		timeoutExtractor,
-		"should switch to default value is negative",
-		timeout,
-		new("-69"),
-		config.DefaultTimeout,
-	}, {
-		portExtractor,
+		portExtr,
 		"should have proper defaults",
 		port,
 		nil,
 		config.DefaultPort,
 	}, {
-		portExtractor,
+		portExtr,
 		"should ignore crap",
 		port,
 		new("crap"),
 		config.DefaultPort,
 	}, {
-		portExtractor,
+		portExtr,
 		"should fallback to default if < 1024",
 		port,
 		new("80"),
 		config.DefaultPort,
 	}, {
-		portExtractor,
+		portExtr,
 		"should fallback to default if > 65535",
 		port,
 		new("65536"),
 		config.DefaultPort,
 	}, {
-		portExtractor,
+		portExtr,
 		"should respect if set",
 		port,
 		new("42069"),
 		42069,
+	}, {
+		tiemoutExtr,
+		"should have proper defaults",
+		timeout,
+		nil,
+		config.DefaultTimeout,
+	}, {
+		tiemoutExtr,
+		"should respect if set",
+		timeout,
+		new("30"),
+		30 * time.Second,
+	}, {
+		tiemoutExtr,
+		"should ignore crap",
+		timeout,
+		new("kek"),
+		config.DefaultTimeout,
+	}, {
+		tiemoutExtr,
+		"should switch to default if 0",
+		timeout,
+		new("0"),
+		config.DefaultTimeout,
+	}, {
+		tiemoutExtr,
+		"should switch to default value is negative",
+		timeout,
+		new("-69"),
+		config.DefaultTimeout,
 	}}
 
 	for _, tc := range testCases {
@@ -120,7 +121,7 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 
 	val := reflect.ValueOf(*cfg)
 	typ := reflect.TypeFor[config.Config]()
-	for i := 0; i < val.NumField(); i++ {
+	for i := range val.NumField() {
 		field := typ.Field(i)
 		if field.PkgPath == "" {
 			v := val.Field(i).Interface()

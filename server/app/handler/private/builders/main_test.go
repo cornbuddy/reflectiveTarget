@@ -22,16 +22,12 @@ func TestMain(m *testing.M) {
 		log.Panicf("failed to setup db: %v", err)
 	}
 
-	defer func() {
-		if err := cleanup(); err != nil {
-			log.Panicf("failed to cleanup db: %v", err)
-		}
-	}()
-
 	targetRepo = repositories.TargetRepo{DB: db}
 
-	code := m.Run()
-	if code != 0 {
-		os.Exit(code)
+	code, err := utils.RunAndCleanup(ctx, m, cleanup)
+	if err != nil {
+		log.Panicf("failed to cleanup: %v", err)
 	}
+
+	os.Exit(code)
 }

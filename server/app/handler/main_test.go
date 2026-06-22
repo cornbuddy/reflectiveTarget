@@ -8,11 +8,12 @@ import (
 	"os"
 	"testing"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
-	"github.com/redis/go-redis/v9"
 )
 
 const (
@@ -38,32 +39,22 @@ func TestMain(m *testing.M) {
 		log.Panicf("failed to setup db: %v", err)
 	}
 
-	defer func() {
-		if err := cleanupDb(); err != nil {
-			log.Panicf("failed to cleanup db: %v", err)
-		}
-	}()
-
 	cleanUpCache, testCache, err := utils.SetupCache(ctx)
 	if err != nil {
 		log.Panicf("failed to setup db: %v", err)
 	}
-
-	defer func() {
-		if err := cleanUpCache(); err != nil {
-			log.Panicf("failed to clean up cache: %v", err)
-		}
-	}()
 
 	db = testDb
 	router = MakeHandler(makeTestConfig(testDb, testCache)).ServeHTTP
 	sessionStore = daos.SessionStore{Cache: testCache}
 	userDao = daos.UserDao{DB: testDb}
 
-	code := m.Run()
-	if code != 0 {
-		os.Exit(code)
+	code, err := utils.RunAndCleanup(ctx, m, cleanupDb, cleanUpCache)
+	if err != nil {
+		log.Panicf("failed to cleanup: %v", err)
 	}
+
+	os.Exit(code)
 }
 
 func makeTestConfig(db *sql.DB, cache *redis.Client) *config.Config {

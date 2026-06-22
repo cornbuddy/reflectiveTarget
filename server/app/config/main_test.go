@@ -16,14 +16,17 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
+const (
+	username = "test_user"
+	password = "kekekeke"
+	database = "testdb"
+)
+
 var (
 	dbHost    string
 	cacheAddr string
 
-	ctx      = context.TODO()
-	username = "test_user"
-	password = "kekekeke"
-	database = "testdb"
+	ctx = context.TODO()
 )
 
 func TestMain(m *testing.M) {
@@ -42,13 +45,11 @@ func TestMain(m *testing.M) {
 		log.Panicf("failed to run db: %v", err)
 	}
 
-	defer func() {
-		if err := dbCont.Terminate(ctx); err != nil {
-			log.Panicf("failed to stop db: %v", err)
-		}
-	}()
+	dbCleanup := func() error {
+		return dbCont.Terminate(ctx)
+	}
 
-	dbHost, err = dbCont.ContainerIP(ctx)
+	dbIP, err := dbCont.ContainerIP(ctx)
 	if err != nil {
 		log.Panicf("failed to fetch db ip: %v", err)
 	}
@@ -58,11 +59,9 @@ func TestMain(m *testing.M) {
 		log.Panicf("failed to run cache: %v", err)
 	}
 
-	defer func() {
-		if err := cacheCont.Terminate(ctx); err != nil {
-			log.Panicf("failed to stop cache: %v", err)
-		}
-	}()
+	cacheCleanup := func() error {
+		return cacheCont.Terminate(ctx)
+	}
 
 	uri, err := cacheCont.ConnectionString(ctx)
 	if err != nil {
@@ -75,9 +74,12 @@ func TestMain(m *testing.M) {
 	}
 
 	cacheAddr = cacheOpts.Addr
+	dbHost = dbIP
 
-	code := m.Run()
-	if code != 0 {
-		os.Exit(code)
+	code, err := utils.RunAndCleanup(ctx, m, dbCleanup, cacheCleanup)
+	if err != nil {
+		log.Panicf("failed to cleanup: %v", err)
 	}
+
+	os.Exit(code)
 }

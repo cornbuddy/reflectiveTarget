@@ -25,22 +25,18 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	var code int
-	defer os.Exit(code)
-
 	cleanupDb, testDb, err := utils.SetupDB(ctx)
 	if err != nil {
 		log.Panicf("failed to setup db: %v", err)
 	}
 
-	defer func() {
-		if err := cleanupDb(); err != nil {
-			log.Panicf("failed to cleanup db: %v", err)
-		}
-	}()
-
 	db = testDb
 	userDao = daos.UserDao{DB: testDb}
 
-	code = m.Run()
+	code, err := utils.RunAndCleanup(ctx, m, cleanupDb)
+	if err != nil {
+		log.Panicf("failed to cleanup: %v", err)
+	}
+
+	os.Exit(code)
 }
