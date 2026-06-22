@@ -20,6 +20,6 @@ func TestLoggerMiddlewareShouldAddLoggerToContext(t *testing.T) {
 		assert.NotEmpty(t, logger)
 	})
 
-	r := httptest.NewRequest(http.MethodGet, "/", nil)
+	r := httptest.NewRequestWithContext(ctx, http.MethodGet, "/", nil)
 	mw.Logger(stub).ServeHTTP(httptest.NewRecorder(), r)
 }

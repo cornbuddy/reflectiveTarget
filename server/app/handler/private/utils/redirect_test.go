@@ -52,7 +52,7 @@ func TestRedirect(t *testing.T) {
 			Redirect(w, r, tc.url, tc.wantBody)
 		}
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest(http.MethodPost, "/kek", nil)
+		r := httptest.NewRequestWithContext(ctx, http.MethodPost, "/kek", nil)
 		r.Header = tc.requestHeaders
 		handle(w, r)
 		resp := w.Result()
