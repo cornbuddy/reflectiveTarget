@@ -77,7 +77,7 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 	assert.JSONEq(t, ctAppJson, resp.Header.Get("Content-Type"))
 	assert.Equal(t, "ok", body, "should save shots")
 
-	res, err := db.Query(
+	res, err := db.QueryContext(ctx,
 		"SELECT * FROM shots WHERE x = $1 AND y = $2",
 		shot.X, shot.Y,
 	)

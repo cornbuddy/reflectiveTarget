@@ -113,7 +113,7 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 			return err
 		}
 
-		return db.Ping()
+		return db.PingContext(ctx)
 	}); err != nil {
 		return nil, err
 	}

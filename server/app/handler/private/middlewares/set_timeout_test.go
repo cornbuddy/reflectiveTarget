@@ -34,10 +34,9 @@ func TestSetTimeout(t *testing.T) {
 		stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			time.Sleep(tc.sleep)
 		})
-		setTimeout := mw.SetTimeout(timeout)
 		w := httptest.NewRecorder()
-		r := httptest.NewRequest(http.MethodGet, "/", nil)
-		setTimeout(stub).ServeHTTP(w, r)
+		r := httptest.NewRequestWithContext(ctx, http.MethodGet, "/", nil)
+		mw.SetTimeout(timeout)(stub).ServeHTTP(w, r)
 
 		assert.Equal(t, tc.status, w.Result().StatusCode, tc.desc)
 	}
