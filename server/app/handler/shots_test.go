@@ -32,7 +32,7 @@ func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 	resp, body, err := utils.MakeRequest(ctAppJson, get, url, router, nil)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	assert.JSONEq(t, ctAppJson, resp.Header.Get("Content-Type"))
+	assert.Equal(t, ctAppJson, resp.Header.Get("Content-Type"))
 
 	var shots contracts.ShotsResponse
 	require.NoError(t, json.Unmarshal([]byte(body), &shots))
@@ -73,9 +73,9 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 		&http.Cookie{Name: constants.SessionCookieName, Value: "kek"},
 	)
 	require.NoError(t, err)
-	assert.Equal(t, http.StatusCreated, resp.StatusCode)
-	assert.JSONEq(t, ctAppJson, resp.Header.Get("Content-Type"))
-	assert.Equal(t, "ok", body, "should save shots")
+	assert.Equal(t, http.StatusCreated, resp.StatusCode, "should save shots")
+	assert.Equal(t, ctAppJson, resp.Header.Get("Content-Type"))
+	assert.Empty(t, body)
 
 	rows, err := db.QueryContext(ctx,
 		"SELECT id FROM shots WHERE x = $1 AND y = $2",
