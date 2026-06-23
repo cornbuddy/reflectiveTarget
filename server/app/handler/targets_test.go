@@ -31,7 +31,7 @@ const (
 var (
 	_q        = contracts.QuestionField{}
 	formQ0ID  = _q.NameID(0)
-	formQ0Val = _q.NameValue(1)
+	formQ0Val = _q.NameValue(0)
 	formQ1Val = _q.NameValue(1)
 )
 
@@ -127,7 +127,7 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 	}
 
 	testCases := []testCase{{
-		"rejects target with existing name name",
+		"rejects target with existing name",
 		neturl.Values{
 			"name":    []string{s.ownedTargets[0].Name},
 			formQ0Val: []string{q1},
@@ -145,7 +145,7 @@ func (s *TargetsSuite) ShouldRejectInvalidTarget(t *testgroup.T) {
 		neturl.Values{
 			formName:  []string{"same question twice"},
 			formQ0Val: []string{q1},
-			formQ1Val: []string{q2},
+			formQ1Val: []string{q1},
 		},
 		validators.ErrRepeatedQuestion.Error(),
 	}}
