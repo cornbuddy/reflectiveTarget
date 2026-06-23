@@ -41,7 +41,7 @@ func (v LoginFormValidator) Validate(
 		return false
 	}
 
-	valid, err := user.Verify(form.Password.Value)
+	valid, err := user.Password.Verify(form.Password.Value)
 	if err != nil {
 		form.Password.AddError(err)
 

@@ -75,7 +75,7 @@ func InsertUsers(db *sql.DB, users entities.Users) error {
 func InsertUser(db *sql.DB, user *entities.User) error {
 	q := "INSERT INTO users (username, hashed_password) VALUES($1, $2) " +
 		"RETURNING id"
-	err := db.QueryRow(q, user.Username, user.Hash).Scan(&user.ID)
+	err := db.QueryRow(q, user.Username, user.Password.Hash).Scan(&user.ID)
 	if err != nil {
 		return err
 	}

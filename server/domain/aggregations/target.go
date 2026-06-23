@@ -9,11 +9,12 @@ import (
 )
 
 type Target struct {
-	Name  string
-	Owner entities.User
 	valueobjects.ID
 	valueobjects.Shots
 	valueobjects.Questions
+
+	Name  string
+	Owner entities.User
 }
 
 type Targets []Target

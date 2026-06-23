@@ -6,8 +6,9 @@ import (
 )
 
 type Question struct {
-	Text string
 	ID
+
+	Text string
 }
 
 type Questions []Question

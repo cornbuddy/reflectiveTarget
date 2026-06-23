@@ -7,16 +7,13 @@ import (
 )
 
 type User struct {
-	Username string
-	valueobjects.Password
 	valueobjects.ID
+
+	Username string
+	Password valueobjects.Password
 }
 
 type Users []User
-
-func (u *User) String() string {
-	return fmt.Sprintf("{ID: %d, Username: '%s'}", u.ID, u.Username)
-}
 
 func NewUser(username, plaintext string) (*User, error) {
 	password, err := valueobjects.NewPassword(plaintext)
@@ -28,4 +25,8 @@ func NewUser(username, plaintext string) (*User, error) {
 		Username: username,
 		Password: *password,
 	}, nil
+}
+
+func (u *User) String() string {
+	return fmt.Sprintf("{ID: %d, Username: '%s'}", u.ID, u.Username)
 }

@@ -64,6 +64,8 @@ func TestTargetStringer(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			got := tc.target.String()
 			assert.Equal(t, tc.want, got)
 		})

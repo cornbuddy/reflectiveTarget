@@ -19,12 +19,12 @@ func TestPasswordShouldVerify(t *testing.T) {
 	}
 
 	testCases := []testCase{{
-		password: "kek",
+		password: kek,
 		verify:   "not-kek",
 		want:     false,
 	}, {
-		password: "kek",
-		verify:   "kek",
+		password: kek,
+		verify:   kek,
 		want:     true,
 	}}
 
@@ -43,10 +43,10 @@ func TestPasswordHashingShouldNotBeDetermenistic(t *testing.T) {
 
 	plaintext := "kek"
 	pwd1, err := valueobjects.NewPassword(plaintext)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	pwd2, err := valueobjects.NewPassword(plaintext)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.NotEqual(t, pwd1.Hash, pwd2.Hash)
 }

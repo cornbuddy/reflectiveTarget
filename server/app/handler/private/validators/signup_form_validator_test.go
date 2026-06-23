@@ -52,8 +52,8 @@ func TestSignupFormValidator(t *testing.T) {
 	}, {
 		contracts.SignupForm{
 			Username:     contracts.Field{Value: user.Username},
-			Password:     contracts.Field{Value: user.Hash},
-			Confirmation: contracts.Field{Value: user.Hash},
+			Password:     contracts.Field{Value: user.Password.Hash},
+			Confirmation: contracts.Field{Value: user.Password.Hash},
 		},
 		contracts.SignupForm{
 			Username: contracts.Field{
@@ -61,10 +61,10 @@ func TestSignupFormValidator(t *testing.T) {
 				Errors: contracts.Errors{validators.ErrUserAlreadyExists},
 			},
 			Password: contracts.Field{
-				Value: user.Hash,
+				Value: user.Password.Hash,
 			},
 			Confirmation: contracts.Field{
-				Value: user.Hash,
+				Value: user.Password.Hash,
 			},
 		},
 		false,
