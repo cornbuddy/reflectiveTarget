@@ -13,17 +13,17 @@ const (
 )
 
 // returns input name of question text
-func (f *QuestionField) NameValue() string {
+func (f *QuestionField) NameValue(i int) string {
 	return fmt.Sprintf(
 		"%s_%d_%s",
-		QuestionFieldPrefix, f.ID, QuestionFieldValuePostfix,
+		QuestionFieldPrefix, i, QuestionFieldValuePostfix,
 	)
 }
 
 // returns input name of question ID
-func (f *QuestionField) NameID() string {
+func (f *QuestionField) NameID(i int) string {
 	return fmt.Sprintf(
 		"%s_%d_%s",
-		QuestionFieldPrefix, f.ID, QuestionFieldIDPostfix,
+		QuestionFieldPrefix, i, QuestionFieldIDPostfix,
 	)
 }

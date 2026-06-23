@@ -1,6 +1,7 @@
-package handler
+package handler_test
 
 import (
+	"context"
 	"database/sql"
 	"net/http"
 	"testing"
@@ -18,11 +19,12 @@ import (
 
 const defaultPassword = "default-password123@"
 
-func makeTestTarget(db *sql.DB, userID int) (int, error) {
+func makeTestTarget(ctx context.Context, db *sql.DB, userID int) (int, error) {
 	var targetID int
 	q := "INSERT INTO targets (name, owner_id) VALUES($1, $2) " +
 		"RETURNING id"
-	if err := db.QueryRow(q, "kek?", userID).Scan(&targetID); err != nil {
+	err := db.QueryRowContext(ctx, q, "kek?", userID).Scan(&targetID)
+	if err != nil {
 		return 0, err
 	}
 

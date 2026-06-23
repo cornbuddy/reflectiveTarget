@@ -14,6 +14,7 @@ func TestQuestionFieldMethods(t *testing.T) {
 	type testCase struct {
 		desc      string
 		field     contracts.QuestionField
+		i         int
 		wantValue string
 		wantID    string
 	}
@@ -27,11 +28,13 @@ func TestQuestionFieldMethods(t *testing.T) {
 	testCases := []testCase{{
 		"uses 0 by default",
 		contracts.QuestionField{},
+		0,
 		qPref + "_0_" + qValPost,
 		qPref + "_0_" + qIDPost,
 	}, {
 		"uses id in the middle",
-		contracts.QuestionField{contracts.Field{ID: 69}},
+		contracts.QuestionField{},
+		69,
 		qPref + "_69_" + qValPost,
 		qPref + "_69_" + qIDPost,
 	}}
@@ -40,8 +43,8 @@ func TestQuestionFieldMethods(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			t.Parallel()
 
-			assert.Equal(t, tc.wantValue, tc.field.NameValue())
-			assert.Equal(t, tc.wantID, tc.field.NameID())
+			assert.Equal(t, tc.wantValue, tc.field.NameValue(tc.i))
+			assert.Equal(t, tc.wantID, tc.field.NameID(tc.i))
 		})
 	}
 }

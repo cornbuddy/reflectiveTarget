@@ -1,13 +1,15 @@
-package utils
+package utils_test
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 )
 
 func TestSaveSessionShouldUpdateSessionStore(t *testing.T) {
@@ -15,7 +17,7 @@ func TestSaveSessionShouldUpdateSessionStore(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	wantSession := sessiondata.SessionData{Username: "kek"}
-	token, err := SaveSession(ctx, store, wantSession, w)
+	token, err := utils.SaveSession(ctx, store, wantSession, w)
 	require.NoError(t, err)
 
 	header := w.Header().Get("Set-Cookie")

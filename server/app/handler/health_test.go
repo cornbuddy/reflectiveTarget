@@ -1,4 +1,4 @@
-package handler
+package handler_test
 
 import (
 	"net/http"
@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -45,7 +46,7 @@ func TestHealthHandlerShouldFailWhenDbsDontWork(t *testing.T) {
 
 	// let's build handler with broken dependencies
 	config := makeTestConfig(db, cache)
-	router := MakeHandler(config).ServeHTTP
+	router := handler.MakeHandler(config).ServeHTTP
 	res, _, err := utils.MakeRequest("", http.MethodGet, healthUrl, router, nil)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusInternalServerError, res.StatusCode)

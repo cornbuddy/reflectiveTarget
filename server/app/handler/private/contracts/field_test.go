@@ -36,6 +36,8 @@ func TestFieldsStringer(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			got := tc.fields.String()
 			assert.Equal(t, tc.want, got)
 		})
@@ -81,6 +83,8 @@ func TestFieldStringer(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			got := tc.field.String()
 			assert.Equal(t, tc.want, got)
 		})
@@ -116,6 +120,8 @@ func TestErrors(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			assert.Equal(t, tc.want, tc.errs.Error())
 		})
 	}
@@ -178,6 +184,8 @@ func TestFieldsMethods(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			assert.Equal(t, tc.valid, tc.fields.AreValid())
 			assert.Equal(t, !tc.valid, tc.fields.AreInvalid())
 		})

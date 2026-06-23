@@ -31,6 +31,8 @@ func TestContentTypeSetsContentType(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			m := http.MethodPost
 			h := mw.SetHeader(tc.key, tc.value)(emptyStub).ServeHTTP
 			r, _, err := utils.MakeRequest("", m, "/", h, nil)

@@ -1,4 +1,4 @@
-package handler
+package handler_test
 
 import (
 	"fmt"
@@ -29,11 +29,10 @@ const (
 )
 
 var (
-	_q1       = contracts.QuestionField{Field: contracts.Field{ID: 1}}
-	_q2       = contracts.QuestionField{Field: contracts.Field{ID: 2}}
-	formQ0ID  = _q1.NameID()
-	formQ0Val = _q1.NameValue()
-	formQ1Val = _q2.NameValue()
+	_q        = contracts.QuestionField{}
+	formQ0ID  = _q.NameID(0)
+	formQ0Val = _q.NameValue(1)
+	formQ1Val = _q.NameValue(1)
 )
 
 type TargetsSuite struct {

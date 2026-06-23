@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
@@ -12,12 +13,11 @@ import (
 )
 
 var (
-	_q0       = contracts.QuestionField{Field: contracts.Field{ID: 1}}
-	_q1       = contracts.QuestionField{Field: contracts.Field{ID: 2}}
-	formQ0ID  = _q0.NameID()
-	formQ0Val = _q0.NameValue()
-	formQ1ID  = _q1.NameID()
-	formQ1Val = _q1.NameValue()
+	_q        = contracts.QuestionField{}
+	formQ0ID  = _q.NameID(0)
+	formQ0Val = _q.NameValue(0)
+	formQ1ID  = _q.NameID(1)
+	formQ1Val = _q.NameValue(1)
 )
 
 func TestTargetFormStringer(t *testing.T) {
@@ -37,6 +37,8 @@ func TestTargetFormStringer(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			got := tc.form.String()
 			assert.Regexp(t, tc.regexp, got)
 		})
@@ -238,11 +240,14 @@ func TestNewTargetForm(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := contracts.NewTargetForm(tc.form)
-			assert.ErrorIs(t, err, tc.err)
+			require.ErrorIs(t, err, tc.err)
 			assert.Equal(t, tc.want, got)
+
 			for _, msg := range tc.errContains {
-				assert.ErrorContains(t, err, msg)
+				require.ErrorContains(t, err, msg)
 			}
 		})
 	}

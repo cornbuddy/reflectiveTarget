@@ -21,7 +21,8 @@ var (
 )
 
 type TargetForm struct {
-	Name      Field
+	Name Field
+	// TODO: switch to QuestionFields
 	Questions Fields
 }
 

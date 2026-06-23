@@ -112,6 +112,7 @@ func TestOptionalConfiguration(t *testing.T) {
 	}
 }
 
+//nolint:paralleltest
 func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 	setRequiredEnvVars(t)
 
@@ -144,16 +145,17 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 	for _, table := range tables {
 		// I don't care about sql injections in tests
 		//nolint:gosec
-		query := "SELECT * FROM " + table
+		query := "SELECT id FROM " + table
 		rows, err := db.Query(query)
 		require.NoError(t, err)
 
 		cols, err := rows.Columns()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotEmpty(t, cols)
 	}
 }
 
+//nolint:paralleltest
 func TestInitShouldReturnErrorWhenRequiredEnvVarsAreNotSet(t *testing.T) {
 	_, err := config.MakeConfig(ctx)
 	require.ErrorContains(t, err, "is not set")

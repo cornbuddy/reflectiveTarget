@@ -19,6 +19,8 @@ linters:
       max-func-lines: 0
     nestif:
       min-complexity: 3
+    paralleltest:
+      check-cleanup: true
     testifylint:
       go-require:
         ignore-http-handlers: true
@@ -56,7 +58,6 @@ linters:
     - noctx
     - nolintlint
     - nonamedreturns
-    - nosprintfhostport
     - paralleltest
     - perfsprint
     - reassign

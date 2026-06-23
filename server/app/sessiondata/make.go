@@ -7,8 +7,13 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
 
+type ctxKey int
+
 const (
-	SessionDataCtx  = "session-data"
+	SessionDataCtx ctxKey = iota
+)
+
+const (
 	SessionDuration = 30 * 24 * time.Hour
 )
 
@@ -23,7 +28,7 @@ func Read(ctx context.Context) SessionData {
 	return getData[SessionData](ctx, SessionDataCtx)
 }
 
-func getData[T any](ctx context.Context, key string) T {
+func getData[T any](ctx context.Context, key ctxKey) T {
 	var result T
 	val := ctx.Value(key)
 	if val != nil {
