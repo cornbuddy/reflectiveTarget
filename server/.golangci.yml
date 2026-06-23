@@ -22,6 +22,8 @@ linters:
     paralleltest:
       check-cleanup: true
     testifylint:
+      enable-all: true
+      disable: [encoded-compare]
       go-require:
         ignore-http-handlers: true
   enable:

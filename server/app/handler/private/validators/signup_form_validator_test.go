@@ -81,6 +81,7 @@ func TestSignupFormValidator(t *testing.T) {
 			Password: contracts.Field{
 				Value: weakPassword,
 				Errors: contracts.Errors{
+					validators.ErrPasswordTooShort,
 					validators.ErrPasswordDoesntContainDigits,
 					validators.ErrPasswordDoesntContainSpecialChars,
 				},
