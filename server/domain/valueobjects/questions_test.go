@@ -29,6 +29,8 @@ func TestQuestionStringer(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			got := tc.question.String()
 			assert.Equal(t, tc.want, got)
 		})
@@ -50,12 +52,14 @@ func TestQuestionsStringer(t *testing.T) {
 		"[]",
 	}, {
 		"not empty",
-		vo.Questions{vo.Question{"1", 1}, vo.Question{"2", 2}},
+		vo.Questions{vo.Question{1, "1"}, vo.Question{2, "2"}},
 		"[{ID: 1, Text: '1'}, {ID: 2, Text: '2'}]",
 	}}
 
 	for _, tc := range testCasess {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			got := tc.questions.String()
 			assert.Equal(t, tc.want, got)
 		})
