@@ -83,7 +83,7 @@ func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 		formQ0Val: []string{newQstn},
 	}.Encode())
 
-	r, body, err := utils.MakeRequest(ctForm, post, url, s.handler, form)
+	r, body, err := utils.MakeRequest(ctForm, put, url, s.handler, form)
 	t.Require.NoError(err)
 	t.Equal(http.StatusSeeOther, r.StatusCode)
 	t.Equal("target updated", body)
