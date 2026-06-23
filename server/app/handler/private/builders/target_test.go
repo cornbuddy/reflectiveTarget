@@ -138,6 +138,8 @@ func TestTargetBuilder(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			gotTarget, err := builder.Target(ctx, &tc.form, ownerID, tc.targetID)
 			require.NoError(t, err)
 			assert.Equal(t, tc.wantTarget, gotTarget)

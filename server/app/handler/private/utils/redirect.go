@@ -7,14 +7,14 @@ import (
 )
 
 var (
-	htmxRequestKey = http.CanonicalHeaderKey("HX-Request")
+	HtmxRequestKey = http.CanonicalHeaderKey("HX-Request")
 )
 
 // distinguish is it htmx request, and if it is, passes htmx specific headers to
 // the response. othervise, performs standard http redirect. see
 // https://stackoverflow.com/a/77252592
 func Redirect(w http.ResponseWriter, r *http.Request, url, body string) {
-	isHtmx := r.Header.Get(htmxRequestKey) == "true"
+	isHtmx := r.Header.Get(HtmxRequestKey) == "true"
 	if isHtmx {
 		w.Header().Set("HX-Redirect", url)
 		w.WriteHeader(http.StatusOK)

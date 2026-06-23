@@ -1,4 +1,4 @@
-package utils
+package utils_test
 
 import (
 	"io"
@@ -8,6 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 )
 
 func TestRedirect(t *testing.T) {
@@ -26,14 +28,14 @@ func TestRedirect(t *testing.T) {
 
 	testCases := []testCase{{
 		"should return http redirect on malformed htmx header",
-		http.Header{htmxRequestKey: []string{"false"}},
+		http.Header{utils.HtmxRequestKey: []string{"false"}},
 		"/",
 		body,
 		http.Header{"Location": []string{"/"}},
 		http.StatusSeeOther,
 	}, {
 		"should return htmx redirect on htmx header",
-		http.Header{htmxRequestKey: []string{"true"}},
+		http.Header{utils.HtmxRequestKey: []string{"true"}},
 		"/",
 		body,
 		http.Header{"Hx-Redirect": []string{"/"}},
@@ -49,7 +51,7 @@ func TestRedirect(t *testing.T) {
 
 	for _, tc := range testCases {
 		handle := func(w http.ResponseWriter, r *http.Request) {
-			Redirect(w, r, tc.url, tc.wantBody)
+			utils.Redirect(w, r, tc.url, tc.wantBody)
 		}
 		w := httptest.NewRecorder()
 		r := httptest.NewRequestWithContext(ctx, http.MethodPost, "/kek", nil)

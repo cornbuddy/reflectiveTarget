@@ -1,4 +1,4 @@
-package handler
+package handler_test
 
 import (
 	"context"
@@ -11,6 +11,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/config"
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
@@ -45,7 +46,7 @@ func TestMain(m *testing.M) {
 	}
 
 	db = testDb
-	router = MakeHandler(makeTestConfig(testDb, testCache)).ServeHTTP
+	router = handler.MakeHandler(makeTestConfig(testDb, testCache)).ServeHTTP
 	sessionStore = daos.SessionStore{Cache: testCache}
 	userDao = daos.UserDao{DB: testDb}
 

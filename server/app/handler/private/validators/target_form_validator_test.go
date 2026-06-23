@@ -254,6 +254,8 @@ func TestTargetFormValidator(t *testing.T) {
 	v := validators.TargetFormValidator{repositories.TargetRepo{DB: db}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			got, err := v.Validate(ctx, &tc.form, tc.ownerID, tc.targetID)
 			require.NoError(t, err)
 			assert.Equal(t, tc.wantRes, got)

@@ -1,4 +1,4 @@
-package handler
+package handler_test
 
 import (
 	"bytes"
@@ -25,7 +25,7 @@ func TestShouldReturnNoShotsForEmptyTarget(t *testing.T) {
 	user, err := makeTestUser(db)
 	require.NoError(t, err)
 
-	targetID, err := makeTestTarget(db, int(user.ID))
+	targetID, err := makeTestTarget(ctx, db, int(user.ID))
 	require.NoError(t, err)
 
 	url := fmt.Sprintf("/api/target/%v/shots", targetID)
@@ -54,7 +54,7 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 	user, err := makeTestUser(db)
 	require.NoError(t, err)
 
-	targetID, err := makeTestTarget(db, int(user.ID))
+	targetID, err := makeTestTarget(ctx, db, int(user.ID))
 	require.NoError(t, err)
 
 	shot := valueobjects.Shot{
@@ -77,12 +77,18 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 	assert.JSONEq(t, ctAppJson, resp.Header.Get("Content-Type"))
 	assert.Equal(t, "ok", body, "should save shots")
 
-	res, err := db.QueryContext(ctx,
-		"SELECT * FROM shots WHERE x = $1 AND y = $2",
+	rows, err := db.QueryContext(ctx,
+		"SELECT id FROM shots WHERE x = $1 AND y = $2",
 		shot.X, shot.Y,
 	)
 	require.NoError(t, err)
-	assert.True(t, res.Next(), "should save shots")
+	require.NoError(t, rows.Err())
+
+	t.Cleanup(func() {
+		require.NoError(t, rows.Close())
+	})
+
+	assert.True(t, rows.Next(), "should save shots")
 }
 
 func TestShotsShouldBeValidated(t *testing.T) {
