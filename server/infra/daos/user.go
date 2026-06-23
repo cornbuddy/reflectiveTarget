@@ -3,12 +3,13 @@ package daos
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 )
 
 type UserDao struct {
-	*sql.DB
+	DB *sql.DB
 }
 
 func (dao UserDao) Save(ctx context.Context, user *entities.User) error {
@@ -17,7 +18,7 @@ func (dao UserDao) Save(ctx context.Context, user *entities.User) error {
 		"RETURNING id"
 	username := user.Username
 	hash := user.Password.Hash
-	err := dao.QueryRowContext(ctx, query, username, hash).Scan(&user.ID)
+	err := dao.DB.QueryRowContext(ctx, query, username, hash).Scan(&user.ID)
 	if err != nil {
 		return err
 	}
@@ -28,13 +29,12 @@ func (dao UserDao) Save(ctx context.Context, user *entities.User) error {
 func (dao UserDao) Find(
 	ctx context.Context, username string,
 ) (*entities.User, error) {
-
 	var user entities.User
 	query := "SELECT id, username, hashed_password FROM users " +
 		"WHERE username = $1"
 	err := dao.DB.QueryRowContext(ctx, query, username).
 		Scan(&user.ID, &user.Username, &user.Password.Hash)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		// kinda expected
 		return nil, nil
 	} else if err != nil {

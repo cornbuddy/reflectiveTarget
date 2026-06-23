@@ -12,7 +12,6 @@ import (
 func InsertShots(
 	db *sql.DB, shots vo.Shots, targetId vo.ID, shooter string,
 ) error {
-
 	for i := range shots {
 		err := InsertShot(db, &shots[i], targetId, shooter)
 		if err != nil {
@@ -26,7 +25,6 @@ func InsertShots(
 func InsertShot(
 	db *sql.DB, shot *vo.Shot, targetId vo.ID, shooter string,
 ) error {
-
 	q := "INSERT INTO shots (x, y, target_id, shooter) " +
 		"VALUES($1, $2, $3, $4) "
 	_, err := db.Query(q, shot.X, shot.Y, targetId, shooter)
@@ -40,7 +38,6 @@ func InsertShot(
 func InsertQuestions(
 	db *sql.DB, questions vo.Questions, targetId vo.ID,
 ) error {
-
 	for i := range questions {
 		err := InsertQuestion(db, &questions[i], targetId)
 		if err != nil {

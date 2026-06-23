@@ -32,7 +32,7 @@ func (s *TargetQueriesTest) GetShouldReturnTargetIfExist(t *testgroup.T) {
 	got, err := s.repo.Get(ctx, want.ID)
 	t.Require.NoError(err)
 	t.NotNil(got)
-	t.EqualValues(want, *got)
+	t.Equal(want, *got)
 }
 
 func (s *TargetQueriesTest) ListShouldReturnEmptyListIfNoUser(t *testgroup.T) {

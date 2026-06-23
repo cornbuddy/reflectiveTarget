@@ -1,4 +1,4 @@
-package daos
+package daos_test
 
 import (
 	"database/sql"
@@ -18,7 +18,7 @@ func TestShotsDaoListShouldReturnEmptyListWhenNoShotsForTarget(t *testing.T) {
 	var targetID valueobjects.ID
 	q := "INSERT INTO targets (name, owner_id) VALUES ($1, $2) RETURNING id"
 	name := utils.MakeRandomString(5)
-	require.NoError(t, db.QueryRow(q, name, user.ID).Scan(&targetID))
+	require.NoError(t, db.QueryRowContext(ctx, q, name, user.ID).Scan(&targetID))
 
 	got, err := shotsDao.List(ctx, targetID)
 	require.NoError(t, err)
@@ -52,10 +52,16 @@ func TestShotsDaoShouldSaveShots(t *testing.T) {
 	shots := valueobjects.Shots{shot}
 	require.NoError(t, shotsDao.Save(ctx, shooter, target.ID, shots))
 
-	res, err := db.Query(
-		"SELECT * FROM shots WHERE x = $1 AND y = $2",
+	rows, err := db.QueryContext(ctx,
+		"SELECT id FROM shots WHERE x = $1 AND y = $2",
 		shot.X, shot.Y,
 	)
+
 	require.NoError(t, err)
-	assert.True(t, res.Next(), "should save shot")
+	require.NoError(t, rows.Err())
+
+	//nolint:paralleltest
+	defer rows.Close()
+
+	assert.True(t, rows.Next(), "should save shot")
 }

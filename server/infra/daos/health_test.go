@@ -1,4 +1,4 @@
-package daos
+package daos_test
 
 import (
 	"testing"
@@ -6,30 +6,31 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	testutils "github.com/cornbuddy/reflectiveTarget/server/test/utils"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 func TestHealthShouldReturnErrorWhenDependenciesDontWork(t *testing.T) {
 	t.Parallel()
 
-	cleanUpDb, db, err := testutils.StartDB(ctx)
+	cleanUpDb, db, err := utils.StartDB(ctx)
 	require.NoError(t, err)
 
 	t.Cleanup(func() {
-		assert.NoError(t, cleanUpDb())
+		require.NoError(t, cleanUpDb())
 	})
 
-	cleanUpCache, cache, err := testutils.SetupCache(ctx)
+	cleanUpCache, cache, err := utils.SetupCache(ctx)
 	require.NoError(t, err)
 
 	t.Cleanup(func() {
-		cleanUpCache()
+		require.NoError(t, cleanUpCache())
 	})
 
 	require.NoError(t, db.Close())
 	require.NoError(t, cache.Close())
 
-	health := HealthDao{
+	health := daos.HealthDao{
 		DB:    db,
 		Cache: cache,
 	}

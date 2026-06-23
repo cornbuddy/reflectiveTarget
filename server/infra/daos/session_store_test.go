@@ -1,12 +1,12 @@
-package daos
+package daos_test
 
 import (
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 )
 
 func TestSessionStoreShouldReturnNilWhenNoSessionFound(t *testing.T) {
@@ -51,9 +51,9 @@ func TestSessionStoreShouldSaveAndRestoreSession(t *testing.T) {
 		assert.NotNil(t, got)
 		assert.Equal(t, tc.want, *got)
 
-		key := store.key(tc.token)
+		key := store.Key(tc.token)
 		ttl, err := cache.TTL(ctx, key).Result()
 		require.NoError(t, err)
-		assert.Equal(t, ttl, sessiondata.SessionDuration)
+		assert.Equal(t, sessiondata.SessionDuration, ttl)
 	}
 }

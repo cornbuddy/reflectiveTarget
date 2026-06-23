@@ -42,6 +42,8 @@ func TestContext(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			t.Parallel()
+
 			ctx := log.Context(context.TODO(), tc.fields...)
 			logger, ok := ctx.Value(log.LoggerCtx).(*zap.Logger)
 			assert.True(t, ok)

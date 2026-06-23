@@ -14,7 +14,6 @@ import (
 func RunAndCleanup(
 	ctx context.Context, m *testing.M, cleanups ...Cleanup,
 ) (int, error) {
-
 	code := m.Run()
 	if len(cleanups) == 0 {
 		return code, nil
