@@ -12,7 +12,6 @@ func MakeRequestWithCookies(
 	handle http.HandlerFunc, body io.Reader,
 	cookies ...*http.Cookie,
 ) (*http.Response, string, error) {
-
 	req := httptest.NewRequest(method, url, body)
 	if contentType != "" {
 		req.Header.Set("Content-Type", contentType)
@@ -29,7 +28,6 @@ func MakeRequest(
 	contentType, method, url string,
 	handle http.HandlerFunc, body io.Reader,
 ) (*http.Response, string, error) {
-
 	req := httptest.NewRequest(method, url, body)
 	if contentType != "" {
 		req.Header.Set("Content-Type", contentType)
@@ -41,7 +39,6 @@ func MakeRequest(
 func makeRequest(
 	req *http.Request, handle http.HandlerFunc,
 ) (*http.Response, string, error) {
-
 	w := httptest.NewRecorder()
 	handle(w, req)
 

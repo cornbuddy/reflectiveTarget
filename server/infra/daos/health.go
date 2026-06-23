@@ -8,7 +8,7 @@ import (
 )
 
 type HealthDao struct {
-	*sql.DB
+	DB    *sql.DB
 	Cache *redis.Client
 }
 
@@ -21,7 +21,7 @@ type HealthStatus struct {
 
 func (dao HealthDao) CheckHealth(ctx context.Context) HealthStatus {
 	dbConnections := 0
-	dbConnected := dao.DB.Ping() == nil
+	dbConnected := dao.DB.PingContext(ctx) == nil
 	if dbConnected {
 		dbConnections = dao.DB.Stats().OpenConnections
 	}

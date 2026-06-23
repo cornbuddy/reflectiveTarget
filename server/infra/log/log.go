@@ -6,7 +6,9 @@ import (
 	"go.uber.org/zap"
 )
 
-const LoggerCtx = "logger-ctx"
+type keyCtx int
+
+const LoggerCtx keyCtx = iota
 
 // returns child context with zap logger in it
 func Context(ctx context.Context, fields ...zap.Field) context.Context {
@@ -21,6 +23,7 @@ func Logger(ctx context.Context, fields ...zap.Field) *zap.Logger {
 			"failed to extract logger from context, using default one",
 			zap.Any("context", ctx),
 		)
+
 		return logger.With(fields...)
 	}
 

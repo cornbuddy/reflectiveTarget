@@ -22,8 +22,7 @@ type SessionStore struct {
 func (s SessionStore) Get(
 	ctx context.Context, sessionId string,
 ) (*sessiondata.SessionData, error) {
-
-	key := s.key(sessionId)
+	key := s.Key(sessionId)
 	jsonData, err := s.Cache.Get(ctx, key).Bytes()
 	if errors.Is(err, redis.Nil) {
 		return nil, nil
@@ -42,13 +41,12 @@ func (s SessionStore) Get(
 func (s SessionStore) Update(
 	ctx context.Context, sessionId string, data sessiondata.SessionData,
 ) error {
-
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
 
-	key := s.key(sessionId)
+	key := s.Key(sessionId)
 	err = s.Cache.Set(ctx, key, jsonData, sessiondata.SessionDuration).Err()
 	if err != nil {
 		return err
@@ -57,6 +55,7 @@ func (s SessionStore) Update(
 	return nil
 }
 
-func (s SessionStore) key(sessionId string) string {
+// returns key to the session data
+func (s SessionStore) Key(sessionId string) string {
 	return fmt.Sprintf("%s:%s", prefix, sessionId)
 }

@@ -1,4 +1,4 @@
-package daos
+package daos_test
 
 import (
 	"testing"
@@ -24,13 +24,13 @@ func TestShouldSaveUser(t *testing.T) {
 	t.Parallel()
 
 	want := entities.User{Username: "kek2", Password: password}
-	assert.NoError(t, userDao.Save(ctx, &want))
+	require.NoError(t, userDao.Save(ctx, &want))
 
 	var id valueobjects.ID
 	query := "SELECT id FROM users WHERE username = $1"
-	assert.NoError(t, db.QueryRow(query, want.Username).Scan(&id))
+	require.NoError(t, db.QueryRowContext(ctx, query, want.Username).Scan(&id))
 	assert.GreaterOrEqual(t, id, 1)
-	assert.Equal(t, id, want.ID)
+	assert.Equal(t, want.ID, id)
 }
 
 func TestShouldFindUserIfExists(t *testing.T) {
@@ -38,11 +38,11 @@ func TestShouldFindUserIfExists(t *testing.T) {
 
 	query := "INSERT INTO users (username, hashed_password) VALUES ($1, $2)"
 	username := "kek"
-	_, err := db.Exec(query, username, "kek1")
-	assert.NoError(t, err)
+	_, err := db.ExecContext(ctx, query, username, "kek1")
+	require.NoError(t, err)
 
 	user, err := userDao.Find(ctx, username)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, username, user.Username)
 	assert.NotEmpty(t, user.Password.Hash)
 	assert.GreaterOrEqual(t, user.ID, 1)
@@ -52,6 +52,6 @@ func TestShouldReturnNilIfUserDoesNotExist(t *testing.T) {
 	t.Parallel()
 
 	user, err := userDao.Find(ctx, "not-exists")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Nil(t, user)
 }

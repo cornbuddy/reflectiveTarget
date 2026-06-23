@@ -8,20 +8,17 @@ import (
 )
 
 type ShotsDao struct {
-	*sql.DB
+	DB *sql.DB
 }
 
 func (d ShotsDao) List(ctx context.Context, targetID vo.ID) (vo.Shots, error) {
-	q := "SELECT id FROM targets WHERE id = $1"
-	if err := d.DB.QueryRowContext(ctx, q, targetID).Scan(&targetID); err != nil {
-		return nil, err
-	}
-
-	q = "SELECT x, y FROM shots WHERE target_id = $1"
+	q := "SELECT x, y FROM shots WHERE target_id = $1"
 	rows, err := d.DB.QueryContext(ctx, q, targetID)
 	if err != nil {
 		return nil, err
 	}
+
+	defer rows.Close()
 
 	shots := vo.Shots{}
 	for rows.Next() {
@@ -33,20 +30,32 @@ func (d ShotsDao) List(ctx context.Context, targetID vo.ID) (vo.Shots, error) {
 		shots = append(shots, shot)
 	}
 
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return shots, nil
 }
 
 func (d ShotsDao) Save(
 	ctx context.Context, shooter string, targetID vo.ID, shots vo.Shots,
 ) error {
-
-	q := "INSERT INTO shots (x, y, target_id, shooter) " +
-		"VALUES ($1, $2, $3, $4)"
+	var err error
+	var rows *sql.Rows
+	// TODO: use copy protocol https://github.com/jackc/pgx/discussions/1545
 	for _, shot := range shots {
+		q := "INSERT INTO shots (x, y, target_id, shooter) " +
+			"VALUES ($1, $2, $3, $4)"
 		x := shot.X
 		y := shot.Y
-		_, err := d.DB.QueryContext(ctx, q, x, y, targetID, shooter)
+		rows, err = d.DB.QueryContext(ctx, q, x, y, targetID, shooter)
 		if err != nil {
+			return err
+		}
+
+		defer rows.Close()
+
+		if err := rows.Err(); err != nil {
 			return err
 		}
 	}

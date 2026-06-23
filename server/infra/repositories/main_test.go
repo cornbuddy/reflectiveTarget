@@ -25,15 +25,14 @@ func TestMain(m *testing.M) {
 		log.Fatalf("failed to setup db: %v", err)
 	}
 
-	defer func() {
-		if err := cleanup(); err != nil {
-			log.Fatalf("failed to clean up db: %v", err)
-		}
-	}()
-
 	db = testDb
 
-	os.Exit(m.Run())
+	code, err := utils.RunAndCleanup(ctx, m, cleanup)
+	if err != nil {
+		log.Fatalf("failed to cleanup: %v", err)
+	}
+
+	os.Exit(code)
 }
 
 func makeTarget(owner entities.User) aggregations.Target {

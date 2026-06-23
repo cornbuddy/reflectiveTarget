@@ -2,6 +2,10 @@
 version: "2"
 linters:
   settings:
+    errcheck:
+      exclude-functions:
+        # this method never returns error, see source code
+        - (*database/sql.Rows).Close
     gocognit:
       min-complexity: 20
     goconst:
@@ -34,6 +38,7 @@ linters:
     - durationcheck
     - embeddedstructfieldcheck
     - err113
+    - errcheck
     - errname
     - errorlint
     - funcorder

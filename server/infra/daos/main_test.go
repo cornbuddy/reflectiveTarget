@@ -1,4 +1,4 @@
-package daos
+package daos_test
 
 import (
 	"context"
@@ -13,6 +13,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -21,10 +22,10 @@ var (
 
 	db       *sql.DB
 	cache    *redis.Client
-	health   HealthDao
-	store    SessionStore
-	shotsDao ShotsDao
-	userDao  UserDao
+	health   daos.HealthDao
+	store    daos.SessionStore
+	shotsDao daos.ShotsDao
+	userDao  daos.UserDao
 
 	target   aggregations.Target
 	user     entities.User
@@ -38,22 +39,10 @@ func TestMain(m *testing.M) {
 		log.Fatalf("failed to setup db: %v", err)
 	}
 
-	defer func() {
-		if err := cleanUpDb(); err != nil {
-			log.Fatalf("failed to clean up db: %v", err)
-		}
-	}()
-
 	cleanUpCache, testCache, err := utils.SetupCache(ctx)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
 	}
-
-	defer func() {
-		if err := cleanUpCache(); err != nil {
-			log.Fatalf("failed to clean up cache: %v", err)
-		}
-	}()
 
 	pwd, err := valueobjects.NewPassword("kek")
 	if err != nil {
@@ -62,10 +51,10 @@ func TestMain(m *testing.M) {
 
 	cache = testCache
 	db = testDb
-	userDao = UserDao{DB: db}
-	shotsDao = ShotsDao{DB: db}
-	store = SessionStore{cache}
-	health = HealthDao{db, cache}
+	userDao = daos.UserDao{DB: db}
+	shotsDao = daos.ShotsDao{DB: db}
+	store = daos.SessionStore{cache}
+	health = daos.HealthDao{db, cache}
 
 	password = *pwd
 	user = entities.User{
@@ -80,18 +69,22 @@ func TestMain(m *testing.M) {
 		valueobjects.Shot{X: rand.IntN(101), Y: rand.IntN(101)},
 	}
 
-	if err := fillDatabase(db, &user, &target, shots); err != nil {
+	if err := fillDatabase(ctx, db, &user, &target, shots); err != nil {
 		log.Fatalf("failed to fill db: %v", err)
 	}
 
-	os.Exit(m.Run())
+	code, err := utils.RunAndCleanup(ctx, m, cleanUpCache, cleanUpDb)
+	if err != nil {
+		log.Fatalf("failed to cleanup: %v", err)
+	}
+
+	os.Exit(code)
 }
 
 func fillDatabase(
-	db *sql.DB, user *entities.User, target *aggregations.Target,
-	shots valueobjects.Shots,
+	ctx context.Context, db *sql.DB, user *entities.User,
+	target *aggregations.Target, shots valueobjects.Shots,
 ) error {
-
 	if err := utils.InsertUser(db, user); err != nil {
 		return err
 	}
@@ -105,10 +98,15 @@ func fillDatabase(
 		"VALUES ($1, $2, $3, $4)"
 	shooter := "i'm-a-shooter"
 	for _, shot := range shots {
-		_, err := db.Query(q, shot.X, shot.Y, target.ID, shooter)
-		if err != nil {
+		rows, err := db.QueryContext(ctx, q, shot.X, shot.Y, target.ID, shooter)
+		switch {
+		case err != nil:
 			return err
+		case rows.Err() != nil:
+			return rows.Err()
 		}
+
+		defer rows.Close()
 	}
 
 	return nil
