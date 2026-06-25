@@ -272,7 +272,7 @@ func insertTestTarget(db *sql.DB) (
 		return nil, nil, err
 	}
 
-	if err := utils.InsertUser(db, user); err != nil {
+	if err := utils.InsertUser(ctx, db, user); err != nil {
 		return nil, nil, err
 	}
 
@@ -285,7 +285,7 @@ func insertTestTarget(db *sql.DB) (
 			Text: utils.MakeRandomString(5),
 		}},
 	}
-	if err := utils.InsertTarget(db, target); err != nil {
+	if err := utils.InsertTarget(ctx, db, target); err != nil {
 		return nil, nil, err
 	}
 

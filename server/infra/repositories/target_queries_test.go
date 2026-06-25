@@ -68,7 +68,7 @@ func (s *TargetQueriesTest) PreGroup(t *testgroup.T) {
 	t.Require.NoError(err)
 
 	users := entities.Users{*owner1, *owner2}
-	t.Require.NoError(testutils.InsertUsers(db, users))
+	t.Require.NoError(testutils.InsertUsers(ctx, db, users))
 
 	questions := vo.Questions{
 		{Text: "kek1?"},
@@ -94,7 +94,7 @@ func (s *TargetQueriesTest) PreGroup(t *testgroup.T) {
 		Questions: append(vo.Questions{}, questions...),
 		Shots:     append(vo.Shots{}, shots...),
 	}}
-	t.Require.NoError(testutils.InsertTargets(db, targets))
+	t.Require.NoError(testutils.InsertTargets(ctx, db, targets))
 
 	s.owner1 = &users[0]
 	s.owner2 = &users[1]

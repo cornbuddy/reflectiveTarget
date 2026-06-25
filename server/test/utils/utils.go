@@ -39,7 +39,9 @@ func DeepCopy[T any](val T) (*T, error) {
 	}
 
 	var res T
-	json.Unmarshal(bytes, &res)
+	if err := json.Unmarshal(bytes, &res); err != nil {
+		return nil, err
+	}
 
 	return &res, nil
 }

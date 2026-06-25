@@ -22,7 +22,7 @@ func SetupDB(ctx context.Context) (Cleanup, *sql.DB, error) {
 		return cleanup, nil, err
 	}
 
-	if _, err := db.Exec(migrations.InitQuery); err != nil {
+	if _, err := db.ExecContext(ctx, migrations.InitQuery); err != nil {
 		return cleanup, nil, err
 	}
 
@@ -31,6 +31,7 @@ func SetupDB(ctx context.Context) (Cleanup, *sql.DB, error) {
 
 // starts testcontainer with database
 func StartDB(ctx context.Context) (Cleanup, *sql.DB, error) {
+	//nolint:mnd
 	str := wait.ForLog("database system is ready to accept connections").
 		WithOccurrence(2).
 		WithStartupTimeout(5 * time.Second)

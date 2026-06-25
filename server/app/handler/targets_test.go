@@ -49,7 +49,7 @@ func (s *TargetsSuite) UpdateShouldBeIdempotent(t *testgroup.T) {
 		Owner:     *s.owner,
 		Questions: vo.Questions{question},
 	}
-	t.Require.NoError(utils.InsertTarget(db, &target))
+	t.Require.NoError(utils.InsertTarget(ctx, db, &target))
 
 	url := fmt.Sprintf("/targets/%d", target.ID)
 	form := strings.NewReader(neturl.Values{
@@ -72,7 +72,7 @@ func (s *TargetsSuite) ShouldUpdateExistingTarget(t *testgroup.T) {
 		Owner:     *s.owner,
 		Questions: vo.Questions{question},
 	}
-	t.Require.NoError(utils.InsertTarget(db, &target))
+	t.Require.NoError(utils.InsertTarget(ctx, db, &target))
 
 	question = target.Questions[0]
 	newQstn := "updated question, still single"
@@ -208,8 +208,8 @@ func (s *TargetsSuite) PreGroup(t *testgroup.T) {
 	foreigner, err := entities.NewUser("user2", "password")
 	t.Require.NoError(err)
 
-	t.Require.NoError(utils.InsertUser(db, owner))
-	t.Require.NoError(utils.InsertUser(db, foreigner))
+	t.Require.NoError(utils.InsertUser(ctx, db, owner))
+	t.Require.NoError(utils.InsertUser(ctx, db, foreigner))
 
 	questions := vo.Questions{
 		{Text: "kek1?"},
@@ -230,7 +230,7 @@ func (s *TargetsSuite) PreGroup(t *testgroup.T) {
 		Questions: append(vo.Questions{}, questions...),
 		Shots:     append(vo.Shots{}, shots...),
 	}}
-	t.Require.NoError(utils.InsertTargets(db, ownedTargets))
+	t.Require.NoError(utils.InsertTargets(ctx, db, ownedTargets))
 
 	foreignTargets := aggregations.Targets{aggregations.Target{
 		Name:      "test3",
@@ -238,7 +238,7 @@ func (s *TargetsSuite) PreGroup(t *testgroup.T) {
 		Questions: append(vo.Questions{}, questions...),
 		Shots:     append(vo.Shots{}, shots...),
 	}}
-	t.Require.NoError(utils.InsertTargets(db, foreignTargets))
+	t.Require.NoError(utils.InsertTargets(ctx, db, foreignTargets))
 
 	token := "kekeke"
 	session := sessiondata.SessionData{

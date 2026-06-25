@@ -118,7 +118,7 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 		return nil, err
 	}
 
-	if err := utils.InitDatabase(db); err != nil {
+	if err := utils.InitDatabase(ctx, db); err != nil {
 		return nil, err
 	}
 
