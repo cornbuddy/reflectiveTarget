@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"errors"
+	"log"
 
 	"github.com/redis/go-redis/v9"
 	tc "github.com/testcontainers/testcontainers-go"
@@ -49,7 +50,7 @@ func SetupCache(ctx context.Context) (Cleanup, *redis.Client, error) {
 
 	cleanup = func() error {
 		if err := client.Close(); err != nil {
-			return err
+			log.Printf("failed to close redis client: %v", err)
 		}
 
 		if err := tc.TerminateContainer(cont); err != nil {

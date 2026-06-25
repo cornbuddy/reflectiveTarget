@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"database/sql"
+	"log"
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -64,7 +65,7 @@ func StartDB(ctx context.Context) (Cleanup, *sql.DB, error) {
 
 	cleanup = func() error {
 		if err := db.Close(); err != nil {
-			return err
+			log.Printf("failed to close db client: %v", err)
 		}
 
 		if err := tc.TerminateContainer(cont); err != nil {
