@@ -12,7 +12,12 @@ type ShotsDao struct {
 }
 
 func (d ShotsDao) List(ctx context.Context, targetID vo.ID) (vo.Shots, error) {
-	q := "SELECT x, y FROM shots WHERE target_id = $1"
+	q := "SELECT id FROM targets WHERE id = $1"
+	if err := d.DB.QueryRowContext(ctx, q, targetID).Scan(&targetID); err != nil {
+		return nil, err
+	}
+
+	q = "SELECT x, y FROM shots WHERE target_id = $1"
 	rows, err := d.DB.QueryContext(ctx, q, targetID)
 	if err != nil {
 		return nil, err
