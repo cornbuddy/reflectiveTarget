@@ -85,12 +85,12 @@ func fillDatabase(
 	ctx context.Context, db *sql.DB, user *entities.User,
 	target *aggregations.Target, shots valueobjects.Shots,
 ) error {
-	if err := utils.InsertUser(db, user); err != nil {
+	if err := utils.InsertUser(ctx, db, user); err != nil {
 		return err
 	}
 
 	target.Owner = *user
-	if err := utils.InsertTarget(db, target); err != nil {
+	if err := utils.InsertTarget(ctx, db, target); err != nil {
 		return err
 	}
 

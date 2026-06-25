@@ -17,7 +17,7 @@ func TestSignupFormValidator(t *testing.T) {
 
 	user, err := entities.NewUser("yet another username", validPassword)
 	require.NoError(t, err)
-	require.NoError(t, utils.InsertUser(db, user))
+	require.NoError(t, utils.InsertUser(ctx, db, user))
 
 	type testCase struct {
 		form  contracts.SignupForm

@@ -58,7 +58,7 @@ func (s *TargetCommandsTest) SaveShouldSaveTarget(t *testgroup.T) {
 func (s *TargetCommandsTest) PreGroup(t *testgroup.T) {
 	owner, err := entities.NewUser(utils.MakeRandomString(5), "password")
 	t.Require.NoError(err)
-	t.Require.NoError(utils.InsertUser(db, owner))
+	t.Require.NoError(utils.InsertUser(ctx, db, owner))
 
 	s.repo = &repositories.TargetRepo{db}
 	s.owner = owner

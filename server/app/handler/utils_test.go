@@ -39,7 +39,7 @@ func makeTestUser(db *sql.DB) (*entities.User, error) {
 		return nil, err
 	}
 
-	if err := utils.InsertUser(db, user); err != nil {
+	if err := utils.InsertUser(ctx, db, user); err != nil {
 		return nil, err
 	}
 

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
@@ -10,10 +11,11 @@ import (
 )
 
 func InsertShots(
-	db *sql.DB, shots vo.Shots, targetId vo.ID, shooter string,
+	ctx context.Context, db *sql.DB, shots vo.Shots, targetId vo.ID,
+	shooter string,
 ) error {
 	for i := range shots {
-		err := InsertShot(db, &shots[i], targetId, shooter)
+		err := InsertShot(ctx, db, &shots[i], targetId, shooter)
 		if err != nil {
 			return err
 		}
@@ -23,12 +25,19 @@ func InsertShots(
 }
 
 func InsertShot(
-	db *sql.DB, shot *vo.Shot, targetId vo.ID, shooter string,
+	ctx context.Context, db *sql.DB, shot *vo.Shot, targetId vo.ID,
+	shooter string,
 ) error {
 	q := "INSERT INTO shots (x, y, target_id, shooter) " +
 		"VALUES($1, $2, $3, $4) "
-	_, err := db.Query(q, shot.X, shot.Y, targetId, shooter)
+	rows, err := db.QueryContext(ctx, q, shot.X, shot.Y, targetId, shooter)
 	if err != nil {
+		return err
+	}
+
+	defer rows.Close()
+
+	if err := rows.Err(); err != nil {
 		return err
 	}
 
@@ -36,10 +45,10 @@ func InsertShot(
 }
 
 func InsertQuestions(
-	db *sql.DB, questions vo.Questions, targetId vo.ID,
+	ctx context.Context, db *sql.DB, questions vo.Questions, targetId vo.ID,
 ) error {
 	for i := range questions {
-		err := InsertQuestion(db, &questions[i], targetId)
+		err := InsertQuestion(ctx, db, &questions[i], targetId)
 		if err != nil {
 			return err
 		}
@@ -48,10 +57,12 @@ func InsertQuestions(
 	return nil
 }
 
-func InsertQuestion(db *sql.DB, question *vo.Question, targetId vo.ID) error {
+func InsertQuestion(
+	ctx context.Context, db *sql.DB, question *vo.Question, targetId vo.ID,
+) error {
 	q := "INSERT INTO questions (text, target_id) VALUES($1, $2) " +
 		"RETURNING id"
-	err := db.QueryRow(q, question.Text, targetId).Scan(&question.ID)
+	err := db.QueryRowContext(ctx, q, question.Text, targetId).Scan(&question.ID)
 	if err != nil {
 		return err
 	}
@@ -59,9 +70,9 @@ func InsertQuestion(db *sql.DB, question *vo.Question, targetId vo.ID) error {
 	return nil
 }
 
-func InsertUsers(db *sql.DB, users entities.Users) error {
+func InsertUsers(ctx context.Context, db *sql.DB, users entities.Users) error {
 	for i := range users {
-		if err := InsertUser(db, &users[i]); err != nil {
+		if err := InsertUser(ctx, db, &users[i]); err != nil {
 			return err
 		}
 	}
@@ -69,10 +80,11 @@ func InsertUsers(db *sql.DB, users entities.Users) error {
 	return nil
 }
 
-func InsertUser(db *sql.DB, user *entities.User) error {
+func InsertUser(ctx context.Context, db *sql.DB, user *entities.User) error {
 	q := "INSERT INTO users (username, hashed_password) VALUES($1, $2) " +
 		"RETURNING id"
-	err := db.QueryRow(q, user.Username, user.Password.Hash).Scan(&user.ID)
+	err := db.QueryRowContext(ctx, q, user.Username, user.Password.Hash).
+		Scan(&user.ID)
 	if err != nil {
 		return err
 	}
@@ -80,9 +92,11 @@ func InsertUser(db *sql.DB, user *entities.User) error {
 	return nil
 }
 
-func InsertTargets(db *sql.DB, targets aggregations.Targets) error {
+func InsertTargets(
+	ctx context.Context, db *sql.DB, targets aggregations.Targets,
+) error {
 	for i := range targets {
-		if err := InsertTarget(db, &targets[i]); err != nil {
+		if err := InsertTarget(ctx, db, &targets[i]); err != nil {
 			return err
 		}
 	}
@@ -90,20 +104,23 @@ func InsertTargets(db *sql.DB, targets aggregations.Targets) error {
 	return nil
 }
 
-func InsertTarget(db *sql.DB, target *aggregations.Target) error {
+func InsertTarget(
+	ctx context.Context, db *sql.DB, target *aggregations.Target,
+) error {
 	q := "INSERT INTO targets (name, owner_id) VALUES($1, $2) " +
 		"RETURNING id"
-	err := db.QueryRow(q, target.Name, target.Owner.ID).Scan(&target.ID)
+	err := db.QueryRowContext(ctx, q, target.Name, target.Owner.ID).
+		Scan(&target.ID)
 	if err != nil {
 		return err
 	}
 
 	id := target.ID
-	if err := InsertQuestions(db, target.Questions, id); err != nil {
+	if err := InsertQuestions(ctx, db, target.Questions, id); err != nil {
 		return err
 	}
 
-	if err := InsertShots(db, target.Shots, id, "kek"); err != nil {
+	if err := InsertShots(ctx, db, target.Shots, id, "kek"); err != nil {
 		return err
 	}
 

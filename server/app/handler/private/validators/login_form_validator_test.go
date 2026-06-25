@@ -25,7 +25,7 @@ func TestLoginFormValidation(t *testing.T) {
 	const absentUsername = "do not exist"
 	user, err := entities.NewUser("completely random username", validPassword)
 	require.NoError(t, err)
-	require.NoError(t, utils.InsertUser(db, user))
+	require.NoError(t, utils.InsertUser(ctx, db, user))
 
 	testCases := []testCase{{
 		"empty fields",

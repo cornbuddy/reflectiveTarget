@@ -11,6 +11,8 @@ import (
 
 const CacheImage = "redis:8"
 
+var ErrFailedToCreateCacheClient = errors.New("failed to create redis client")
+
 func SetupCache(ctx context.Context) (Cleanup, *redis.Client, error) {
 	cont, err := tcredis.Run(ctx, CacheImage)
 
@@ -38,7 +40,7 @@ func SetupCache(ctx context.Context) (Cleanup, *redis.Client, error) {
 
 	client := redis.NewClient(opts)
 	if client == nil {
-		return cleanup, nil, errors.New("failed to create redis client")
+		return cleanup, nil, ErrFailedToCreateCacheClient
 	}
 
 	if err := client.Ping(ctx).Err(); err != nil {
