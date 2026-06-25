@@ -41,7 +41,7 @@ func StartDB(ctx context.Context) (Cleanup, *sql.DB, error) {
 	}
 	cont, err := postgres.Run(ctx, DbImage, opts...)
 
-	cleanup := func() error {
+	terminate := func() error {
 		if err := tc.TerminateContainer(cont); err != nil {
 			return err
 		}
@@ -50,29 +50,25 @@ func StartDB(ctx context.Context) (Cleanup, *sql.DB, error) {
 	}
 
 	if err != nil {
-		return cleanup, nil, err
+		return terminate, nil, err
 	}
 
 	connStr, err := cont.ConnectionString(ctx, "sslmode=disable")
 	if err != nil {
-		return cleanup, nil, err
+		return terminate, nil, err
 	}
 
 	db, err := sql.Open("pgx", connStr)
 	if err != nil {
-		return cleanup, nil, err
+		return terminate, nil, err
 	}
 
-	cleanup = func() error {
+	cleanup := func() error {
 		if err := db.Close(); err != nil {
 			log.Printf("failed to close db client: %v", err)
 		}
 
-		if err := tc.TerminateContainer(cont); err != nil {
-			return err
-		}
-
-		return nil
+		return terminate()
 	}
 
 	return cleanup, db, nil
