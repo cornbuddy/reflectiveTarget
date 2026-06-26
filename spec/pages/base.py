@@ -3,24 +3,68 @@ import logging
 from playwright.sync_api import Page, Locator
 
 
-# holds the information about most used locators
-LOCATORS = {
-    # layout
-    "sidebar_toggler": "#sidebar-toggler",
-    "sidebar": "nav",
-    "form": "form",
-    "submit": "//button[@type='submit']",
-    # target form
-    "canvas": "canvas",
-    "name": "//input[@name='name']",
-    "add_question": "//button[text()='Add question']",
-    "questions": "//input[starts-with(@placeholder, 'Question')]",
-    "question": lambda i: f"//input[@name='question_{i}_value']",
-    # authz form
-    "username": "input#username",
-    "password": "input#password",
-    "confirmation": "input#confirmation",
-}
+class Locators:
+    """contains key locators of the application"""
+
+    @classmethod
+    def sidebar_toggler(cls) -> str:
+        """button to toggle sidebar"""
+        return "#sidebar-toggler"
+
+    @classmethod
+    def sidebar(cls) -> str:
+        """sidebar menu"""
+        return "nav"
+
+    @classmethod
+    def form(cls) -> str:
+        """http form"""
+        return "form"
+
+    @classmethod
+    def submit(cls) -> str:
+        """button to submit the form"""
+        return "//button[@type='submit']"
+
+    @classmethod
+    def target(cls) -> str:
+        """canvas to draw target"""
+        return "canvas"
+
+    @classmethod
+    def target_name(cls) -> str:
+        """target name form input"""
+        return "//input[@name='name']"
+
+    @classmethod
+    def add_question(cls) -> str:
+        """button to add question to the form"""
+        return "//button[text()='Add question']"
+
+    @classmethod
+    def questions(cls) -> str:
+        """list of all questions of the target"""
+        return "//input[starts-with(@placeholder, 'Question')]"
+
+    @classmethod
+    def question(cls, i: int) -> str:
+        """question with the given index i"""
+        return f"//input[@name='question_{i}_value']"
+
+    @classmethod
+    def username(cls) -> str:
+        """username form input"""
+        return "input#username"
+
+    @classmethod
+    def password(cls) -> str:
+        """password form input"""
+        return "input#password"
+
+    @classmethod
+    def confirmation(cls) -> str:
+        """confirmation form input"""
+        return "input#confirmation"
 
 
 class _Model:
@@ -48,12 +92,12 @@ class Layout(_Model):
     @property
     def sidebar_toggler(self):
         """button to toggle sidebar"""
-        return self.page.locator(LOCATORS["sidebar_toggler"])
+        return self.page.locator(Locators.sidebar_toggler())
 
     @property
     def sidebar(self):
         """sidebar with navigation"""
-        return self.page.locator(LOCATORS["sidebar"])
+        return self.page.locator(Locators.sidebar())
 
     def ensure_navigation_opened(self):
         """opens navigation bar if not opened"""
@@ -95,9 +139,9 @@ class _Form(_Page):
     @property
     def form(self) -> Locator:
         """html form"""
-        return self.page.locator(LOCATORS["form"])
+        return self.page.locator(Locators.form())
 
     @property
     def submit(self) -> Locator:
         """button to submit form"""
-        return self.page.locator(LOCATORS["submit"])
+        return self.page.locator(Locators.submit())

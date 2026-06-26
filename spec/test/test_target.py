@@ -2,7 +2,7 @@ import pytest
 from playwright.sync_api import expect
 
 from constants import URL
-from pages.base import LOCATORS
+from pages.base import Locators
 from pages.pages import NewTargetPage, TargetsListPage, UpdateTargetPage
 
 TARGET_NAME = "totally unique target"
@@ -10,19 +10,19 @@ TARGET_NAME = "totally unique target"
 
 def test_has_proper_components(new_target_page: NewTargetPage):
     locators = [
-        (LOCATORS["form"]),
-        (LOCATORS["canvas"]),
-        (LOCATORS["submit"]),
-        (LOCATORS["add_question"]),
-        (LOCATORS["name"]),
-        (LOCATORS["question"](0)),
+        Locators.form(),
+        Locators.target(),
+        Locators.submit(),
+        Locators.add_question(),
+        Locators.target_name(),
+        Locators.question(0),
     ]
     for locator in locators:
         expect(new_target_page.page.locator(locator)).to_have_count(1)
 
 
-def test_canvas_is_properly_sized(new_target_page: NewTargetPage):
-    size = new_target_page.page.locator(LOCATORS["canvas"]).bounding_box()
+def test_target_is_properly_sized(new_target_page: NewTargetPage):
+    size = new_target_page.page.locator(Locators.target()).bounding_box()
     assert abs(size["height"] - size["width"]) < 1
 
 
@@ -30,7 +30,7 @@ def test_target_can_have_many_questions(new_target_page: NewTargetPage):
     name, questions = "kek?", ["kek1", "kek2", "kek3"]
     target_id = new_target_page.create_target(name, questions)
     update_page = UpdateTargetPage(new_target_page.page, target_id)
-    inputs = update_page.page.locator(LOCATORS["questions"])
+    inputs = update_page.page.locator(Locators.questions())
     expect(inputs).to_have_count(len(questions))
     expect(update_page.name_input).to_have_attribute("value", name)
     for i, qstn_input in enumerate(inputs.all()):
@@ -54,7 +54,7 @@ def test_user_should_be_able_to_edit_its_target(
     want_question = "new question value"
     update_page.update_target(TARGET_NAME, [want_question])
     page.get_by_text(TARGET_NAME).click()
-    question_input = page.locator(LOCATORS["question"](0))
+    question_input = page.locator(Locators.question(0))
     expect(question_input).to_have_attribute("value", want_question)
 
 

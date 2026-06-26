@@ -1,7 +1,7 @@
 from playwright.sync_api import Page
 
 from constants import URL
-from .base import _Form, _Page, LOCATORS
+from .base import _Form, _Page, Locators
 
 
 class LoginPage(_Form):
@@ -9,8 +9,8 @@ class LoginPage(_Form):
 
     def __init__(self, page: Page):
         super().__init__(page, f"{URL}/login")
-        self.username_input = page.locator(LOCATORS["username"])
-        self.password_input = page.locator(LOCATORS["password"])
+        self.username_input = page.locator(Locators.username())
+        self.password_input = page.locator(Locators.password())
 
     def login(self, username: str, password: str):
         self.log.info("going to login as %s", username)
@@ -35,9 +35,9 @@ class SignupPage(_Form):
 
     def __init__(self, page: Page):
         super().__init__(page, f"{URL}/signup")
-        self.username_input = page.locator(LOCATORS["username"])
-        self.password_input = page.locator(LOCATORS["password"])
-        self.confirmation_input = self.form.locator(LOCATORS["confirmation"])
+        self.username_input = page.locator(Locators.username())
+        self.password_input = page.locator(Locators.password())
+        self.confirmation_input = self.form.locator(Locators.confirmation())
 
     def signup(self, username: str, password: str, confirmation: str = None):
         self.log.info("signing up as %s", username)
@@ -81,8 +81,8 @@ class NewTargetPage(_Form):
 
     def __init__(self, page: Page):
         super().__init__(page, f"{URL}/targets/new")
-        self.name_input = page.locator(LOCATORS["name"])
-        self.add_question = page.locator(LOCATORS["add_question"])
+        self.name_input = page.locator(Locators.target_name())
+        self.add_question = page.locator(Locators.add_question())
 
     def create_target(self, name: str, questions: list) -> int:
         """creates target with given parameters. returns id of the target"""
@@ -94,7 +94,7 @@ class NewTargetPage(_Form):
                 self.log.debug("adding question input")
                 self.add_question.click()
             self.log.debug("looking for input question locator")
-            inpt = self.page.locator(LOCATORS["question"](i))
+            inpt = self.page.locator(Locators.question(i))
             self.log.debug("filling input text=%s input=%s", question, inpt)
             inpt.fill(question)
             self.log.debug("done filling")
@@ -113,7 +113,7 @@ class UpdateTargetPage(_Form):
     def __init__(self, page: Page, target_id: int):
         super().__init__(page, f"{URL}/targets/{target_id}")
         self.target_id = target_id
-        self.name_input = page.locator(LOCATORS["name"])
+        self.name_input = page.locator(Locators.target_name())
 
     def update_target(self, name: str, questions: list):
         self.log.info("updating target name=%s id=%d", name, self.target_id)
@@ -121,7 +121,7 @@ class UpdateTargetPage(_Form):
         self.name_input.fill(name)
         for i, question in enumerate(questions):
             self.log.debug("creating question i=%d text=%s", i, question)
-            inpt = self.page.locator(LOCATORS["question"](i))
+            inpt = self.page.locator(Locators.question(i))
             self.log.debug("filling question input")
             inpt.clear()
             inpt.fill(question)
