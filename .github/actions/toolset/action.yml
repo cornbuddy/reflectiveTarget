@@ -1,0 +1,18 @@
+---
+
+name: toolset
+description: sets up all required tools to work with the repo
+
+runs:
+  using: composite
+  steps:
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: actions/setup-python@v4
+        with:
+          update-environment: false
+          python-version: "3.13"
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "~1.26"

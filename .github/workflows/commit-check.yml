@@ -16,18 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          update-environment: false
-      - uses: oven-sh/setup-bun@v2
-      - uses: actions/setup-go@v6
-        with:
-          go-version: "~1.26"
+      - uses: ./.github/actions/toolset
       - uses: pre-commit/action@v3.0.1
 
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: ./.github/actions/toolset
       - run: make test
