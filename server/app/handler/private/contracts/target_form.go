@@ -21,16 +21,15 @@ var (
 )
 
 type TargetForm struct {
-	Name Field
-	// TODO: switch to QuestionFields
-	Questions Fields
+	Name      Field
+	Questions QuestionFields
 }
 
 func NewTargetFormFromTarget(target aggregations.Target) TargetForm {
-	questions := make(Fields, 0, len(target.Questions))
+	questions := make(QuestionFields, 0, len(target.Questions))
 	for _, question := range target.Questions {
 		field := Field{ID: question.ID, Value: question.Text}
-		questions = append(questions, field)
+		questions = append(questions, QuestionField{field})
 	}
 
 	return TargetForm{
@@ -58,7 +57,7 @@ func (f *TargetForm) String() string {
 	)
 }
 
-func parseQuestions(form url.Values) (Fields, error) {
+func parseQuestions(form url.Values) (QuestionFields, error) {
 	valueAttrs := slices.DeleteFunc(mapKeys(form), func(key string) bool {
 		return !questionValue.MatchString(key)
 	})
@@ -77,7 +76,7 @@ func parseQuestions(form url.Values) (Fields, error) {
 		return cmp.Compare(ai, bi)
 	})
 
-	var questions []Field
+	var questions QuestionFields
 	for i, valueAttr := range valueAttrs {
 		id := valueobjects.ID(0)
 		idAttr := fmt.Sprintf("question_%d_id", i)
@@ -94,9 +93,9 @@ func parseQuestions(form url.Values) (Fields, error) {
 			id = valueobjects.ID(intID)
 		}
 
-		questions = append(questions, Field{
+		questions = append(questions, QuestionField{Field{
 			ID: id, Value: form.Get(valueAttr),
-		})
+		}})
 	}
 
 	return questions, nil

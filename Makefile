@@ -1,7 +1,10 @@
 COMPOSE = docker compose -f develop/compose.yml
 
-.PHONY: all
-all: build run
+.PHONY: dev
+dev: build run
+
+.PHONY: e2e
+e2e: lint test spec
 
 .PHONY: run
 run: stop

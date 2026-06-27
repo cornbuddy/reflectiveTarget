@@ -66,8 +66,10 @@ func (v *TargetFormValidator) Validate(
 	}
 
 	if len(form.Questions) == 0 {
-		form.Questions = []contracts.Field{{
-			Errors: contracts.Errors{ErrEmpty},
+		form.Questions = contracts.QuestionFields{{
+			Field: contracts.Field{
+				Errors: contracts.Errors{ErrEmpty},
+			},
 		}}
 	}
 

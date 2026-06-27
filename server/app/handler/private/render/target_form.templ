@@ -33,10 +33,8 @@ templ targetForm(data TargetFormData) {
 			for i, q := range data.Questions {
 				<section id={ fmt.Sprintf("question_%d", i) }>
 					{{ ph := fmt.Sprintf("Question %d", i+1) }}
-					{{ value := fmt.Sprintf("question_%d_value", i) }}
-					<input name={ value } placeholder={ ph } value={ q.Value }/>
-					{{ id := fmt.Sprintf("question_%d_id", i) }}
-					<input name={ id } value={ q.ID } type="hidden"/>
+					<input name={ q.NameValue(i) } placeholder={ ph } value={ q.Value }/>
+					<input name={ q.NameID(i) } value={ q.ID } type="hidden"/>
 					@errors(q.Errors)
 				</section>
 			}

@@ -52,8 +52,10 @@ func TestTargetFormValidator(t *testing.T) {
 			Name: contracts.Field{
 				Errors: contracts.Errors{validators.ErrEmpty},
 			},
-			Questions: []contracts.Field{{
-				Errors: contracts.Errors{validators.ErrEmpty},
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Errors: contracts.Errors{validators.ErrEmpty},
+				},
 			}},
 		},
 		false,
@@ -63,15 +65,17 @@ func TestTargetFormValidator(t *testing.T) {
 		newTargetID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
-			Questions: []contracts.Field{{
-				Value: "",
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{Value: ""},
 			}},
 		},
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
-			Questions: []contracts.Field{{
-				Value:  "",
-				Errors: contracts.Errors{validators.ErrEmpty},
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value:  "",
+					Errors: contracts.Errors{validators.ErrEmpty},
+				},
 			}},
 		},
 		false,
@@ -111,33 +115,19 @@ func TestTargetFormValidator(t *testing.T) {
 		newTargetID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
-			Questions: contracts.Fields{{
-				Value: longQuestion,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value: longQuestion,
+				},
 			}},
 		},
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
-			Questions: contracts.Fields{{
-				Value:  longQuestion,
-				Errors: contracts.Errors{validators.ErrTooLongQuestion},
-			}},
-		},
-		false,
-	}, {
-		"should reject if question text is too long",
-		owner.ID,
-		newTargetID,
-		contracts.TargetForm{
-			Name: contracts.Field{Value: notSoLongTargetName},
-			Questions: contracts.Fields{{
-				Value: longQuestion,
-			}},
-		},
-		contracts.TargetForm{
-			Name: contracts.Field{Value: notSoLongTargetName},
-			Questions: contracts.Fields{{
-				Value:  longQuestion,
-				Errors: contracts.Errors{validators.ErrTooLongQuestion},
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value:  longQuestion,
+					Errors: contracts.Errors{validators.ErrTooLongQuestion},
+				},
 			}},
 		},
 		false,
@@ -147,19 +137,27 @@ func TestTargetFormValidator(t *testing.T) {
 		newTargetID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
-			Questions: contracts.Fields{{
-				Value: notSoLongQuestion,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value: notSoLongQuestion,
+				},
 			}, {
-				Value: notSoLongQuestion,
+				Field: contracts.Field{
+					Value: notSoLongQuestion,
+				},
 			}},
 		},
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
-			Questions: contracts.Fields{{
-				Value: notSoLongQuestion,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value: notSoLongQuestion,
+				},
 			}, {
-				Value:  notSoLongQuestion,
-				Errors: contracts.Errors{validators.ErrRepeatedQuestion},
+				Field: contracts.Field{
+					Value:  notSoLongQuestion,
+					Errors: contracts.Errors{validators.ErrRepeatedQuestion},
+				},
 			}},
 		},
 		false,
@@ -169,8 +167,10 @@ func TestTargetFormValidator(t *testing.T) {
 		newTargetID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: target.Name},
-			Questions: contracts.Fields{{
-				Value: notSoLongQuestion,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value: notSoLongQuestion,
+				},
 			}},
 		},
 		contracts.TargetForm{
@@ -180,8 +180,10 @@ func TestTargetFormValidator(t *testing.T) {
 					validators.ErrTargetAlreadyExists,
 				},
 			},
-			Questions: contracts.Fields{{
-				Value: notSoLongQuestion,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value: notSoLongQuestion,
+				},
 			}},
 		},
 		false,
@@ -191,14 +193,18 @@ func TestTargetFormValidator(t *testing.T) {
 		newTargetID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: target.Name},
-			Questions: contracts.Fields{{
-				Value: notSoLongQuestion,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value: notSoLongQuestion,
+				},
 			}},
 		},
 		contracts.TargetForm{
 			Name: contracts.Field{Value: target.Name},
-			Questions: contracts.Fields{{
-				Value: notSoLongQuestion,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value: notSoLongQuestion,
+				},
 			}},
 		},
 		true,
@@ -208,14 +214,18 @@ func TestTargetFormValidator(t *testing.T) {
 		target.ID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: target.Name},
-			Questions: contracts.Fields{{
-				Value: notSoLongQuestion,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value: notSoLongQuestion,
+				},
 			}},
 		},
 		contracts.TargetForm{
 			Name: contracts.Field{Value: target.Name},
-			Questions: contracts.Fields{{
-				Value: notSoLongQuestion,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value: notSoLongQuestion,
+				},
 			}},
 		},
 		true,
@@ -238,14 +248,18 @@ func TestTargetFormValidator(t *testing.T) {
 		newTargetID,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
-			Questions: contracts.Fields{{
-				Value: notSoLongQuestion,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value: notSoLongQuestion,
+				},
 			}},
 		},
 		contracts.TargetForm{
 			Name: contracts.Field{Value: notSoLongTargetName},
-			Questions: contracts.Fields{{
-				Value: notSoLongQuestion,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value: notSoLongQuestion,
+				},
 			}},
 		},
 		true,
@@ -292,11 +306,13 @@ func insertTestTarget(db *sql.DB) (
 	return target, user, nil
 }
 
-func makeRandomFields(amount int) contracts.Fields {
-	fields := make(contracts.Fields, amount)
+func makeRandomFields(amount int) contracts.QuestionFields {
+	fields := make(contracts.QuestionFields, amount)
 	for i := range amount {
-		fields[i] = contracts.Field{
-			Value: utils.MakeRandomString(5),
+		fields[i] = contracts.QuestionField{
+			Field: contracts.Field{
+				Value: utils.MakeRandomString(5),
+			},
 		}
 	}
 

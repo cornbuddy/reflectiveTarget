@@ -26,14 +26,20 @@ func (u *TargetFormTest) RendersErrorsProperly(t *testgroup.T) {
 				Value:  "",
 				Errors: contracts.Errors{err1},
 			},
-			Questions: contracts.Fields{{
-				Value:  "kek1",
-				Errors: contracts.Errors{err2},
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Value:  "kek1",
+					Errors: contracts.Errors{err2},
+				},
 			}, {
-				Value:  "kek12",
-				Errors: contracts.Errors{err1, err2},
+				Field: contracts.Field{
+					Value:  "kek12",
+					Errors: contracts.Errors{err1, err2},
+				},
 			}, {
-				Value: "kek0",
+				Field: contracts.Field{
+					Value: "kek0",
+				},
 			}},
 		},
 	}
@@ -73,9 +79,11 @@ func (u *TargetFormTest) RendersProperViewForm(t *testgroup.T) {
 			{Text: "fails there"}, {Text: "kek2?"},
 		},
 	}
-	formQuestions := make(contracts.Fields, len(target.Questions))
+	formQuestions := make(contracts.QuestionFields, len(target.Questions))
 	for i, q := range target.Questions {
-		formQuestions[i] = contracts.Field{Value: q.Text}
+		formQuestions[i] = contracts.QuestionField{
+			Field: contracts.Field{Value: q.Text},
+		}
 	}
 	form := contracts.TargetForm{
 		Name:      contracts.Field{Value: target.Name},
