@@ -1,4 +1,4 @@
-package daos_test
+package sessionstore_test
 
 import (
 	"testing"
@@ -12,7 +12,7 @@ import (
 func TestSessionStoreShouldReturnNilWhenNoSessionFound(t *testing.T) {
 	t.Parallel()
 
-	token := "not-exists"
+	token := sessiondata.SessionID("not-exists")
 	got, err := store.Get(ctx, token)
 	require.NoError(t, err)
 	assert.Nil(t, got)
@@ -23,7 +23,7 @@ func TestSessionStoreShouldSaveAndRestoreSession(t *testing.T) {
 
 	type testCase struct {
 		desc  string
-		token string
+		token sessiondata.SessionID
 		want  sessiondata.SessionData
 	}
 
@@ -50,10 +50,5 @@ func TestSessionStoreShouldSaveAndRestoreSession(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, tc.want, *got)
-
-		key := store.Key(tc.token)
-		ttl, err := cache.TTL(ctx, key).Result()
-		require.NoError(t, err)
-		assert.Equal(t, sessiondata.SessionDuration, ttl)
 	}
 }

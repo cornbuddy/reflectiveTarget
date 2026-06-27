@@ -17,6 +17,8 @@ const (
 	SessionDuration = 30 * 24 * time.Hour
 )
 
+type SessionID string
+
 type SessionData struct {
 	IsAuthenticated bool
 	UserID          valueobjects.ID

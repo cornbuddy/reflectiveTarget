@@ -9,13 +9,13 @@ import (
 	"testing"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 type (

@@ -23,7 +23,6 @@ var (
 	db       *sql.DB
 	cache    *redis.Client
 	health   daos.HealthDao
-	store    daos.SessionStore
 	shotsDao daos.ShotsDao
 	userDao  daos.UserDao
 
@@ -53,7 +52,6 @@ func TestMain(m *testing.M) {
 	db = testDb
 	userDao = daos.UserDao{DB: db}
 	shotsDao = daos.ShotsDao{DB: db}
-	store = daos.SessionStore{cache}
 	health = daos.HealthDao{db, cache}
 
 	password = *pwd

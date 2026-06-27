@@ -1,4 +1,4 @@
-package daos
+package redis
 
 import (
 	"context"
@@ -15,12 +15,12 @@ const (
 	prefix = "session"
 )
 
-type SessionStore struct {
+type RedisStore struct {
 	Cache *redis.Client
 }
 
-func (s SessionStore) Get(
-	ctx context.Context, sessionId string,
+func (s RedisStore) Get(
+	ctx context.Context, sessionId sessiondata.SessionID,
 ) (*sessiondata.SessionData, error) {
 	key := s.Key(sessionId)
 	jsonData, err := s.Cache.Get(ctx, key).Bytes()
@@ -38,8 +38,9 @@ func (s SessionStore) Get(
 	return &data, nil
 }
 
-func (s SessionStore) Update(
-	ctx context.Context, sessionId string, data sessiondata.SessionData,
+func (s RedisStore) Update(
+	ctx context.Context, sessionId sessiondata.SessionID,
+	data sessiondata.SessionData,
 ) error {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
@@ -56,6 +57,6 @@ func (s SessionStore) Update(
 }
 
 // returns key to the session data
-func (s SessionStore) Key(sessionId string) string {
+func (s RedisStore) Key(sessionId sessiondata.SessionID) string {
 	return fmt.Sprintf("%s:%s", prefix, sessionId)
 }
