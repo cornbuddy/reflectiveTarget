@@ -29,7 +29,7 @@ var (
 func TestMain(m *testing.M) {
 	cleanup, cache, err := utils.SetupCache(ctx)
 	if err != nil {
-		log.Panicf("failed to setup cache: %v", err)
+		log.Fatalf("failed to setup cache: %v", err)
 	}
 
 	store = daos.SessionStore{Cache: cache}
@@ -37,7 +37,7 @@ func TestMain(m *testing.M) {
 
 	code, err := utils.RunAndCleanup(ctx, m, cleanup)
 	if err != nil {
-		log.Panicf("failed to cleanup: %v", err)
+		log.Fatalf("failed to cleanup: %v", err)
 	}
 
 	os.Exit(code)

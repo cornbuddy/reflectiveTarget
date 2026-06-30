@@ -37,12 +37,12 @@ var (
 func TestMain(m *testing.M) {
 	cleanupDb, testDb, err := utils.SetupDB(ctx)
 	if err != nil {
-		log.Panicf("failed to setup db: %v", err)
+		log.Fatalf("failed to setup db: %v", err)
 	}
 
 	cleanUpCache, testCache, err := utils.SetupCache(ctx)
 	if err != nil {
-		log.Panicf("failed to setup db: %v", err)
+		log.Fatalf("failed to setup db: %v", err)
 	}
 
 	db = testDb
@@ -52,7 +52,7 @@ func TestMain(m *testing.M) {
 
 	code, err := utils.RunAndCleanup(ctx, m, cleanupDb, cleanUpCache)
 	if err != nil {
-		log.Panicf("failed to cleanup: %v", err)
+		log.Fatalf("failed to cleanup: %v", err)
 	}
 
 	os.Exit(code)
