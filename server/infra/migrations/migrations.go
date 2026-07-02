@@ -2,5 +2,8 @@ package migrations
 
 import _ "embed"
 
-//go:embed tables.sql
-var InitQuery string
+//go:embed init-db.sql
+var InitDBQuery string
+
+//go:embed init-session-store.sql
+var InitSessionStoreQuery string

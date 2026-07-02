@@ -1,28 +1,28 @@
-package redis_test
+package postgres_test
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"os"
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/infra/sessionstore/private/redis"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 var (
 	ctx = context.TODO()
 
-	store redis.RedisStore
+	db *sql.DB
 )
 
 func TestMain(m *testing.M) {
-	cleanup, cache, err := utils.SetupCache(ctx)
+	cleanup, testDB, err := utils.StartDB(ctx)
 	if err != nil {
 		log.Fatalf("failed to setup db: %v", err)
 	}
 
-	store = redis.RedisStore{Cache: cache}
+	db = testDB
 
 	code, err := utils.RunAndCleanup(ctx, m, cleanup)
 	if err != nil {
