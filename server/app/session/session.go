@@ -1,4 +1,4 @@
-package sessiondata
+package session
 
 import (
 	"context"
@@ -19,15 +19,20 @@ const (
 
 type SessionID string
 
-type SessionData struct {
+type Data struct {
 	IsAuthenticated bool
 	UserID          valueobjects.ID
 	Username        string
 }
 
+type Store interface {
+	Get(context.Context, SessionID) (*Data, error)
+	Update(context.Context, SessionID, Data) error
+}
+
 // reads session data from context. returns zero object if not found
-func Read(ctx context.Context) SessionData {
-	return getData[SessionData](ctx, SessionDataCtx)
+func Read(ctx context.Context) Data {
+	return getData[Data](ctx, SessionDataCtx)
 }
 
 func getData[T any](ctx context.Context, key ctxKey) T {

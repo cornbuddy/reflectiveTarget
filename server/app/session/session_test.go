@@ -1,12 +1,12 @@
-package sessionstore_test
+package session_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 )
 
 func TestSessionStoreShouldReturnNilWhenNoSessionFound(t *testing.T) {
@@ -50,5 +50,31 @@ func TestSessionStoreShouldSaveAndRestoreSession(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, tc.want, *got)
+	}
+}
+
+func TestMake(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		desc string
+		ctx  context.Context
+		want Data
+	}
+
+	testData := Data{true, 69, "kek"}
+	testCases := []testCase{{
+		"should return zero value by default",
+		ctx,
+		Data{},
+	}, {
+		"should return explicitly set logger",
+		context.WithValue(ctx, SessionDataCtx, &testData),
+		testData,
+	}}
+
+	for _, tc := range testCases {
+		got := Read(tc.ctx)
+		assert.EqualExportedValues(t, tc.want, got, tc.desc)
 	}
 }

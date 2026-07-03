@@ -1,4 +1,4 @@
-package sessionstore_test
+package session_test
 
 import (
 	"context"
@@ -6,14 +6,14 @@ import (
 	"os"
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/infra/sessionstore"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 var (
 	ctx = context.TODO()
 
-	store sessionstore.SessionStore
+	store session.Store
 )
 
 func TestMain(m *testing.M) {
