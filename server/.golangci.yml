@@ -1,5 +1,16 @@
 ---
 version: "2"
+
+formatters:
+  enable:
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/cornbuddy/reflectiveTarget/server
+
 linters:
   settings:
     errcheck:

@@ -3,9 +3,10 @@ package redis_test
 import (
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
 )
 
 func TestShouldSetProperTTL(t *testing.T) {
