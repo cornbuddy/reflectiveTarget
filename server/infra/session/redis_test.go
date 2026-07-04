@@ -1,4 +1,4 @@
-package redis_test
+package session_test
 
 import (
 	"testing"
@@ -6,14 +6,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	appsession "github.com/cornbuddy/reflectiveTarget/server/app/session"
+	infrasession "github.com/cornbuddy/reflectiveTarget/server/infra/session"
 )
 
 func TestRedisStore(t *testing.T) {
 	t.Parallel()
 
-	id := sessiondata.SessionID("kek")
-	want := sessiondata.SessionData{
+	store := infrasession.RedisStore{cache}
+
+	id := appsession.SessionID("kek")
+	want := appsession.Data{
 		IsAuthenticated: true,
 		UserID:          69,
 		Username:        "kek",
@@ -27,5 +30,5 @@ func TestRedisStore(t *testing.T) {
 	key := store.Key(id)
 	ttl, err := store.Cache.TTL(ctx, key).Result()
 	require.NoError(t, err)
-	assert.Equal(t, sessiondata.SessionDuration, ttl, "should have proper ttl")
+	assert.Equal(t, appsession.SessionDuration, ttl, "should have proper ttl")
 }

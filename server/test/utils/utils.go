@@ -10,7 +10,7 @@ import (
 )
 
 // runs test suite and executes clean up in parallel. returns zero if tests are
-// fine, and non-zeor othervise. returns error if any of cleanups was failed
+// fine, and non-zero othervise. returns error if any of cleanups was failed
 func RunAndCleanup(
 	ctx context.Context, m *testing.M, cleanups ...Cleanup,
 ) (int, error) {

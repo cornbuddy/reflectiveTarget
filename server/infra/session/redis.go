@@ -1,4 +1,4 @@
-package redis
+package session
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 )
 
 const (
@@ -20,8 +20,8 @@ type RedisStore struct {
 }
 
 func (s RedisStore) Get(
-	ctx context.Context, sessionId sessiondata.SessionID,
-) (*sessiondata.SessionData, error) {
+	ctx context.Context, sessionId session.SessionID,
+) (*session.Data, error) {
 	key := s.Key(sessionId)
 	jsonData, err := s.Cache.Get(ctx, key).Bytes()
 	if errors.Is(err, redis.Nil) {
@@ -30,7 +30,7 @@ func (s RedisStore) Get(
 		return nil, err
 	}
 
-	var data sessiondata.SessionData
+	var data session.Data
 	if err := json.Unmarshal(jsonData, &data); err != nil {
 		return nil, err
 	}
@@ -39,8 +39,8 @@ func (s RedisStore) Get(
 }
 
 func (s RedisStore) Update(
-	ctx context.Context, sessionId sessiondata.SessionID,
-	data sessiondata.SessionData,
+	ctx context.Context, sessionId session.SessionID,
+	data session.Data,
 ) error {
 	jsonData, err := json.Marshal(data)
 	if err != nil {
@@ -48,7 +48,7 @@ func (s RedisStore) Update(
 	}
 
 	key := s.Key(sessionId)
-	err = s.Cache.Set(ctx, key, jsonData, sessiondata.SessionDuration).Err()
+	err = s.Cache.Set(ctx, key, jsonData, session.SessionDuration).Err()
 	if err != nil {
 		return err
 	}
@@ -57,6 +57,6 @@ func (s RedisStore) Update(
 }
 
 // returns key to the session data
-func (s RedisStore) Key(sessionId sessiondata.SessionID) string {
+func (s RedisStore) Key(sessionId session.SessionID) string {
 	return fmt.Sprintf("%s:%s", prefix, sessionId)
 }

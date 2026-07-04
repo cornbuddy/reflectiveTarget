@@ -1,11 +1,11 @@
-package postgres_test
+package session_test
 
 import (
 	"testing"
 
 	"github.com/bloomberg/go-testgroup"
 
-	"github.com/cornbuddy/reflectiveTarget/server/infra/sessionstore/private/postgres"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/session"
 )
 
 const (
@@ -14,7 +14,7 @@ const (
 )
 
 type PostgresStoreTest struct {
-	store *postgres.PostgresStore
+	store *session.PostgresStore
 }
 
 func (s *PostgresStoreTest) TableHasProperColumns(t *testgroup.T) {
@@ -83,7 +83,7 @@ func (s *PostgresStoreTest) CreatesSessionTable(t *testgroup.T) {
 }
 
 func (s *PostgresStoreTest) PreGroup(t *testgroup.T) {
-	store, err := postgres.NewPostgresStore(ctx, db)
+	store, err := session.NewPostgresStore(ctx, db)
 	t.Require.NoError(err)
 
 	s.store = store
