@@ -1,10 +1,12 @@
 package session_test
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/bloomberg/go-testgroup"
 
+	// appsession "github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/session"
 )
 
@@ -14,7 +16,12 @@ const (
 )
 
 type PostgresStoreTest struct {
+	db    *sql.DB
 	store *session.PostgresStore
+}
+
+func (s *PostgresStoreTest) UpdateCreatesRecodrs(t *testgroup.T) {
+	t.Fail("not implemented")
 }
 
 func (s *PostgresStoreTest) TableHasProperColumns(t *testgroup.T) {
@@ -46,14 +53,17 @@ func (s *PostgresStoreTest) TableHasProperColumns(t *testgroup.T) {
 		"integer",
 		yes,
 		nil,
+	}, {
+		"username",
+		"character varying",
+		yes,
+		nil,
 	}}
 
-	query := `
-		SELECT data_type, is_nullable, column_default
-		FROM information_schema.columns
-		WHERE table_schema = $1 AND table_name = $2 AND column_name = $3;
-	`
-
+	const query = `
+	SELECT data_type, is_nullable, column_default
+	FROM information_schema.columns
+	WHERE table_schema = $1 AND table_name = $2 AND column_name = $3`
 	for _, tc := range testCases {
 		t.Run(tc.column, func(t *testgroup.T) {
 			t.Parallel()
@@ -73,7 +83,8 @@ func (s *PostgresStoreTest) TableHasProperColumns(t *testgroup.T) {
 
 func (s *PostgresStoreTest) CreatesSessionTable(t *testgroup.T) {
 	var exists bool
-	query := `SELECT EXISTS (
+	query := `
+	SELECT EXISTS (
 		SELECT FROM pg_tables
 		WHERE schemaname = $1 AND tablename = $2
 	)`
@@ -86,6 +97,7 @@ func (s *PostgresStoreTest) PreGroup(t *testgroup.T) {
 	store, err := session.NewPostgresStore(ctx, db)
 	t.Require.NoError(err)
 
+	s.db = db
 	s.store = store
 }
 
