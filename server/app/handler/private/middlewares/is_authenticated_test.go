@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -55,7 +55,7 @@ func TestIsAuthenticated(t *testing.T) {
 
 func (s *IsAuthenticatedSuite) PreGroup(t *testgroup.T) {
 	token := "kekeke"
-	data := sessiondata.SessionData{
+	data := session.Data{
 		IsAuthenticated: true,
 		UserID:          69,
 		Username:        username,

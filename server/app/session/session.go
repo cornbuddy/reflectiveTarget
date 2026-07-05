@@ -14,7 +14,8 @@ const (
 )
 
 const (
-	SessionDuration = 30 * 24 * time.Hour
+	// duration of the http session
+	Duration = 30 * 24 * time.Hour
 )
 
 type SessionID string

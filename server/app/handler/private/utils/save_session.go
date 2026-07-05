@@ -7,31 +7,31 @@ import (
 
 	"github.com/google/uuid"
 
-	appconst "github.com/cornbuddy/reflectiveTarget/server/app/constants"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
-	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 )
 
 func SaveSession(
-	ctx context.Context, store daos.SessionStore,
-	data sessiondata.SessionData, w http.ResponseWriter,
-) (string, error) {
-	raw, err := uuid.NewRandom()
+	ctx context.Context, store session.Store,
+	data session.Data, w http.ResponseWriter,
+) (session.SessionID, error) {
+	uuid, err := uuid.NewRandom()
 	if err != nil {
 		return "", err
 	}
 
-	token := raw.String()
+	raw := uuid.String()
+	token := session.SessionID(raw)
 	if err := store.Update(ctx, token, data); err != nil {
 		return "", err
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     appconst.SessionCookieName,
-		Value:    token,
+		Name:     constants.SessionCookieName,
+		Value:    raw,
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
-		Expires:  time.Now().Add(sessiondata.SessionDuration),
+		Expires:  time.Now().Add(session.Duration),
 	})
 
 	return token, nil

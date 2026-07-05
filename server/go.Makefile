@@ -16,7 +16,7 @@ fmt:
 	go fmt ./...
 
 .PHONY: vet
-vet:
+vet: generate
 	go vet ./...
 
 .PHONY: tidy

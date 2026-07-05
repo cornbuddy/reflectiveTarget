@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 )
 
@@ -13,7 +13,7 @@ func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		log := log.Logger(ctx)
-		session := sessiondata.Read(ctx)
+		session := session.Read(ctx)
 		if session.IsAuthenticated {
 			log.Debug("request is authenticated")
 			next.ServeHTTP(w, r)

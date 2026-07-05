@@ -14,7 +14,7 @@ import (
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -51,8 +51,8 @@ var (
 	anonCtx = context.TODO()
 	userCtx = context.WithValue(
 		context.TODO(),
-		sessiondata.SessionDataCtx,
-		&sessiondata.SessionData{
+		session.SessionDataCtx,
+		&session.Data{
 			IsAuthenticated: true,
 			UserID:          12,
 			Username:        "kek",

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 )
@@ -12,7 +13,7 @@ import (
 func TestSessionStoreShouldReturnNilWhenNoSessionFound(t *testing.T) {
 	t.Parallel()
 
-	token := sessiondata.SessionID("not-exists")
+	token := session.SessionID("not-exists")
 	got, err := store.Get(ctx, token)
 	require.NoError(t, err)
 	assert.Nil(t, got)
@@ -23,14 +24,14 @@ func TestSessionStoreShouldSaveAndRestoreSession(t *testing.T) {
 
 	type testCase struct {
 		desc  string
-		token sessiondata.SessionID
-		want  sessiondata.SessionData
+		token session.SessionID
+		want  session.Data
 	}
 
 	testCases := []testCase{{
 		"should add entry for authenticated user",
 		"kek",
-		sessiondata.SessionData{
+		session.Data{
 			IsAuthenticated: true,
 			Username:        "user",
 			UserID:          69,
@@ -38,7 +39,7 @@ func TestSessionStoreShouldSaveAndRestoreSession(t *testing.T) {
 	}, {
 		"should add entry for anonymous user",
 		"kek1",
-		sessiondata.SessionData{
+		session.Data{
 			IsAuthenticated: false,
 		},
 	}}
@@ -59,22 +60,22 @@ func TestMake(t *testing.T) {
 	type testCase struct {
 		desc string
 		ctx  context.Context
-		want Data
+		want session.Data
 	}
 
-	testData := Data{true, 69, "kek"}
+	testData := session.Data{true, 69, "kek"}
 	testCases := []testCase{{
 		"should return zero value by default",
 		ctx,
-		Data{},
+		session.Data{},
 	}, {
 		"should return explicitly set logger",
-		context.WithValue(ctx, SessionDataCtx, &testData),
+		context.WithValue(ctx, session.SessionDataCtx, &testData),
 		testData,
 	}}
 
 	for _, tc := range testCases {
-		got := Read(tc.ctx)
+		got := session.Read(tc.ctx)
 		assert.EqualExportedValues(t, tc.want, got, tc.desc)
 	}
 }

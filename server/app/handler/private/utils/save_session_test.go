@@ -9,14 +9,14 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 )
 
 func TestSaveSessionShouldUpdateSessionStore(t *testing.T) {
 	t.Parallel()
 
 	w := httptest.NewRecorder()
-	wantSession := sessiondata.SessionData{Username: "kek"}
+	wantSession := session.Data{Username: "kek"}
 	token, err := utils.SaveSession(ctx, store, wantSession, w)
 	require.NoError(t, err)
 

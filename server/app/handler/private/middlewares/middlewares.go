@@ -1,9 +1,9 @@
 package middlewares
 
 import (
-	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 )
 
 type Middleware struct {
-	SessionStore daos.SessionStore
+	SessionStore session.Store
 }

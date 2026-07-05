@@ -13,7 +13,7 @@ import (
 	appconst "github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
@@ -241,7 +241,7 @@ func (s *TargetsSuite) PreGroup(t *testgroup.T) {
 	t.Require.NoError(utils.InsertTargets(ctx, db, foreignTargets))
 
 	token := "kekeke"
-	session := sessiondata.SessionData{
+	session := session.Data{
 		IsAuthenticated: true,
 		UserID:          owner.ID,
 		Username:        owner.Username,

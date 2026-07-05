@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -19,11 +19,11 @@ func TestSaveSessionShouldPutSessionDataToCtx(t *testing.T) {
 	type testCase struct {
 		desc      string
 		sessionId string
-		want      sessiondata.SessionData
+		want      session.Data
 	}
 
 	sessionId := "kekeke"
-	want := sessiondata.SessionData{
+	want := session.Data{
 		IsAuthenticated: true,
 		UserID:          69,
 		Username:        username,
@@ -37,7 +37,7 @@ func TestSaveSessionShouldPutSessionDataToCtx(t *testing.T) {
 	}, {
 		"should put zero object on cache miss",
 		"not found",
-		sessiondata.SessionData{},
+		session.Data{},
 	}}
 
 	for _, tc := range testCases {
@@ -49,7 +49,7 @@ func TestSaveSessionShouldPutSessionDataToCtx(t *testing.T) {
 			require.NotNil(t, w)
 			require.NotNil(t, r)
 
-			got := sessiondata.Read(r.Context())
+			got := session.Read(r.Context())
 			assert.EqualExportedValues(t, tc.want, got, tc.desc)
 		})
 		handler := mw.SaveSession(stub).ServeHTTP
@@ -104,7 +104,7 @@ func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
 	t.Parallel()
 
 	token := uuid.NewString()
-	require.NoError(t, store.Update(ctx, token, sessiondata.SessionData{}))
+	require.NoError(t, store.Update(ctx, token, session.Data{}))
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := w.Header().Get("Set-Cookie")
