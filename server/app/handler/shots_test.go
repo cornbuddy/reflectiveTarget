@@ -70,7 +70,7 @@ func TestShotsShouldBeSavedIfValid(t *testing.T) {
 	url := fmt.Sprintf("/api/target/%v/shots", targetID)
 	resp, body, err := utils.MakeRequestWithCookies(
 		ctAppJson, post, url, router, &shots,
-		&http.Cookie{Name: constants.SessionCookieName, Value: "kek"},
+		&http.Cookie{Name: constants.SessionCookieName, Value: sessionID.String()},
 	)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode, "should save shots")

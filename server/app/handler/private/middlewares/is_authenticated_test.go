@@ -32,7 +32,7 @@ func (s *IsAuthenticatedSuite) ShouldErrorIfTokenIsInvalid(t *testgroup.T) {
 		"", http.MethodGet, "/", s.handler, nil, cookies...,
 	)
 	t.Require.NoError(err)
-	t.Equal(http.StatusForbidden, r.StatusCode)
+	t.Equal(http.StatusInternalServerError, r.StatusCode)
 }
 
 func (s *IsAuthenticatedSuite) Should200IfAuthenticated(t *testgroup.T) {

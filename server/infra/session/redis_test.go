@@ -15,7 +15,7 @@ func TestRedisStore(t *testing.T) {
 
 	store := session.RedisStore{cache}
 
-	id := appsession.SessionID("kek")
+	id := appsession.MakeID()
 	want := appsession.Data{
 		UserID:   69,
 		Username: "kek",

@@ -21,9 +21,9 @@ type PostgresStoreTest struct {
 	store *session.PostgresStore
 }
 
-func (s *PostgresStoreTest) UpdateCreatesRecodrs(t *testgroup.T) {
+func (s *PostgresStoreTest) UpdateCreatesRecords(t *testgroup.T) {
 	const username, userID = "username", 69
-	id := appsession.SessionID("kekeke")
+	id := appsession.MakeID()
 	data := appsession.Data{UserID: userID, Username: username}
 	t.Require.NoError(s.store.Update(ctx, id, data))
 
@@ -51,17 +51,12 @@ func (s *PostgresStoreTest) TableHasProperColumns(t *testgroup.T) {
 		"id",
 		"uuid",
 		no,
-		new("gen_random_uuid()"),
+		nil,
 	}, {
 		"session_data",
 		"jsonb",
 		no,
 		new("'{}'::jsonb"),
-	}, {
-		"ip_address",
-		"inet",
-		no,
-		nil,
 	}, {
 		"user_id",
 		"integer",
