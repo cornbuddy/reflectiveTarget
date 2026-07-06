@@ -9,12 +9,10 @@ import (
 
 type ctxKey int
 
-const SessionDataCtx ctxKey = iota
+const sessionDataCtx ctxKey = iota
 
-const (
-	// duration of the http session
-	Duration = 30 * 24 * time.Hour
-)
+// duration of the http session
+const Duration = 30 * 24 * time.Hour
 
 type SessionID string
 
@@ -28,10 +26,15 @@ type Store interface {
 	Update(context.Context, SessionID, Data) error
 }
 
+// returns context with the session data
+func Context(ctx context.Context, data *Data) context.Context {
+	return context.WithValue(ctx, sessionDataCtx, data)
+}
+
 // reads session data from context. returns zero object if not found
 func Read(ctx context.Context) Data {
 	var result Data
-	val := ctx.Value(SessionDataCtx)
+	val := ctx.Value(sessionDataCtx)
 	if val != nil {
 		result = *val.(*Data)
 	}

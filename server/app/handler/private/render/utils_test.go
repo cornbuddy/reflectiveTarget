@@ -49,14 +49,10 @@ var (
 		utils.AssertNotContainsTokens,
 	}}
 	anonCtx = context.TODO()
-	userCtx = context.WithValue(
-		context.TODO(),
-		session.SessionDataCtx,
-		&session.Data{
-			UserID:   12,
-			Username: "kek",
-		},
-	)
+	userCtx = session.Context(context.TODO(), &session.Data{
+		UserID:   12,
+		Username: "kek",
+	})
 )
 
 func (tcs *fieldErrorsTestCases) assert(t *testing.T, body io.Reader) {

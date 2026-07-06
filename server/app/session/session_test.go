@@ -19,6 +19,10 @@ const (
 func TestContext(t *testing.T) {
 	t.Parallel()
 
+	want := session.Data{userID, username}
+	ctx := session.Context(context.TODO(), &want)
+	got := session.Read(ctx)
+	assert.EqualExportedValues(t, want, got)
 }
 
 func TestSessionData(t *testing.T) {
@@ -107,8 +111,8 @@ func TestMake(t *testing.T) {
 		ctx,
 		session.Data{},
 	}, {
-		"should return explicitly set logger",
-		context.WithValue(ctx, session.SessionDataCtx, &testData),
+		"should return session data",
+		session.Context(ctx, &testData),
 		testData,
 	}}
 

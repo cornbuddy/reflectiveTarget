@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"context"
 	"net/http"
 
 	"go.uber.org/zap"
@@ -69,7 +68,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// session token was either found in the session store, or was
 		// set earlier, so let's process the request
 		log.Debug("session is validated", zap.Any("session", *data))
-		newCtx := context.WithValue(ctx, session.SessionDataCtx, data)
+		newCtx := session.Context(ctx, data)
 		next.ServeHTTP(w, r.WithContext(newCtx))
 	})
 }
