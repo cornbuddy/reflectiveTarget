@@ -242,9 +242,8 @@ func (s *TargetsSuite) PreGroup(t *testgroup.T) {
 
 	token := "kekeke"
 	data := session.Data{
-		IsAuthenticated: true,
-		UserID:          owner.ID,
-		Username:        owner.Username,
+		UserID:   owner.ID,
+		Username: owner.Username,
 	}
 	t.Require.NoError(store.Update(ctx, session.SessionID(token), data))
 

@@ -53,9 +53,8 @@ var (
 		context.TODO(),
 		session.SessionDataCtx,
 		&session.Data{
-			IsAuthenticated: true,
-			UserID:          12,
-			Username:        "kek",
+			UserID:   12,
+			Username: "kek",
 		},
 	)
 )

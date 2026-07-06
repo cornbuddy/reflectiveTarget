@@ -7,7 +7,7 @@ import (
 
 	"go.uber.org/zap"
 
-	. "github.com/cornbuddy/reflectiveTarget/server/app/session"
+	appsession "github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/migrations"
 )
@@ -30,7 +30,7 @@ func NewPostgresStore(ctx context.Context, db *sql.DB) (*PostgresStore, error) {
 }
 
 func (s *PostgresStore) Update(
-	ctx context.Context, id SessionID, data Data,
+	ctx context.Context, id appsession.SessionID, data appsession.Data,
 ) error {
 	return errors.New("not implemented")
 }

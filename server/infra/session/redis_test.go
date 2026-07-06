@@ -17,9 +17,8 @@ func TestRedisStore(t *testing.T) {
 
 	id := appsession.SessionID("kek")
 	want := appsession.Data{
-		IsAuthenticated: true,
-		UserID:          69,
-		Username:        "kek",
+		UserID:   69,
+		Username: "kek",
 	}
 	require.NoError(t, store.Update(ctx, id, want))
 

@@ -66,9 +66,8 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 
 	log = log.With(zap.String("username", user.Username))
 	data := session.Data{
-		IsAuthenticated: true,
-		UserID:          user.ID,
-		Username:        user.Username,
+		UserID:   user.ID,
+		Username: user.Username,
 	}
 	if _, err := utils.SaveSession(ctx, h.sessionStore, data, w); err != nil {
 		log.Error("failed to register session", zap.Error(err))
@@ -123,9 +122,8 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := session.Data{
-		IsAuthenticated: true,
-		UserID:          user.ID,
-		Username:        user.Username,
+		UserID:   user.ID,
+		Username: user.Username,
 	}
 	store := h.sessionStore
 	if _, err := utils.SaveSession(ctx, store, data, w); err != nil {

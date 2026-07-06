@@ -9,9 +9,7 @@ import (
 
 type ctxKey int
 
-const (
-	SessionDataCtx ctxKey = iota
-)
+const SessionDataCtx ctxKey = iota
 
 const (
 	// duration of the http session
@@ -21,11 +19,8 @@ const (
 type SessionID string
 
 type Data struct {
-	// TODO: make a method from this property. it shouldn't be a property as
-	// this value can be calculated via checking username and id
-	IsAuthenticated bool
-	UserID          valueobjects.ID
-	Username        string
+	UserID   valueobjects.ID
+	Username string
 }
 
 type Store interface {
@@ -35,15 +30,15 @@ type Store interface {
 
 // reads session data from context. returns zero object if not found
 func Read(ctx context.Context) Data {
-	return getData[Data](ctx, SessionDataCtx)
-}
-
-func getData[T any](ctx context.Context, key ctxKey) T {
-	var result T
-	val := ctx.Value(key)
+	var result Data
+	val := ctx.Value(SessionDataCtx)
 	if val != nil {
-		result = *val.(*T)
+		result = *val.(*Data)
 	}
 
 	return result
+}
+
+func (d *Data) IsAuthenticated() bool {
+	return d.UserID != 0 || len(d.Username) != 0
 }

@@ -43,7 +43,7 @@ templ navigation(data session.Data) {
 		kek
 	</button>
 	<nav>
-		if data.IsAuthenticated {
+		if data.IsAuthenticated() {
 			<a href="/targets">Targets</a>
 			<a href="/logout">Logout</a>
 		} else {

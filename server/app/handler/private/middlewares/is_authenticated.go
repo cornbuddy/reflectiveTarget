@@ -14,7 +14,7 @@ func (mw Middleware) IsAuthenticated(next http.Handler) http.Handler {
 		ctx := r.Context()
 		log := log.Logger(ctx)
 		session := session.Read(ctx)
-		if session.IsAuthenticated {
+		if session.IsAuthenticated() {
 			log.Debug("request is authenticated")
 			next.ServeHTTP(w, r)
 		} else {

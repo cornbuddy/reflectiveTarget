@@ -8,7 +8,51 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/session"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
+
+const (
+	username = "username"
+	userID   = valueobjects.ID(69)
+)
+
+func TestContext(t *testing.T) {
+	t.Parallel()
+
+}
+
+func TestSessionData(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		desc string
+		data session.Data
+		want bool
+	}
+
+	testCases := []testCase{{
+		"should be false by default",
+		session.Data{},
+		false,
+	}, {
+		"should be true if ID is not zero",
+		session.Data{UserID: userID},
+		true,
+	}, {
+		"should be true if username is not empty",
+		session.Data{Username: username},
+		true,
+	}, {
+		"should be true if both are not zero",
+		session.Data{UserID: userID, Username: username},
+		true,
+	}}
+
+	for _, tc := range testCases {
+		got := tc.data.IsAuthenticated()
+		assert.Equal(t, tc.want, got, tc.desc)
+	}
+}
 
 func TestSessionStoreShouldReturnNilWhenNoSessionFound(t *testing.T) {
 	t.Parallel()
@@ -31,17 +75,11 @@ func TestSessionStoreShouldSaveAndRestoreSession(t *testing.T) {
 	testCases := []testCase{{
 		"should add entry for authenticated user",
 		"kek",
-		session.Data{
-			IsAuthenticated: true,
-			Username:        "user",
-			UserID:          69,
-		},
+		session.Data{userID, username},
 	}, {
 		"should add entry for anonymous user",
 		"kek1",
-		session.Data{
-			IsAuthenticated: false,
-		},
+		session.Data{},
 	}}
 
 	for _, tc := range testCases {
@@ -63,7 +101,7 @@ func TestMake(t *testing.T) {
 		want session.Data
 	}
 
-	testData := session.Data{true, 69, "kek"}
+	testData := session.Data{userID, username}
 	testCases := []testCase{{
 		"should return zero value by default",
 		ctx,
