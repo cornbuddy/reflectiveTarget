@@ -3,9 +3,11 @@ package session
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"go.uber.org/zap"
 
+	. "github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/migrations"
 )
@@ -25,4 +27,10 @@ func NewPostgresStore(ctx context.Context, db *sql.DB) (*PostgresStore, error) {
 	log.Info("store is initialized")
 
 	return &PostgresStore{db}, nil
+}
+
+func (s *PostgresStore) Update(
+	ctx context.Context, id SessionID, data Data,
+) error {
+	return errors.New("not implemented")
 }

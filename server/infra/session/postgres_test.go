@@ -6,7 +6,7 @@ import (
 
 	"github.com/bloomberg/go-testgroup"
 
-	// appsession "github.com/cornbuddy/reflectiveTarget/server/app/session"
+	appsession "github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/session"
 )
 
@@ -21,7 +21,9 @@ type PostgresStoreTest struct {
 }
 
 func (s *PostgresStoreTest) UpdateCreatesRecodrs(t *testgroup.T) {
-	t.Fail("not implemented")
+	id := appsession.SessionID("kekeke")
+	data := appsession.Data{}
+	t.Require.NoError(s.store.Update(ctx, id, data))
 }
 
 func (s *PostgresStoreTest) TableHasProperColumns(t *testgroup.T) {

@@ -21,6 +21,8 @@ const (
 type SessionID string
 
 type Data struct {
+	// TODO: make a method from this property. it shouldn't be a property as
+	// this value can be calculated via checking username and id
 	IsAuthenticated bool
 	UserID          valueobjects.ID
 	Username        string
