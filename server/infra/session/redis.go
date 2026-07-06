@@ -48,7 +48,7 @@ func (s RedisStore) Update(
 	}
 
 	key := s.Key(sessionId)
-	err = s.Cache.Set(ctx, key, jsonData, session.SessionDuration).Err()
+	err = s.Cache.Set(ctx, key, jsonData, session.Duration).Err()
 	if err != nil {
 		return err
 	}

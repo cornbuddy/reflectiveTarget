@@ -7,13 +7,13 @@ import (
 	"github.com/stretchr/testify/require"
 
 	appsession "github.com/cornbuddy/reflectiveTarget/server/app/session"
-	infrasession "github.com/cornbuddy/reflectiveTarget/server/infra/session"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/session"
 )
 
 func TestRedisStore(t *testing.T) {
 	t.Parallel()
 
-	store := infrasession.RedisStore{cache}
+	store := session.RedisStore{cache}
 
 	id := appsession.SessionID("kek")
 	want := appsession.Data{
@@ -30,5 +30,5 @@ func TestRedisStore(t *testing.T) {
 	key := store.Key(id)
 	ttl, err := store.Cache.TTL(ctx, key).Result()
 	require.NoError(t, err)
-	assert.Equal(t, appsession.SessionDuration, ttl, "should have proper ttl")
+	assert.Equal(t, appsession.Duration, ttl, "should have proper ttl")
 }

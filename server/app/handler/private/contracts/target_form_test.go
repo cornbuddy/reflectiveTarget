@@ -116,8 +116,8 @@ func TestNewTargetForm(t *testing.T) {
 		url.Values{formQ0Val: []string{kek}},
 		&contracts.TargetForm{
 			Questions: contracts.QuestionFields{{
-				contracts.Field{Value: kek}},
-			},
+				contracts.Field{Value: kek},
+			}},
 		},
 		nil,
 		nil,

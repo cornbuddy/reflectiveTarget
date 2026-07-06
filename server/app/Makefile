@@ -8,6 +8,8 @@ test: generate
 
 lint: generate
 
+vet: generate
+
 build: generate
 	go build \
 		-a -v \

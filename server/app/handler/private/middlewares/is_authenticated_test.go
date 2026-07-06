@@ -54,7 +54,8 @@ func TestIsAuthenticated(t *testing.T) {
 }
 
 func (s *IsAuthenticatedSuite) PreGroup(t *testgroup.T) {
-	token := "kekeke"
+	raw := "kekeke"
+	token := session.SessionID(raw)
 	data := session.Data{
 		IsAuthenticated: true,
 		UserID:          69,
@@ -62,7 +63,7 @@ func (s *IsAuthenticatedSuite) PreGroup(t *testgroup.T) {
 	}
 	t.Require.NoError(store.Update(ctx, token, data))
 
-	s.authenticatedToken = token
+	s.authenticatedToken = raw
 	s.handler = chain(
 		emptyStub,
 		mw.IsAuthenticated,

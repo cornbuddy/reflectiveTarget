@@ -18,11 +18,11 @@ func TestSaveSessionShouldPutSessionDataToCtx(t *testing.T) {
 
 	type testCase struct {
 		desc      string
-		sessionId string
+		sessionId session.SessionID
 		want      session.Data
 	}
 
-	sessionId := "kekeke"
+	sessionId := session.SessionID("kekeke")
 	want := session.Data{
 		IsAuthenticated: true,
 		UserID:          69,
@@ -43,7 +43,7 @@ func TestSaveSessionShouldPutSessionDataToCtx(t *testing.T) {
 	for _, tc := range testCases {
 		cookies := []*http.Cookie{{
 			Name:  constants.SessionCookieName,
-			Value: tc.sessionId,
+			Value: string(tc.sessionId),
 		}}
 		stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.NotNil(t, w)
@@ -103,7 +103,7 @@ func TestSaveSessionShouldAddSessionCookieIfNotPresent(t *testing.T) {
 func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
 	t.Parallel()
 
-	token := uuid.NewString()
+	token := session.SessionID(uuid.NewString())
 	require.NoError(t, store.Update(ctx, token, session.Data{}))
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -114,7 +114,7 @@ func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
 	handler := mw.SaveSession(stub).ServeHTTP
 	cookies := []*http.Cookie{{
 		Name:  constants.SessionCookieName,
-		Value: token,
+		Value: string(token),
 	}}
 	_, _, err := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/", handler, nil, cookies...,

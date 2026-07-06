@@ -109,7 +109,6 @@ func TestTargetFormValidator(t *testing.T) {
 		},
 		false,
 	}, {
-
 		"should reject if question name is too long",
 		owner.ID,
 		newTargetID,

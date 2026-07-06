@@ -6,14 +6,15 @@ import (
 	"os"
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/session"
+	appsession "github.com/cornbuddy/reflectiveTarget/server/app/session"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/session"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 var (
 	ctx = context.TODO()
 
-	store session.Store
+	store appsession.Store
 )
 
 func TestMain(m *testing.M) {
@@ -22,7 +23,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("failed to setup db: %v", err)
 	}
 
-	store = sessionstore.NewRedisStore(redis)
+	store = session.RedisStore{Cache: redis}
 
 	code, err := utils.RunAndCleanup(ctx, m, cleanupRedis)
 	if err != nil {

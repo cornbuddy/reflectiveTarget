@@ -241,12 +241,12 @@ func (s *TargetsSuite) PreGroup(t *testgroup.T) {
 	t.Require.NoError(utils.InsertTargets(ctx, db, foreignTargets))
 
 	token := "kekeke"
-	session := session.Data{
+	data := session.Data{
 		IsAuthenticated: true,
 		UserID:          owner.ID,
 		Username:        owner.Username,
 	}
-	t.Require.NoError(sessionStore.Update(ctx, token, session))
+	t.Require.NoError(store.Update(ctx, session.SessionID(token), data))
 
 	s.owner = owner
 	s.ownedTargets = ownedTargets

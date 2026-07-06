@@ -3,8 +3,9 @@ package validators_test
 import (
 	"testing"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
 )
 
 func TestValidationResult(t *testing.T) {

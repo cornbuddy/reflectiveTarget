@@ -72,8 +72,8 @@ func TestTargetBuilder(t *testing.T) {
 			Questions: contracts.QuestionFields{{
 				Field: contracts.Field{
 					Errors: contracts.Errors{validators.ErrEmpty},
-				}},
-			},
+				},
+			}},
 		},
 	}, {
 		"returns nil if questions are wrong",
