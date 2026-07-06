@@ -24,11 +24,11 @@ func TestSaveSessionShouldUpdateSessionStore(t *testing.T) {
 	cookie, err := http.ParseSetCookie(header)
 	require.NoError(t, err)
 	require.NotNil(t, cookie)
-	assert.Equal(t, string(token), cookie.Value)
+	assert.Equal(t, token.String(), cookie.Value)
 	assert.Equal(t, http.SameSiteStrictMode, cookie.SameSite)
 	assert.True(t, cookie.HttpOnly)
 
-	gotSession, err := store.Get(ctx, token)
+	gotSession, err := store.Get(ctx, *token)
 	require.NoError(t, err)
 	assert.NotNil(t, gotSession)
 	assert.Equal(t, wantSession, *gotSession, "should update session store")

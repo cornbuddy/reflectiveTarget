@@ -240,12 +240,12 @@ func (s *TargetsSuite) PreGroup(t *testgroup.T) {
 	}}
 	t.Require.NoError(utils.InsertTargets(ctx, db, foreignTargets))
 
-	token := "kekeke"
+	id := session.MakeID()
 	data := session.Data{
 		UserID:   owner.ID,
 		Username: owner.Username,
 	}
-	t.Require.NoError(store.Update(ctx, session.SessionID(token), data))
+	t.Require.NoError(store.Update(ctx, id, data))
 
 	s.owner = owner
 	s.ownedTargets = ownedTargets
@@ -253,7 +253,7 @@ func (s *TargetsSuite) PreGroup(t *testgroup.T) {
 	s.handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookies := []*http.Cookie{{
 			Name:  appconst.SessionCookieName,
-			Value: token,
+			Value: id.String(),
 		}}
 
 		for _, c := range cookies {

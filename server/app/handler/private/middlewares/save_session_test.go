@@ -22,27 +22,27 @@ func TestSaveSessionShouldPutSessionDataToCtx(t *testing.T) {
 		want      session.Data
 	}
 
-	sessionId := session.SessionID("kekeke")
+	authorizedID := session.MakeID()
 	want := session.Data{
 		UserID:   69,
 		Username: username,
 	}
-	require.NoError(t, store.Update(ctx, sessionId, want))
+	require.NoError(t, store.Update(ctx, authorizedID, want))
 
 	testCases := []testCase{{
 		"should put cached data to context if any",
-		sessionId,
+		authorizedID,
 		want,
 	}, {
 		"should put zero object on cache miss",
-		"not found",
+		session.MakeID(),
 		session.Data{},
 	}}
 
 	for _, tc := range testCases {
 		cookies := []*http.Cookie{{
 			Name:  constants.SessionCookieName,
-			Value: string(tc.sessionId),
+			Value: tc.sessionId.String(),
 		}}
 		stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.NotNil(t, w)
@@ -102,8 +102,8 @@ func TestSaveSessionShouldAddSessionCookieIfNotPresent(t *testing.T) {
 func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
 	t.Parallel()
 
-	token := session.SessionID(uuid.NewString())
-	require.NoError(t, store.Update(ctx, token, session.Data{}))
+	id := session.MakeID()
+	require.NoError(t, store.Update(ctx, id, session.Data{}))
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := w.Header().Get("Set-Cookie")
@@ -113,7 +113,7 @@ func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
 	handler := mw.SaveSession(stub).ServeHTTP
 	cookies := []*http.Cookie{{
 		Name:  constants.SessionCookieName,
-		Value: string(token),
+		Value: id.String(),
 	}}
 	_, _, err := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/", handler, nil, cookies...,

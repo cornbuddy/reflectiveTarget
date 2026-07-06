@@ -7,6 +7,7 @@ import (
 	"github.com/bloomberg/go-testgroup"
 
 	appsession "github.com/cornbuddy/reflectiveTarget/server/app/session"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/session"
 )
 
@@ -21,9 +22,20 @@ type PostgresStoreTest struct {
 }
 
 func (s *PostgresStoreTest) UpdateCreatesRecodrs(t *testgroup.T) {
+	const username, userID = "username", 69
 	id := appsession.SessionID("kekeke")
-	data := appsession.Data{}
+	data := appsession.Data{UserID: userID, Username: username}
 	t.Require.NoError(s.store.Update(ctx, id, data))
+
+	var gotID appsession.SessionID
+	var gotUserID valueobjects.ID
+	var gotUsername string
+	q := `SELECT id, user_id, username FROM sessions WHERE id = $1`
+	err := s.db.QueryRowContext(ctx, q, id).Scan(&gotID, &gotUserID, &gotUsername)
+	t.Require.NoError(err)
+	t.Equal(id, gotID)
+	t.Equal(userID, gotUserID)
+	t.Equal(username, gotUsername)
 }
 
 func (s *PostgresStoreTest) TableHasProperColumns(t *testgroup.T) {

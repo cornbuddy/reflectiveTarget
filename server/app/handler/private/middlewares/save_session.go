@@ -27,7 +27,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 			_, err := utils.SaveSession(ctx, store, emptySession, w)
 			if err != nil {
 				log.Error("failed to save session", zap.Error(err))
-				http.Error(w, "internal server error", http.StatusInternalServerError)
+				utils.HttpError(w, http.StatusInternalServerError)
 
 				return
 			}
@@ -37,15 +37,24 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 			return
 		}
 
-		// empty error means cookie exists, hence session id
+		// empty error means cookie exists, hence session cookieValue
 		// should be validated
-		id := cookie.Value
-		log = log.With(zap.String("token", id))
+		cookieValue := cookie.Value
+		log = log.With(zap.String("token", cookieValue))
+		log.Debug("parsing token...")
+		id, err := session.IDFromString(cookieValue)
+		if err != nil {
+			log.Error("failed to parse session token from cookie", zap.Error(err))
+			utils.HttpError(w, http.StatusInternalServerError)
+
+			return
+		}
+
 		log.Debug("validating session...")
-		data, err := store.Get(ctx, session.SessionID(id))
+		data, err := store.Get(ctx, *id)
 		if err != nil {
 			log.Error("failed to fetch session", zap.Error(err))
-			http.Error(w, "internal server error", http.StatusInternalServerError)
+			utils.HttpError(w, http.StatusInternalServerError)
 
 			return
 		}
@@ -59,7 +68,7 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 			_, err := utils.SaveSession(ctx, store, *data, w)
 			if err != nil {
 				log.Error("failed to save session", zap.Error(err))
-				http.Error(w, "internal server error", http.StatusInternalServerError)
+				utils.HttpError(w, http.StatusInternalServerError)
 
 				return
 			}

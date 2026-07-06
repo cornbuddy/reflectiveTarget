@@ -2,7 +2,6 @@ package session
 
 import (
 	"context"
-	"time"
 
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 )
@@ -11,19 +10,9 @@ type ctxKey int
 
 const sessionDataCtx ctxKey = iota
 
-// duration of the http session
-const Duration = 30 * 24 * time.Hour
-
-type SessionID string
-
 type Data struct {
 	UserID   valueobjects.ID
 	Username string
-}
-
-type Store interface {
-	Get(context.Context, SessionID) (*Data, error)
-	Update(context.Context, SessionID, Data) error
 }
 
 // returns context with the session data

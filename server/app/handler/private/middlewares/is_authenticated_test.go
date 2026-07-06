@@ -13,8 +13,8 @@ import (
 )
 
 type IsAuthenticatedSuite struct {
-	authenticatedToken string
-	handler            http.HandlerFunc
+	sessionID session.SessionID
+	handler   http.HandlerFunc
 }
 
 func (s *IsAuthenticatedSuite) ShouldErrorIfNoToken(t *testgroup.T) {
@@ -38,7 +38,7 @@ func (s *IsAuthenticatedSuite) ShouldErrorIfTokenIsInvalid(t *testgroup.T) {
 func (s *IsAuthenticatedSuite) Should200IfAuthenticated(t *testgroup.T) {
 	cookies := []*http.Cookie{{
 		Name:  constants.SessionCookieName,
-		Value: s.authenticatedToken,
+		Value: s.sessionID.String(),
 	}}
 	r, _, err := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/", s.handler, nil, cookies...,
@@ -54,15 +54,14 @@ func TestIsAuthenticated(t *testing.T) {
 }
 
 func (s *IsAuthenticatedSuite) PreGroup(t *testgroup.T) {
-	raw := "kekeke"
-	token := session.SessionID(raw)
+	id := session.MakeID()
 	data := session.Data{
 		UserID:   69,
 		Username: username,
 	}
-	t.Require.NoError(store.Update(ctx, token, data))
+	t.Require.NoError(store.Update(ctx, id, data))
 
-	s.authenticatedToken = raw
+	s.sessionID = id
 	s.handler = chain(
 		emptyStub,
 		mw.IsAuthenticated,

@@ -3,7 +3,6 @@ package session
 import (
 	"context"
 	"database/sql"
-	"errors"
 
 	"go.uber.org/zap"
 
@@ -32,5 +31,5 @@ func NewPostgresStore(ctx context.Context, db *sql.DB) (*PostgresStore, error) {
 func (s *PostgresStore) Update(
 	ctx context.Context, id appsession.SessionID, data appsession.Data,
 ) error {
-	return errors.New("not implemented")
+	return nil
 }
