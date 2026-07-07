@@ -1,6 +1,8 @@
 package contracts
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type QuestionField struct{ Field }
 
@@ -11,6 +13,18 @@ const (
 	QuestionFieldValuePostfix = "value"
 	QuestionFieldIDPostfix    = "id"
 )
+
+func (fs QuestionFields) AreValid() bool {
+	return fieldsAreValid(fs)
+}
+
+func (fs QuestionFields) AreInvalid() bool {
+	return !fieldsAreValid(fs)
+}
+
+func (fs QuestionFields) String() string {
+	return toString(fs)
+}
 
 // returns input name of question text
 func (f *QuestionField) NameValue(i int) string {

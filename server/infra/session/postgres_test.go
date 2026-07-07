@@ -1,0 +1,117 @@
+package session_test
+
+import (
+	"database/sql"
+	"testing"
+
+	"github.com/bloomberg/go-testgroup"
+
+	appsession "github.com/cornbuddy/reflectiveTarget/server/app/session"
+	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/session"
+)
+
+const (
+	schema = "public"
+	table  = "sessions"
+)
+
+type PostgresStoreTest struct {
+	db    *sql.DB
+	store *session.PostgresStore
+}
+
+func (s *PostgresStoreTest) UpdateCreatesRecords(t *testgroup.T) {
+	const username, userID = "username", 69
+	id := appsession.MakeID()
+	data := appsession.Data{UserID: userID, Username: username}
+	t.Require.NoError(s.store.Update(ctx, id, data))
+
+	var gotID appsession.SessionID
+	var gotUserID valueobjects.ID
+	var gotUsername string
+	q := `SELECT id, user_id, username FROM sessions WHERE id = $1`
+	err := s.db.QueryRowContext(ctx, q, id).Scan(&gotID, &gotUserID, &gotUsername)
+	t.Require.NoError(err)
+	t.Equal(id, gotID)
+	t.Equal(userID, gotUserID)
+	t.Equal(username, gotUsername)
+}
+
+func (s *PostgresStoreTest) TableHasProperColumns(t *testgroup.T) {
+	type testCase struct {
+		column   string
+		dataType string
+		nullable string
+		defaults *string
+	}
+
+	const no, yes = "NO", "YES"
+	testCases := []testCase{{
+		"id",
+		"uuid",
+		no,
+		nil,
+	}, {
+		"session_data",
+		"jsonb",
+		no,
+		new("'{}'::jsonb"),
+	}, {
+		"user_id",
+		"integer",
+		yes,
+		nil,
+	}, {
+		"username",
+		"character varying",
+		yes,
+		nil,
+	}}
+
+	const query = `
+	SELECT data_type, is_nullable, column_default
+	FROM information_schema.columns
+	WHERE table_schema = $1 AND table_name = $2 AND column_name = $3`
+	for _, tc := range testCases {
+		t.Run(tc.column, func(t *testgroup.T) {
+			t.Parallel()
+
+			var dataType string
+			var nullable string
+			var defaults *string
+			err := db.QueryRowContext(ctx, query, schema, table, tc.column).
+				Scan(&dataType, &nullable, &defaults)
+			t.Require.NoError(err)
+			t.Equal(tc.dataType, dataType)
+			t.Equal(tc.nullable, nullable)
+			t.Equal(tc.defaults, defaults)
+		})
+	}
+}
+
+func (s *PostgresStoreTest) CreatesSessionTable(t *testgroup.T) {
+	var exists bool
+	query := `
+	SELECT EXISTS (
+		SELECT FROM pg_tables
+		WHERE schemaname = $1 AND tablename = $2
+	)`
+	err := db.QueryRowContext(ctx, query, schema, table).Scan(&exists)
+	t.Require.NoError(err)
+	t.True(exists)
+}
+
+func (s *PostgresStoreTest) PreGroup(t *testgroup.T) {
+	store, err := session.NewPostgresStore(ctx, db)
+	t.Require.NoError(err)
+
+	s.db = db
+	s.store = store
+}
+
+func TestNewPostgresStore(t *testing.T) {
+	t.Parallel()
+
+	testgroup.RunInParallel(t, new(PostgresStoreTest))
+}

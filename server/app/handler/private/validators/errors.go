@@ -8,18 +8,24 @@ import (
 
 var ErrEmpty = errors.New("field cannot be empty")
 
-var ErrUserAlreadyExists = errors.New("user already exists")
-var ErrUserDoesNotExists = errors.New("user does not exist")
-
-var ErrWrongPassword = errors.New("wrong password")
-var ErrPasswordsShouldMatch = errors.New("passwords should match")
-var ErrPasswordDoesntContainSpecialChars = fmt.Errorf(
-	"password should contain at least one special character: %s",
-	runesToString(SpecialChars),
+var (
+	ErrUserAlreadyExists = errors.New("user already exists")
+	ErrUserDoesNotExists = errors.New("user does not exist")
 )
+
+var (
+	ErrWrongPassword                     = errors.New("wrong password")
+	ErrPasswordsShouldMatch              = errors.New("passwords should match")
+	ErrPasswordDoesntContainSpecialChars = fmt.Errorf(
+		"password should contain at least one special character: %s",
+		runesToString(SpecialChars),
+	)
+)
+
 var ErrPasswordDoesntContainDigits = errors.New(
 	"password should contain at least one digit",
 )
+
 var ErrPasswordTooShort = fmt.Errorf(
 	"password should be at least %d characters long", MinPasswordLength,
 )
@@ -27,14 +33,18 @@ var ErrPasswordTooShort = fmt.Errorf(
 var ErrTargetAlreadyExists = errors.New(
 	"target with the given name already exists",
 )
+
 var ErrTooLongTargetName = fmt.Errorf(
 	"target name should be less than %d characters long", MaxTargetNameLen,
 )
 
-var ErrRepeatedQuestion = errors.New("question already exists in the target")
-var ErrTooLongQuestion = fmt.Errorf(
-	"question should be less than %d characters long", MaxQuestionLen,
+var (
+	ErrRepeatedQuestion = errors.New("question already exists in the target")
+	ErrTooLongQuestion  = fmt.Errorf(
+		"question should be less than %d characters long", MaxQuestionLen,
+	)
 )
+
 var ErrExcessiveQuestion = fmt.Errorf(
 	"target should have no more than %d questions", MaxNumOfQuestions,
 )

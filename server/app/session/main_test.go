@@ -1,4 +1,4 @@
-package utils_test
+package session_test
 
 import (
 	"context"
@@ -18,14 +18,14 @@ var (
 )
 
 func TestMain(m *testing.M) {
-	cleanup, cache, err := utils.SetupCache(ctx)
+	cleanupRedis, redis, err := utils.SetupCache(ctx)
 	if err != nil {
-		log.Fatalf("failed to setup cache: %v", err)
+		log.Fatalf("failed to setup db: %v", err)
 	}
 
-	store = session.RedisStore{Cache: cache}
+	store = session.RedisStore{Cache: redis}
 
-	code, err := utils.RunAndCleanup(ctx, m, cleanup)
+	code, err := utils.RunAndCleanup(ctx, m, cleanupRedis)
 	if err != nil {
 		log.Fatalf("failed to cleanup: %v", err)
 	}

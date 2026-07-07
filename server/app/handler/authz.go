@@ -9,7 +9,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/validators"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
@@ -17,7 +17,7 @@ import (
 
 type authzHandler struct {
 	userDao         daos.UserDao
-	sessionStore    daos.SessionStore
+	sessionStore    session.Store
 	signupValidator validators.SignupFormValidator
 	loginValidator  validators.LoginFormValidator
 }
@@ -25,7 +25,7 @@ type authzHandler struct {
 func (h authzHandler) getLogout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := log.Logger(ctx)
-	data := sessiondata.SessionData{}
+	data := session.Data{}
 	if _, err := utils.SaveSession(ctx, h.sessionStore, data, w); err != nil {
 		log.Error("failed to save session")
 		utils.HttpError(w, http.StatusInternalServerError)
@@ -65,10 +65,9 @@ func (h authzHandler) postLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log = log.With(zap.String("username", user.Username))
-	data := sessiondata.SessionData{
-		IsAuthenticated: true,
-		UserID:          user.ID,
-		Username:        user.Username,
+	data := session.Data{
+		UserID:   user.ID,
+		Username: user.Username,
 	}
 	if _, err := utils.SaveSession(ctx, h.sessionStore, data, w); err != nil {
 		log.Error("failed to register session", zap.Error(err))
@@ -122,10 +121,9 @@ func (h authzHandler) postSignup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := sessiondata.SessionData{
-		IsAuthenticated: true,
-		UserID:          user.ID,
-		Username:        user.Username,
+	data := session.Data{
+		UserID:   user.ID,
+		Username: user.Username,
 	}
 	store := h.sessionStore
 	if _, err := utils.SaveSession(ctx, store, data, w); err != nil {

@@ -6,9 +6,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 )
 
-var (
-	HtmxRequestKey = http.CanonicalHeaderKey("HX-Request")
-)
+var HtmxRequestKey = http.CanonicalHeaderKey("HX-Request")
 
 // distinguish is it htmx request, and if it is, passes htmx specific headers to
 // the response. othervise, performs standard http redirect. see

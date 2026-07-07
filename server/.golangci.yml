@@ -1,10 +1,21 @@
 ---
 version: "2"
+
+formatters:
+  enable:
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/cornbuddy/reflectiveTarget/server
+
 linters:
   settings:
     errcheck:
       exclude-functions:
-        # this method never returns error, see source code
+        # this method never returns error, see the source code
         - (*database/sql.Rows).Close
     gocognit:
       min-complexity: 20

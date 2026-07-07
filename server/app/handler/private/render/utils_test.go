@@ -9,13 +9,13 @@ import (
 	"testing"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 type (
@@ -49,15 +49,10 @@ var (
 		utils.AssertNotContainsTokens,
 	}}
 	anonCtx = context.TODO()
-	userCtx = context.WithValue(
-		context.TODO(),
-		sessiondata.SessionDataCtx,
-		&sessiondata.SessionData{
-			IsAuthenticated: true,
-			UserID:          12,
-			Username:        "kek",
-		},
-	)
+	userCtx = session.Context(context.TODO(), &session.Data{
+		UserID:   12,
+		Username: "kek",
+	})
 )
 
 func (tcs *fieldErrorsTestCases) assert(t *testing.T, body io.Reader) {

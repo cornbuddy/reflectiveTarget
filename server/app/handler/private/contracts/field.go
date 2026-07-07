@@ -27,32 +27,18 @@ func (errs Errors) Error() string {
 }
 
 func (fs Fields) String() string {
-	var res strings.Builder
-	for i, f := range fs {
-		fmt.Fprintf(&res, "%s", f.String())
-		if i < len(fs)-1 {
-			fmt.Fprintf(&res, ", ")
-		}
-	}
-
-	return fmt.Sprintf("[%s]", res.String())
+	return toString(fs)
 }
 
 func (fs Fields) AreValid() bool {
-	if len(fs) == 0 {
-		return true
-	}
-
-	return all(fs, func(f Field) bool {
-		return f.IsValid()
-	})
+	return fieldsAreValid(fs)
 }
 
 func (fs Fields) AreInvalid() bool {
-	return !fs.AreValid()
+	return !fieldsAreValid(fs)
 }
 
-func (f *Field) String() string {
+func (f Field) String() string {
 	var errs strings.Builder
 	for i, err := range f.Errors {
 		fmt.Fprintf(&errs, "'%s'", err.Error())
@@ -71,20 +57,10 @@ func (f *Field) AddError(err error) {
 	f.Errors = append(f.Errors, err)
 }
 
-func (f *Field) IsValid() bool {
+func (f Field) IsValid() bool {
 	return len(f.Errors) == 0
 }
 
-func (f *Field) IsInvalid() bool {
+func (f Field) IsInvalid() bool {
 	return !f.IsValid()
-}
-
-func all[T any](ts []T, pred func(T) bool) bool {
-	for _, t := range ts {
-		if !pred(t) {
-			return false
-		}
-	}
-
-	return true
 }

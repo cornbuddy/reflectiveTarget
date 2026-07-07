@@ -131,7 +131,7 @@ func TestInitShouldReturnConfigWhenEnvVarsAreSet(t *testing.T) {
 	}
 
 	db := cfg.HealthDao.DB
-	cache := cfg.HealthDao.Cache
+	cache := cfg.Cache
 
 	t.Cleanup(func() {
 		assert.NoError(t, db.Close())

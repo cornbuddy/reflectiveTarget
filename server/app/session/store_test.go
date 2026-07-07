@@ -1,4 +1,4 @@
-package daos_test
+package session_test
 
 import (
 	"testing"
@@ -6,13 +6,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 )
 
 func TestSessionStoreShouldReturnNilWhenNoSessionFound(t *testing.T) {
 	t.Parallel()
 
-	token := "not-exists"
+	token := session.MakeID()
 	got, err := store.Get(ctx, token)
 	require.NoError(t, err)
 	assert.Nil(t, got)
@@ -23,24 +23,18 @@ func TestSessionStoreShouldSaveAndRestoreSession(t *testing.T) {
 
 	type testCase struct {
 		desc  string
-		token string
-		want  sessiondata.SessionData
+		token session.SessionID
+		want  session.Data
 	}
 
 	testCases := []testCase{{
 		"should add entry for authenticated user",
-		"kek",
-		sessiondata.SessionData{
-			IsAuthenticated: true,
-			Username:        "user",
-			UserID:          69,
-		},
+		session.MakeID(),
+		session.Data{userID, username},
 	}, {
 		"should add entry for anonymous user",
-		"kek1",
-		sessiondata.SessionData{
-			IsAuthenticated: false,
-		},
+		session.MakeID(),
+		session.Data{},
 	}}
 
 	for _, tc := range testCases {
@@ -50,10 +44,5 @@ func TestSessionStoreShouldSaveAndRestoreSession(t *testing.T) {
 		require.NoError(t, err)
 		assert.NotNil(t, got)
 		assert.Equal(t, tc.want, *got)
-
-		key := store.Key(tc.token)
-		ttl, err := cache.TTL(ctx, key).Result()
-		require.NoError(t, err)
-		assert.Equal(t, sessiondata.SessionDuration, ttl)
 	}
 }

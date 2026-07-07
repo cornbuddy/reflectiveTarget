@@ -2,6 +2,8 @@ import logging
 
 from playwright.sync_api import Page, Locator
 
+from constants import DEBUG
+
 
 class Locators:
     """contains key locators of the application"""
@@ -73,7 +75,7 @@ class _Model:
     def __init__(self, page: Page):
         self._page = page
         self._log = logging.getLogger(type(self).__name__)
-        self.log.setLevel(logging.DEBUG)
+        self.log.setLevel(logging.DEBUG if DEBUG else logging.INFO)
 
     @property
     def log(self) -> logging.Logger:
@@ -104,7 +106,7 @@ class Layout(_Model):
         sidebar_hidden = self.sidebar.is_hidden()
         self.log.info("sidebar hidden: %s", sidebar_hidden)
         if sidebar_hidden:
-            self.log.info("togging sidebar")
+            self.log.debug("togging sidebar")
             self.sidebar_toggler.click()
 
 

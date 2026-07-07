@@ -10,12 +10,12 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 )
 
 const hxTarget = "main"
 
-func layout(data sessiondata.SessionData, component templ.Component) templ.Component {
+func layout(data session.Data, component templ.Component) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -114,7 +114,7 @@ func errors(errs contracts.Errors) templ.Component {
 	})
 }
 
-func navigation(data sessiondata.SessionData) templ.Component {
+func navigation(data session.Data) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -139,7 +139,7 @@ func navigation(data sessiondata.SessionData) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if data.IsAuthenticated {
+		if data.IsAuthenticated() {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<a href=\"/targets\">Targets</a> <a href=\"/logout\">Logout</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

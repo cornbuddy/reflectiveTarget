@@ -54,7 +54,8 @@ func TestShotsValidator(t *testing.T) {
 			Errors: []error{
 				validators.ErrShotBadCoordinate,
 				validators.ErrShotBadCoordinate,
-			}},
+			},
+		},
 	}, {
 		"should not be valid if x > 100 and y < 0",
 		contracts.ShotsRequest{
@@ -64,7 +65,8 @@ func TestShotsValidator(t *testing.T) {
 			Errors: []error{
 				validators.ErrShotBadCoordinate,
 				validators.ErrShotBadCoordinate,
-			}},
+			},
+		},
 	}, {
 		"should not be valid if x < 0 and y > 100",
 		contracts.ShotsRequest{
@@ -74,7 +76,8 @@ func TestShotsValidator(t *testing.T) {
 			Errors: []error{
 				validators.ErrShotBadCoordinate,
 				validators.ErrShotBadCoordinate,
-			}},
+			},
+		},
 	}}
 
 	v := validators.ShotsRequestValidator{}

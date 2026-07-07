@@ -11,7 +11,7 @@ import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/render"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
@@ -53,7 +53,7 @@ func (h targetsHandler) putExisting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session := sessiondata.Read(ctx)
+	session := session.Read(ctx)
 	id := valueobjects.ID(targetID)
 	log = log.With(zap.Stringer("form", form))
 	log.Debug("form parsed, going to build target")
@@ -123,7 +123,7 @@ func (h targetsHandler) getExisting(w http.ResponseWriter, r *http.Request) {
 func (h targetsHandler) list(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := log.Logger(ctx)
-	session := sessiondata.Read(ctx)
+	session := session.Read(ctx)
 	targets, err := h.repo.ListTargetsOfUser(ctx, session.UserID)
 	if err != nil {
 		log.Error("failed to fetch targets", zap.Error(err))
@@ -150,7 +150,7 @@ func (h targetsHandler) postNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session := sessiondata.Read(ctx)
+	session := session.Read(ctx)
 	log.Debug("form parsed, going to create form DTO", zap.Any("form", r.Form))
 	form, err := contracts.NewTargetForm(r.Form)
 	if err != nil {

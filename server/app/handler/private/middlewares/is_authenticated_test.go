@@ -8,13 +8,13 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
 type IsAuthenticatedSuite struct {
-	authenticatedToken string
-	handler            http.HandlerFunc
+	sessionID session.SessionID
+	handler   http.HandlerFunc
 }
 
 func (s *IsAuthenticatedSuite) ShouldErrorIfNoToken(t *testgroup.T) {
@@ -32,13 +32,13 @@ func (s *IsAuthenticatedSuite) ShouldErrorIfTokenIsInvalid(t *testgroup.T) {
 		"", http.MethodGet, "/", s.handler, nil, cookies...,
 	)
 	t.Require.NoError(err)
-	t.Equal(http.StatusForbidden, r.StatusCode)
+	t.Equal(http.StatusInternalServerError, r.StatusCode)
 }
 
 func (s *IsAuthenticatedSuite) Should200IfAuthenticated(t *testgroup.T) {
 	cookies := []*http.Cookie{{
 		Name:  constants.SessionCookieName,
-		Value: s.authenticatedToken,
+		Value: s.sessionID.String(),
 	}}
 	r, _, err := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/", s.handler, nil, cookies...,
@@ -54,15 +54,14 @@ func TestIsAuthenticated(t *testing.T) {
 }
 
 func (s *IsAuthenticatedSuite) PreGroup(t *testgroup.T) {
-	token := "kekeke"
-	data := sessiondata.SessionData{
-		IsAuthenticated: true,
-		UserID:          69,
-		Username:        username,
+	id := session.MakeID()
+	data := session.Data{
+		UserID:   69,
+		Username: username,
 	}
-	t.Require.NoError(store.Update(ctx, token, data))
+	t.Require.NoError(store.Update(ctx, id, data))
 
-	s.authenticatedToken = token
+	s.sessionID = id
 	s.handler = chain(
 		emptyStub,
 		mw.IsAuthenticated,

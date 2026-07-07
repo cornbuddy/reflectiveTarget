@@ -21,11 +21,9 @@ func (r *RenderSignupTest) RendersValidationErrors(t *testgroup.T) {
 		"section#username ul.errors",
 		errs,
 	}, {
-
 		"section#password ul.errors",
 		errs,
 	}, {
-
 		"section#confirmation ul.errors",
 		errs,
 	}}

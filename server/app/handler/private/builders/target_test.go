@@ -36,10 +36,10 @@ func TestTargetBuilder(t *testing.T) {
 		"returns target if form is valid",
 		contracts.TargetForm{
 			Name: contracts.Field{Value: name},
-			Questions: contracts.Fields{{
-				Value: q1,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{Value: q1},
 			}, {
-				Value: q2,
+				Field: contracts.Field{Value: q2},
 			}},
 		},
 		0,
@@ -54,10 +54,10 @@ func TestTargetBuilder(t *testing.T) {
 		},
 		contracts.TargetForm{
 			Name: contracts.Field{Value: name},
-			Questions: contracts.Fields{{
-				Value: q1,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{Value: q1},
 			}, {
-				Value: q2,
+				Field: contracts.Field{Value: q2},
 			}},
 		},
 	}, {
@@ -69,30 +69,34 @@ func TestTargetBuilder(t *testing.T) {
 			Name: contracts.Field{
 				Errors: contracts.Errors{validators.ErrEmpty},
 			},
-			Questions: contracts.Fields{contracts.Field{
-				Errors: contracts.Errors{validators.ErrEmpty},
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					Errors: contracts.Errors{validators.ErrEmpty},
+				},
 			}},
 		},
 	}, {
 		"returns nil if questions are wrong",
 		contracts.TargetForm{
 			Name: contracts.Field{Value: name},
-			Questions: contracts.Fields{{
-				Value: q1,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{Value: q1},
 			}, {
-				Value: q1,
+				Field: contracts.Field{Value: q1},
 			}},
 		},
 		0,
 		nil,
 		contracts.TargetForm{
 			Name: contracts.Field{Value: name},
-			Questions: contracts.Fields{{
-				Value: q1,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{Value: q1},
 			}, {
-				Value: q1,
-				Errors: contracts.Errors{
-					validators.ErrRepeatedQuestion,
+				Field: contracts.Field{
+					Value: q1,
+					Errors: contracts.Errors{
+						validators.ErrRepeatedQuestion,
+					},
 				},
 			}},
 		},
@@ -100,12 +104,16 @@ func TestTargetBuilder(t *testing.T) {
 		"sets proper ids to entities",
 		contracts.TargetForm{
 			Name: contracts.Field{Value: name},
-			Questions: contracts.Fields{{
-				ID:    101,
-				Value: q1,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					ID:    101,
+					Value: q1,
+				},
 			}, {
-				ID:    102,
-				Value: q2,
+				Field: contracts.Field{
+					ID:    102,
+					Value: q2,
+				},
 			}},
 		},
 		69,
@@ -123,12 +131,16 @@ func TestTargetBuilder(t *testing.T) {
 		},
 		contracts.TargetForm{
 			Name: contracts.Field{Value: name},
-			Questions: contracts.Fields{{
-				ID:    101,
-				Value: q1,
+			Questions: contracts.QuestionFields{{
+				Field: contracts.Field{
+					ID:    101,
+					Value: q1,
+				},
 			}, {
-				ID:    102,
-				Value: q2,
+				Field: contracts.Field{
+					ID:    102,
+					Value: q2,
+				},
 			}},
 		},
 	}}

@@ -4,10 +4,11 @@ import (
 	"context"
 	"database/sql"
 
+	_ "github.com/jackc/pgx/v5/stdlib"
+
 	"github.com/cornbuddy/reflectiveTarget/server/domain/aggregations"
 	"github.com/cornbuddy/reflectiveTarget/server/domain/entities"
 	vo "github.com/cornbuddy/reflectiveTarget/server/domain/valueobjects"
-	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func InsertShots(

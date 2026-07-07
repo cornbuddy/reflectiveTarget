@@ -1,14 +1,13 @@
 package middlewares
 
 import (
-	"context"
 	"net/http"
 
 	"go.uber.org/zap"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 )
 
@@ -22,13 +21,13 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 
 		// not empty error means cookie doesn't exist, hence should be
 		// set
-		emptySession := sessiondata.SessionData{}
+		emptySession := session.Data{}
 		if err != nil {
 			log.Info("registering new session...")
 			_, err := utils.SaveSession(ctx, store, emptySession, w)
 			if err != nil {
 				log.Error("failed to save session", zap.Error(err))
-				http.Error(w, "internal server error", http.StatusInternalServerError)
+				utils.HttpError(w, http.StatusInternalServerError)
 
 				return
 			}
@@ -38,15 +37,24 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 			return
 		}
 
-		// empty error means cookie exists, hence session sessionId
+		// empty error means cookie exists, hence session cookieValue
 		// should be validated
-		sessionId := cookie.Value
-		log = log.With(zap.String("token", sessionId))
+		cookieValue := cookie.Value
+		log = log.With(zap.String("token", cookieValue))
+		log.Debug("parsing token...")
+		id, err := session.IDFromString(cookieValue)
+		if err != nil {
+			log.Error("failed to parse session token from cookie", zap.Error(err))
+			utils.HttpError(w, http.StatusInternalServerError)
+
+			return
+		}
+
 		log.Debug("validating session...")
-		session, err := store.Get(ctx, sessionId)
+		data, err := store.Get(ctx, *id)
 		if err != nil {
 			log.Error("failed to fetch session", zap.Error(err))
-			http.Error(w, "internal server error", http.StatusInternalServerError)
+			utils.HttpError(w, http.StatusInternalServerError)
 
 			return
 		}
@@ -54,13 +62,13 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 		// cookie is present, but not found in the session store.
 		// seems like cache key expired earlier than cookie. kinda
 		// suspicious, let's reset the session
-		if session == nil {
+		if data == nil {
 			log.Warn("session is not registered")
-			session = &emptySession
-			_, err := utils.SaveSession(ctx, store, *session, w)
+			data = &emptySession
+			_, err := utils.SaveSession(ctx, store, *data, w)
 			if err != nil {
 				log.Error("failed to save session", zap.Error(err))
-				http.Error(w, "internal server error", http.StatusInternalServerError)
+				utils.HttpError(w, http.StatusInternalServerError)
 
 				return
 			}
@@ -68,8 +76,8 @@ func (mw Middleware) SaveSession(next http.Handler) http.Handler {
 
 		// session token was either found in the session store, or was
 		// set earlier, so let's process the request
-		log.Debug("session is validated", zap.Any("session", *session))
-		newCtx := context.WithValue(ctx, sessiondata.SessionDataCtx, session)
+		log.Debug("session is validated", zap.Any("session", *data))
+		newCtx := session.Context(ctx, data)
 		next.ServeHTTP(w, r.WithContext(newCtx))
 	})
 }

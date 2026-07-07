@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cornbuddy/reflectiveTarget/server/app/constants"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/test/utils"
 )
 
@@ -18,38 +18,37 @@ func TestSaveSessionShouldPutSessionDataToCtx(t *testing.T) {
 
 	type testCase struct {
 		desc      string
-		sessionId string
-		want      sessiondata.SessionData
+		sessionId session.SessionID
+		want      session.Data
 	}
 
-	sessionId := "kekeke"
-	want := sessiondata.SessionData{
-		IsAuthenticated: true,
-		UserID:          69,
-		Username:        username,
+	authorizedID := session.MakeID()
+	want := session.Data{
+		UserID:   69,
+		Username: username,
 	}
-	require.NoError(t, store.Update(ctx, sessionId, want))
+	require.NoError(t, store.Update(ctx, authorizedID, want))
 
 	testCases := []testCase{{
 		"should put cached data to context if any",
-		sessionId,
+		authorizedID,
 		want,
 	}, {
 		"should put zero object on cache miss",
-		"not found",
-		sessiondata.SessionData{},
+		session.MakeID(),
+		session.Data{},
 	}}
 
 	for _, tc := range testCases {
 		cookies := []*http.Cookie{{
 			Name:  constants.SessionCookieName,
-			Value: tc.sessionId,
+			Value: tc.sessionId.String(),
 		}}
 		stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			require.NotNil(t, w)
 			require.NotNil(t, r)
 
-			got := sessiondata.Read(r.Context())
+			got := session.Read(r.Context())
 			assert.EqualExportedValues(t, tc.want, got, tc.desc)
 		})
 		handler := mw.SaveSession(stub).ServeHTTP
@@ -103,8 +102,8 @@ func TestSaveSessionShouldAddSessionCookieIfNotPresent(t *testing.T) {
 func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
 	t.Parallel()
 
-	token := uuid.NewString()
-	require.NoError(t, store.Update(ctx, token, sessiondata.SessionData{}))
+	id := session.MakeID()
+	require.NoError(t, store.Update(ctx, id, session.Data{}))
 
 	stub := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := w.Header().Get("Set-Cookie")
@@ -114,7 +113,7 @@ func TestSaveSessionShouldRespectExistingSessionToken(t *testing.T) {
 	handler := mw.SaveSession(stub).ServeHTTP
 	cookies := []*http.Cookie{{
 		Name:  constants.SessionCookieName,
-		Value: token,
+		Value: id.String(),
 	}}
 	_, _, err := utils.MakeRequestWithCookies(
 		"", http.MethodGet, "/", handler, nil, cookies...,

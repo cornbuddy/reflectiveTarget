@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"go.uber.org/zap"
+
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/utils"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
-	"go.uber.org/zap"
 )
 
 type HealthResponse struct {

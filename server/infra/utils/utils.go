@@ -8,7 +8,7 @@ import (
 )
 
 func InitDatabase(ctx context.Context, db *sql.DB) error {
-	if _, err := db.ExecContext(ctx, migrations.InitQuery); err != nil {
+	if _, err := db.ExecContext(ctx, migrations.InitDBQuery); err != nil {
 		return err
 	}
 

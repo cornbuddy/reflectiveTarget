@@ -12,9 +12,11 @@ import (
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 
+	appsession "github.com/cornbuddy/reflectiveTarget/server/app/session"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/daos"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/log"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/repositories"
+	"github.com/cornbuddy/reflectiveTarget/server/infra/session"
 	"github.com/cornbuddy/reflectiveTarget/server/infra/utils"
 )
 
@@ -31,13 +33,13 @@ const (
 
 type Config struct {
 	daos.HealthDao
-	daos.SessionStore
 	daos.ShotsDao
 	daos.UserDao
 	repositories.TargetRepo
 
-	Timeout time.Duration
-	Port    int
+	SessionStore appsession.Store
+	Timeout      time.Duration
+	Port         int
 }
 
 func MakeConfig(ctx context.Context) (*Config, error) {
@@ -128,7 +130,7 @@ func MakeConfig(ctx context.Context) (*Config, error) {
 		Timeout:      timeout,
 		Port:         port,
 		HealthDao:    daos.HealthDao{DB: db, Cache: cache},
-		SessionStore: daos.SessionStore{Cache: cache},
+		SessionStore: session.RedisStore{Cache: cache},
 		ShotsDao:     daos.ShotsDao{DB: db},
 		UserDao:      daos.UserDao{DB: db},
 		TargetRepo:   repositories.TargetRepo{DB: db},

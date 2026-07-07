@@ -23,7 +23,7 @@ func SetupDB(ctx context.Context) (Cleanup, *sql.DB, error) {
 		return cleanup, nil, err
 	}
 
-	if _, err := db.ExecContext(ctx, migrations.InitQuery); err != nil {
+	if _, err := db.ExecContext(ctx, migrations.InitDBQuery); err != nil {
 		return cleanup, nil, err
 	}
 

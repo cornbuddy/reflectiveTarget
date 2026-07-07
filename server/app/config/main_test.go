@@ -42,7 +42,7 @@ func TestMain(m *testing.M) {
 
 	dbCont, err := postgres.Run(ctx, utils.DbImage, opts...)
 	if err != nil {
-		log.Panicf("failed to run db: %v", err)
+		log.Fatalf("failed to run db: %v", err)
 	}
 
 	dbCleanup := func() error {
@@ -51,12 +51,12 @@ func TestMain(m *testing.M) {
 
 	dbIP, err := dbCont.ContainerIP(ctx)
 	if err != nil {
-		log.Panicf("failed to fetch db ip: %v", err)
+		log.Fatalf("failed to fetch db ip: %v", err)
 	}
 
 	cacheCont, err := tcredis.Run(ctx, utils.CacheImage)
 	if err != nil {
-		log.Panicf("failed to run cache: %v", err)
+		log.Fatalf("failed to run cache: %v", err)
 	}
 
 	cacheCleanup := func() error {
@@ -65,12 +65,12 @@ func TestMain(m *testing.M) {
 
 	uri, err := cacheCont.ConnectionString(ctx)
 	if err != nil {
-		log.Panicf("failed to fetch uri for cache: %v", err)
+		log.Fatalf("failed to fetch uri for cache: %v", err)
 	}
 
 	cacheOpts, err := redis.ParseURL(uri)
 	if err != nil {
-		log.Panicf("failed to parse cache uri: %v", err)
+		log.Fatalf("failed to parse cache uri: %v", err)
 	}
 
 	cacheAddr = cacheOpts.Addr
@@ -78,7 +78,7 @@ func TestMain(m *testing.M) {
 
 	code, err := utils.RunAndCleanup(ctx, m, dbCleanup, cacheCleanup)
 	if err != nil {
-		log.Panicf("failed to cleanup: %v", err)
+		log.Fatalf("failed to cleanup: %v", err)
 	}
 
 	os.Exit(code)

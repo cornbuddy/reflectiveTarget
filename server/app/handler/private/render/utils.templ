@@ -2,12 +2,12 @@ package render
 
 import (
 	"github.com/cornbuddy/reflectiveTarget/server/app/handler/private/contracts"
-	"github.com/cornbuddy/reflectiveTarget/server/app/sessiondata"
+	"github.com/cornbuddy/reflectiveTarget/server/app/session"
 )
 
 const hxTarget = "main"
 
-templ layout(data sessiondata.SessionData, component templ.Component) {
+templ layout(data session.Data, component templ.Component) {
 	<!DOCTYPE html>
 	<html>
 		<head>
@@ -35,7 +35,7 @@ templ errors(errs contracts.Errors) {
 	}
 }
 
-templ navigation(data sessiondata.SessionData) {
+templ navigation(data session.Data) {
 	<button
 		id="sidebar-toggler"
 		hx-on:click="toggleNavigation()"
@@ -43,7 +43,7 @@ templ navigation(data sessiondata.SessionData) {
 		kek
 	</button>
 	<nav>
-		if data.IsAuthenticated {
+		if data.IsAuthenticated() {
 			<a href="/targets">Targets</a>
 			<a href="/logout">Logout</a>
 		} else {

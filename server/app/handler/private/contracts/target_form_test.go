@@ -66,12 +66,16 @@ func TestNewTargetFormFromTarget(t *testing.T) {
 		},
 		contracts.TargetForm{
 			Name: contracts.Field{Value: kek},
-			Questions: contracts.Fields{{
-				ID:    1,
-				Value: kek1,
+			Questions: contracts.QuestionFields{{
+				contracts.Field{
+					ID:    1,
+					Value: kek1,
+				},
 			}, {
-				ID:    2,
-				Value: kek2,
+				contracts.Field{
+					ID:    2,
+					Value: kek2,
+				},
 			}},
 		},
 	}}
@@ -111,7 +115,9 @@ func TestNewTargetForm(t *testing.T) {
 		"should handle question value only",
 		url.Values{formQ0Val: []string{kek}},
 		&contracts.TargetForm{
-			Questions: []contracts.Field{{Value: kek}},
+			Questions: contracts.QuestionFields{{
+				contracts.Field{Value: kek},
+			}},
 		},
 		nil,
 		nil,
@@ -134,9 +140,9 @@ func TestNewTargetForm(t *testing.T) {
 		},
 		&contracts.TargetForm{
 			Name: contracts.Field{Value: qek},
-			Questions: []contracts.Field{
-				{Value: kek1},
-				{Value: kek2},
+			Questions: contracts.QuestionFields{
+				{contracts.Field{Value: kek1}},
+				{contracts.Field{Value: kek2}},
 			},
 		},
 		nil,
@@ -150,9 +156,9 @@ func TestNewTargetForm(t *testing.T) {
 		},
 		&contracts.TargetForm{
 			Name: contracts.Field{Value: qek},
-			Questions: []contracts.Field{
-				{ID: 69, Value: kek1},
-			},
+			Questions: contracts.QuestionFields{{
+				contracts.Field{ID: 69, Value: kek1},
+			}},
 		},
 		nil,
 		nil,
@@ -167,9 +173,9 @@ func TestNewTargetForm(t *testing.T) {
 		},
 		&contracts.TargetForm{
 			Name: contracts.Field{Value: qek},
-			Questions: []contracts.Field{
-				{ID: 69, Value: kek1},
-				{ID: 420, Value: kek2},
+			Questions: contracts.QuestionFields{
+				{contracts.Field{ID: 69, Value: kek1}},
+				{contracts.Field{ID: 420, Value: kek2}},
 			},
 		},
 		nil,
@@ -184,9 +190,9 @@ func TestNewTargetForm(t *testing.T) {
 		},
 		&contracts.TargetForm{
 			Name: contracts.Field{Value: qek},
-			Questions: []contracts.Field{
-				{ID: 69, Value: kek1},
-				{Value: kek2},
+			Questions: contracts.QuestionFields{
+				{contracts.Field{ID: 69, Value: kek1}},
+				{contracts.Field{Value: kek2}},
 			},
 		},
 		nil,
@@ -220,18 +226,18 @@ func TestNewTargetForm(t *testing.T) {
 		},
 		&contracts.TargetForm{
 			Name: contracts.Field{Value: qek},
-			Questions: []contracts.Field{
-				{ID: 1, Value: "1"},
-				{ID: 2, Value: "2"},
-				{ID: 3, Value: "3"},
-				{ID: 4, Value: "4"},
-				{ID: 5, Value: "5"},
-				{ID: 6, Value: "6"},
-				{ID: 7, Value: "7"},
-				{ID: 8, Value: "8"},
-				{ID: 9, Value: "9"},
-				{ID: 10, Value: "10"},
-				{ID: 11, Value: "11"},
+			Questions: contracts.QuestionFields{
+				{contracts.Field{ID: 1, Value: "1"}},
+				{contracts.Field{ID: 2, Value: "2"}},
+				{contracts.Field{ID: 3, Value: "3"}},
+				{contracts.Field{ID: 4, Value: "4"}},
+				{contracts.Field{ID: 5, Value: "5"}},
+				{contracts.Field{ID: 6, Value: "6"}},
+				{contracts.Field{ID: 7, Value: "7"}},
+				{contracts.Field{ID: 8, Value: "8"}},
+				{contracts.Field{ID: 9, Value: "9"}},
+				{contracts.Field{ID: 10, Value: "10"}},
+				{contracts.Field{ID: 11, Value: "11"}},
 			},
 		},
 		nil,
